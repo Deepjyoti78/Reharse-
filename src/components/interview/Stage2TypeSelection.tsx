@@ -38,7 +38,7 @@ const INTERVIEW_TYPES: TypeCardOption[] = [
     ],
     icon: Code2,
     accentColor: '#b4532a', // Rust
-    accentBg: 'rgba(180, 83, 42, 0.08)'
+    accentBg: 'rgba(180, 83, 42, 0.1)'
   },
   {
     type: 'behavioral',
@@ -53,7 +53,7 @@ const INTERVIEW_TYPES: TypeCardOption[] = [
     ],
     icon: Users2,
     accentColor: '#5b8076', // Sage
-    accentBg: 'rgba(91, 128, 118, 0.08)'
+    accentBg: 'rgba(91, 128, 118, 0.1)'
   },
   {
     type: 'hr',
@@ -68,7 +68,7 @@ const INTERVIEW_TYPES: TypeCardOption[] = [
     ],
     icon: Briefcase,
     accentColor: '#dfa84c', // Gold
-    accentBg: 'rgba(223, 168, 76, 0.1)'
+    accentBg: 'rgba(223, 168, 76, 0.12)'
   },
   {
     type: 'coding',
@@ -83,7 +83,7 @@ const INTERVIEW_TYPES: TypeCardOption[] = [
     ],
     icon: Binary,
     accentColor: '#3a2318', // Choc
-    accentBg: 'rgba(58, 35, 24, 0.08)'
+    accentBg: 'rgba(58, 35, 24, 0.1)'
   },
   {
     type: 'mixed',
@@ -98,7 +98,7 @@ const INTERVIEW_TYPES: TypeCardOption[] = [
     ],
     icon: Layers,
     accentColor: '#b4532a',
-    accentBg: 'rgba(180, 83, 42, 0.08)'
+    accentBg: 'rgba(180, 83, 42, 0.1)'
   },
   {
     type: 'custom',
@@ -113,7 +113,7 @@ const INTERVIEW_TYPES: TypeCardOption[] = [
     ],
     icon: Sliders,
     accentColor: '#7d3418',
-    accentBg: 'rgba(125, 52, 24, 0.08)'
+    accentBg: 'rgba(125, 52, 24, 0.1)'
   }
 ];
 
@@ -134,14 +134,9 @@ export const Stage2TypeSelection: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 md:py-8">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3a2318]/10 text-[#3a2318] text-[11px] font-mono uppercase tracking-wider mb-2.5">
-          <span>Stage 02 of 06</span>
-          <span className="opacity-40">•</span>
-          <span>Interview Track</span>
-        </div>
         <h2 className="font-serif text-3xl sm:text-4xl text-[#2a170f] font-normal leading-tight">
           Choose your <em className="italic text-[#b4532a]">interview track.</em>
         </h2>
@@ -160,36 +155,36 @@ export const Stage2TypeSelection: React.FC = () => {
             <div
               key={card.type}
               onClick={() => handleSelectType(card.type)}
-              className={`relative rounded-2xl p-5 sm:p-6 transition-all duration-200 cursor-pointer flex flex-col justify-between border ${
+              className={`relative rounded-3xl p-6 transition-all duration-200 cursor-pointer flex flex-col justify-between border ${
                 isSelected
-                  ? 'bg-[#faf2de] border-[#b4532a] shadow-md ring-2 ring-[#b4532a]/30 translate-y-[-2px]'
-                  : 'bg-[#faf5e8] border-[#3a2318]/15 hover:border-[#3a2318]/40 hover:bg-[#faf3e2] hover:shadow-xs'
+                  ? 'bg-[#faf1dc] border-[#b4532a] shadow-md ring-2 ring-[#b4532a]/30 -translate-y-1'
+                  : 'bg-[#faf4e6] border-[#3a2318]/15 hover:border-[#3a2318]/35 hover:bg-[#faf1dd] hover:shadow-xs'
               }`}
             >
               <div>
                 {/* Top Row: Icon + Category + Selection badge */}
-                <div className="flex items-start justify-between gap-3 mb-3.5">
+                <div className="flex items-start justify-between gap-3 mb-4">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs"
                     style={{ backgroundColor: card.accentBg, color: card.accentColor }}
                   >
                     <Icon className="w-5 h-5" />
                   </div>
                   
                   {isSelected ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#b4532a] text-[#fbf7ee] text-[11px] font-medium font-sans">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#b4532a] text-[#fbf7ee] text-[11px] font-medium font-sans shadow-2xs">
                       <CheckCircle2 className="w-3 h-3" />
                       <span>Selected</span>
                     </span>
                   ) : (
-                    <span className="text-[10px] uppercase tracking-wider font-mono text-[#3a2318]/50">
+                    <span className="text-[10.5px] uppercase tracking-wider font-mono text-[#3a2318]/50">
                       {card.category}
                     </span>
                   )}
                 </div>
 
                 {/* Title */}
-                <h3 className="font-serif text-xl sm:text-[22px] text-[#2a170f] leading-snug font-normal mb-1.5">
+                <h3 className="font-serif text-xl sm:text-[22px] text-[#2a170f] leading-snug font-normal mb-2">
                   {card.title}
                 </h3>
 
@@ -199,8 +194,8 @@ export const Stage2TypeSelection: React.FC = () => {
                 </p>
 
                 {/* Evaluated On Section */}
-                <div className="pt-3 border-t border-[#3a2318]/10">
-                  <div className="text-[10.5px] uppercase tracking-wider font-mono text-[#3a2318]/60 mb-2">
+                <div className="pt-2">
+                  <div className="text-[10.5px] uppercase tracking-wider font-mono text-[#3a2318]/60 mb-2 font-medium">
                     Evaluated on:
                   </div>
                   <ul className="space-y-1.5">
@@ -215,11 +210,11 @@ export const Stage2TypeSelection: React.FC = () => {
               </div>
 
               {/* Bottom selection indicator */}
-              <div className="mt-5 pt-3 border-t border-[#3a2318]/10 flex items-center justify-between text-xs">
-                <span className="font-medium text-[#3a2318]/70">
-                  {isSelected ? 'Ready to configure' : 'Click to select track'}
+              <div className="mt-5 pt-3 flex items-center justify-between text-xs font-sans">
+                <span className={`font-medium ${isSelected ? 'text-[#b4532a]' : 'text-[#3a2318]/60'}`}>
+                  {isSelected ? 'Track selected' : 'Click to select track'}
                 </span>
-                <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#b4532a]' : 'bg-[#3a2318]/20'}`} />
+                <span className={`w-2.5 h-2.5 rounded-full transition-all ${isSelected ? 'bg-[#b4532a] ring-4 ring-[#b4532a]/20' : 'bg-[#3a2318]/20'}`} />
               </div>
             </div>
           );
@@ -227,18 +222,20 @@ export const Stage2TypeSelection: React.FC = () => {
       </div>
 
       {/* Navigation Controls */}
-      <div className="mt-8 pt-6 border-t border-[#3a2318]/15 flex items-center justify-between">
+      <div className="mt-8 flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-transparent hover:bg-[#eddcc0] text-[#3a2318] text-xs sm:text-sm font-medium transition-colors"
+          type="button"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Overview</span>
+          <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
+          <span>Back to overview</span>
         </button>
 
         <button
           onClick={handleContinue}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-sm group cursor-pointer"
+          type="button"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
         >
           <span>Continue to Configuration</span>
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />

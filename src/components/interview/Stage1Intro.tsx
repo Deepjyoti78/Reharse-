@@ -12,41 +12,41 @@ export const Stage1Intro: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-8">
       {/* Main Hero Card */}
-      <div className="relative rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 shadow-sm overflow-hidden p-6 sm:p-10">
+      <div className="relative rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 shadow-md overflow-hidden p-6 sm:p-10">
         
-        {/* Top Header inside Card with Back Button */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8 pb-4 border-b border-[#3a2318]/10">
+        {/* Top Header inside Card with Improved Back to Overview Button */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-7 sm:mb-9">
           <button
             onClick={exitToDashboard}
             type="button"
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#3a2318]/8 hover:bg-[#3a2318]/15 text-[#3a2318] text-xs font-medium font-sans transition-all cursor-pointer group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
           >
-            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-            <span>Back to home</span>
+            <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
+            <span>Back to overview</span>
           </button>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#b4532a]/10 border border-[#b4532a]/20 text-[#b4532a] text-[11px] font-sans font-medium tracking-wide uppercase">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#b4532a]/10 border border-[#b4532a]/20 text-[#b4532a] text-[11px] font-sans font-medium tracking-wide uppercase">
             <Sparkles className="w-3 h-3 text-[#b4532a]" />
             <span>Personalized AI Mock Interview Setup</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           
           {/* Left Text Column */}
           <div className="lg:col-span-7">
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] leading-[1.1] text-[#2a170f] font-normal mb-3">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-[44px] leading-[1.08] text-[#2a170f] font-normal mb-3.5">
               Let’s prepare for your <br />
               <em className="italic text-[#b4532a]">next interview.</em>
             </h1>
 
-            <p className="text-sm sm:text-[15px] text-[#3a2318]/80 leading-relaxed font-sans mb-6">
+            <p className="text-sm sm:text-[15px] text-[#3a2318]/85 leading-relaxed font-sans mb-7">
               You are about to configure a custom simulated interview. In the next few steps, you’ll pick your interview track, adjust the difficulty and tone, optionally upload your resume for tailored questions, test your microphone, and step into an authentic live session.
             </p>
 
             {/* Quick Role Pickers */}
             <div className="mb-8">
-              <div className="text-[11px] uppercase tracking-wider text-[#3a2318]/60 font-mono mb-2.5">
+              <div className="text-[11px] uppercase tracking-wider text-[#3a2318]/60 font-mono mb-3">
                 Quick select target role:
               </div>
               <div className="flex flex-wrap gap-2">
@@ -56,20 +56,23 @@ export const Stage1Intro: React.FC = () => {
                   'Software Development Engineer',
                   'Data Analyst',
                   'UI/UX Designer'
-                ].map(role => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => handleSelectQuickRole(role)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                      config.jobRole === role
-                        ? 'bg-[#3a2318] text-[#f8eed8] shadow-xs'
-                        : 'bg-[#f0e3c5] text-[#3a2318] hover:bg-[#e6d6b2]'
-                    }`}
-                  >
-                    {role}
-                  </button>
-                ))}
+                ].map(role => {
+                  const isSelected = config.jobRole === role;
+                  return (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => handleSelectQuickRole(role)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer border ${
+                        isSelected
+                          ? 'bg-[#2a170f] text-[#f8eed8] border-[#2a170f] shadow-xs'
+                          : 'bg-[#f0e3c5]/80 text-[#2a170f] border-[#3a2318]/15 hover:bg-[#e6d6b2] hover:border-[#3a2318]/30'
+                      }`}
+                    >
+                      {role}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -77,7 +80,7 @@ export const Stage1Intro: React.FC = () => {
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setCurrentStage('type-selection')}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-sm font-medium transition-all shadow-md group cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
               >
                 <span>Choose Interview Type</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -85,7 +88,7 @@ export const Stage1Intro: React.FC = () => {
 
               <button
                 onClick={exitToDashboard}
-                className="px-5 py-3 rounded-full bg-transparent hover:bg-[#f0e3c5]/50 text-[#3a2318] font-sans text-sm font-medium transition-all"
+                className="px-5 py-3 rounded-full bg-transparent hover:bg-[#3a2318]/8 text-[#3a2318] font-sans text-sm font-medium transition-all cursor-pointer"
               >
                 Cancel & return
               </button>
@@ -94,13 +97,13 @@ export const Stage1Intro: React.FC = () => {
 
           {/* Right Visual Column */}
           <div className="lg:col-span-5 flex flex-col items-center">
-            <div className="relative w-full aspect-square max-w-[320px] rounded-2xl overflow-hidden border border-[#3a2318]/20 shadow-inner bg-[#eddcc0]">
+            <div className="relative w-full aspect-square max-w-[320px] rounded-2xl overflow-hidden border border-[#3a2318]/20 shadow-md bg-[#eddcc0]">
               <img
                 src="/images/rehearse/practice/candidate-preparation.webp"
                 alt="Candidate preparing for interview with notes and vintage study lamp"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#2a170f]/80 via-transparent to-transparent flex flex-col justify-end p-4 text-[#f8eed8]">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2a170f]/85 via-transparent to-transparent flex flex-col justify-end p-4 text-[#f8eed8]">
                 <div className="font-serif text-lg leading-tight">Authentic conversational depth</div>
                 <div className="text-[11px] text-[#f8eed8]/80 mt-0.5 font-sans">
                   Adaptive AI that pushes back on weak assumptions.
@@ -110,27 +113,26 @@ export const Stage1Intro: React.FC = () => {
           </div>
         </div>
 
-        {/* 4 Feature Pillars footer within card */}
-        <div className="mt-8 pt-6 border-t border-[#3a2318]/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-sans text-[#3a2318]/85">
-          <div className="flex items-center gap-2">
+        {/* 4 Feature Pillars footer without harsh dividing lines */}
+        <div className="mt-9 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-sans text-[#3a2318]/85">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
             <Target className="w-4 h-4 text-[#b4532a] shrink-0" />
-            <span>Role-tailored question banks</span>
+            <span className="font-medium text-[11.5px]">Role-tailored banks</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
             <Cpu className="w-4 h-4 text-[#5b8076] shrink-0" />
-            <span>Live voice & transcript capture</span>
+            <span className="font-medium text-[11.5px]">Live voice & transcript</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
             <ShieldCheck className="w-4 h-4 text-[#b4532a] shrink-0" />
-            <span>Private & encrypted room</span>
+            <span className="font-medium text-[11.5px]">Private & encrypted</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
             <Award className="w-4 h-4 text-[#dfa84c] shrink-0" />
-            <span>STAR rubrics & scoring debrief</span>
+            <span className="font-medium text-[11.5px]">STAR rubrics & debrief</span>
           </div>
         </div>
       </div>
     </div>
   );
 };
-

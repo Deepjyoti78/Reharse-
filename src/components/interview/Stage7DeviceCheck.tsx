@@ -164,11 +164,6 @@ export const Stage7DeviceCheck: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-8">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3a2318]/10 text-[#3a2318] text-[11px] font-mono uppercase tracking-wider mb-2.5">
-          <span>Stage 07 of 09</span>
-          <span className="opacity-40">•</span>
-          <span>Hardware Calibration</span>
-        </div>
         <h2 className="font-serif text-3xl sm:text-4xl text-[#2a170f] font-normal leading-tight">
           Microphone, camera & <em className="italic text-[#b4532a]">audio check.</em>
         </h2>
@@ -367,12 +362,13 @@ export const Stage7DeviceCheck: React.FC = () => {
       </div>
 
       {/* Navigation Controls */}
-      <div className="mt-8 pt-6 border-t border-[#3a2318]/15 flex items-center justify-between">
+      <div className="mt-8 flex items-center justify-between">
         <button
           onClick={() => setCurrentStage('preview')}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-transparent hover:bg-[#eddcc0] text-[#3a2318] text-xs sm:text-sm font-medium transition-colors"
+          type="button"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
           <span>Back to Summary</span>
         </button>
 
@@ -381,7 +377,8 @@ export const Stage7DeviceCheck: React.FC = () => {
             setCurrentStage('live-room');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-sm font-medium transition-all shadow-md group cursor-pointer"
+          type="button"
+          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
         >
           <Sparkles className="w-4 h-4 text-[#dfa84c]" />
           <span>Enter Live Interview Room</span>
