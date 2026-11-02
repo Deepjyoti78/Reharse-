@@ -651,8 +651,8 @@ export const Stage8LiveRoom: React.FC = () => {
               })}
             </div>
 
-            {/* Current Primary Question Card */}
-            <div className="mt-3 sm:mt-4 p-4 sm:p-6 rounded-2xl bg-[#f5ecda] border border-[#3a2318]/15 shadow-xs">
+            {/* Current Primary Question Card with Smooth Transition on Next Question */}
+            <div key={activeQuestion.id} className="mt-3 sm:mt-4 p-4 sm:p-6 rounded-2xl bg-[#f5ecda] border border-[#3a2318]/15 shadow-xs animate-fade-in-up">
               <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-[#b4532a] mb-2 uppercase tracking-wider font-semibold">
                 <span>Primary Question</span>
                 <span className="truncate max-w-[180px] sm:max-w-none">{activeQuestion.category}</span>
@@ -996,9 +996,9 @@ export const Stage8LiveRoom: React.FC = () => {
 
       {/* PAUSE MODAL (Mobile Responsive) */}
       {isPauseModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="rounded-3xl bg-[#faf4e6] border border-[#3a2318]/20 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f]">
-            <div className="w-12 h-12 rounded-full bg-[#dfa84c]/20 text-[#8d3e1b] flex items-center justify-center mx-auto mb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-backdrop-fade">
+          <div className="rounded-3xl bg-[#faf4e6] border border-[#3a2318]/20 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f] animate-modal-pop">
+            <div className="w-12 h-12 rounded-full bg-[#dfa84c]/20 text-[#8d3e1b] flex items-center justify-center mx-auto mb-3 animate-subtle-float">
               <Pause className="w-6 h-6" />
             </div>
             <h3 className="font-serif text-2xl text-[#2a170f] font-semibold mb-1">Interview Paused</h3>
@@ -1009,7 +1009,7 @@ export const Stage8LiveRoom: React.FC = () => {
             <div className="flex flex-col gap-2.5">
               <button
                 onClick={() => setIsPauseModalOpen(false)}
-                className="w-full py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.98]"
               >
                 <Play className="w-3.5 h-3.5" />
                 <span>Resume Interview</span>
@@ -1019,7 +1019,7 @@ export const Stage8LiveRoom: React.FC = () => {
                   setIsPauseModalOpen(false);
                   exitToDashboard();
                 }}
-                className="w-full py-2.5 rounded-full bg-transparent hover:bg-[#f0e3c5] text-[#2a170f]/80 text-xs font-medium transition-all cursor-pointer"
+                className="w-full py-2.5 rounded-full bg-transparent hover:bg-[#f0e3c5] text-[#2a170f]/80 text-xs font-medium transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.98]"
               >
                 Exit to Dashboard
               </button>
@@ -1030,9 +1030,9 @@ export const Stage8LiveRoom: React.FC = () => {
 
       {/* END ROUND CONFIRMATION MODAL (Mobile Responsive) */}
       {isEndModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="rounded-3xl bg-[#faf4e6] border border-red-200 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f]">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center mx-auto mb-3">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-backdrop-fade">
+          <div className="rounded-3xl bg-[#faf4e6] border border-red-200 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f] animate-modal-pop">
+            <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center mx-auto mb-3 animate-subtle-float">
               <StopCircle className="w-6 h-6" />
             </div>
             <h3 className="font-serif text-2xl text-[#2a170f] font-semibold mb-1">Conclude Interview Round?</h3>
@@ -1071,14 +1071,14 @@ export const Stage8LiveRoom: React.FC = () => {
                   }
                   finishInterview(finalTurns);
                 }}
-                className="w-full py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.98]"
               >
                 <span>End & Generate AI Report</span>
               </button>
 
               <button
                 onClick={() => setIsEndModalOpen(false)}
-                className="w-full py-2.5 rounded-full bg-transparent hover:bg-[#f0e3c5] text-[#2a170f]/80 text-xs font-medium transition-all cursor-pointer"
+                className="w-full py-2.5 rounded-full bg-transparent hover:bg-[#f0e3c5] text-[#2a170f]/80 text-xs font-medium transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.98]"
               >
                 Continue Practicing
               </button>

@@ -161,7 +161,7 @@ export const Stage7DeviceCheck: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-8 animate-fade-in-up">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
         <h2 className="font-serif text-3xl sm:text-4xl text-[#2a170f] font-normal leading-tight">

@@ -86,7 +86,7 @@ export const Stage9Report: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-10 font-sans print:p-0 print:max-w-none">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-10 font-sans print:p-0 print:max-w-none animate-fade-in-up">
       
       {/* Top Header & Actions Bar (Hidden during print) */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8 print:hidden">
@@ -163,16 +163,16 @@ export const Stage9Report: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           
-          {/* Left score ring / gauge */}
-          <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#f5e9d0]/70 border border-[#3a2318]/10 text-center">
+          {/* Left score ring / gauge with Animated Entrance */}
+          <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#f5e9d0]/70 border border-[#3a2318]/10 text-center animate-scale-in">
             <span className="text-[11px] font-mono uppercase tracking-wider text-[#b4532a] mb-1">
               Overall Benchmark Score
             </span>
-            <div className="font-serif text-6xl sm:text-7xl text-[#2a170f] font-normal leading-none my-2">
+            <div className="font-serif text-6xl sm:text-7xl text-[#2a170f] font-normal leading-none my-2 transition-transform hover:scale-105">
               {activeReport.overallScore}
               <span className="text-2xl text-[#3a2318]/40 font-sans font-light">/100</span>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#b4532a] text-[#fdfaf3] text-xs font-medium font-sans mt-2 shadow-xs">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#b4532a] text-[#fdfaf3] text-xs font-medium font-sans mt-2 shadow-xs animate-subtle-float">
               <Award className="w-3.5 h-3.5" />
               <span>{activeReport.performanceLabel}</span>
             </div>

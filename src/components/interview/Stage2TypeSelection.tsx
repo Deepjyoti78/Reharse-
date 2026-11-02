@@ -147,32 +147,33 @@ export const Stage2TypeSelection: React.FC = () => {
 
       {/* Grid of 6 Interactive Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {INTERVIEW_TYPES.map((card) => {
+        {INTERVIEW_TYPES.map((card, index) => {
           const isSelected = config.interviewType === card.type;
           const Icon = card.icon;
+          const staggerClass = `stagger-${Math.min(index + 1, 8)}`;
 
           return (
             <div
               key={card.type}
               onClick={() => handleSelectType(card.type)}
-              className={`relative rounded-3xl p-6 transition-all duration-200 cursor-pointer flex flex-col justify-between border ${
+              className={`relative rounded-3xl p-6 transition-all duration-300 cursor-pointer flex flex-col justify-between border interactive-card animate-fade-in-up ${staggerClass} ${
                 isSelected
-                  ? 'bg-[#faf1dc] border-[#b4532a] shadow-md ring-2 ring-[#b4532a]/30 -translate-y-1'
-                  : 'bg-[#faf4e6] border-[#3a2318]/15 hover:border-[#3a2318]/35 hover:bg-[#faf1dd] hover:shadow-xs'
+                  ? 'bg-[#faf1dc] border-[#b4532a] shadow-lg ring-2 ring-[#b4532a]/40 -translate-y-1.5'
+                  : 'bg-[#faf4e6] border-[#3a2318]/15 hover:border-[#3a2318]/40 hover:bg-[#faf1dd]'
               }`}
             >
               <div>
                 {/* Top Row: Icon + Category + Selection badge */}
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs"
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs transition-transform duration-300 group-hover:scale-110"
                     style={{ backgroundColor: card.accentBg, color: card.accentColor }}
                   >
                     <Icon className="w-5 h-5" />
                   </div>
                   
                   {isSelected ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#b4532a] text-[#fbf7ee] text-[11px] font-medium font-sans shadow-2xs">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#b4532a] text-[#fbf7ee] text-[11px] font-medium font-sans shadow-xs animate-scale-in">
                       <CheckCircle2 className="w-3 h-3" />
                       <span>Selected</span>
                     </span>
@@ -210,11 +211,11 @@ export const Stage2TypeSelection: React.FC = () => {
               </div>
 
               {/* Bottom selection indicator */}
-              <div className="mt-5 pt-3 flex items-center justify-between text-xs font-sans">
-                <span className={`font-medium ${isSelected ? 'text-[#b4532a]' : 'text-[#3a2318]/60'}`}>
+              <div className="mt-5 pt-3 flex items-center justify-between text-xs font-sans border-t border-[#3a2318]/10">
+                <span className={`font-medium transition-colors ${isSelected ? 'text-[#b4532a]' : 'text-[#3a2318]/60'}`}>
                   {isSelected ? 'Track selected' : 'Click to select track'}
                 </span>
-                <span className={`w-2.5 h-2.5 rounded-full transition-all ${isSelected ? 'bg-[#b4532a] ring-4 ring-[#b4532a]/20' : 'bg-[#3a2318]/20'}`} />
+                <span className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${isSelected ? 'bg-[#b4532a] ring-4 ring-[#b4532a]/30 scale-125' : 'bg-[#3a2318]/20'}`} />
               </div>
             </div>
           );

@@ -16,23 +16,35 @@ export const InterviewFlow: React.FC = () => {
 
   // If in live room, render full virtual room without setup header
   if (currentStage === 'live-room') {
-    return <Stage8LiveRoom />;
+    return (
+      <div key="live-room" className="animate-fade-in-up">
+        <Stage8LiveRoom />
+      </div>
+    );
   }
 
   // If in processing transition
   if (currentStage === 'processing') {
-    return <Stage9Processing />;
+    return (
+      <div key="processing" className="animate-fade-in-up">
+        <Stage9Processing />
+      </div>
+    );
   }
 
   // If in performance report
   if (currentStage === 'report') {
-    return <Stage9Report />;
+    return (
+      <div key="report" className="animate-fade-in-up">
+        <Stage9Report />
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-[#f3e7c9] text-[#2a1a12] py-4 sm:py-8 font-sans">
-      {/* Dynamic Stage Rendering */}
-      <div className="animate-in fade-in duration-200">
+      {/* Dynamic Stage Rendering with Stage Entry Transition */}
+      <div key={currentStage} className="animate-fade-in-up">
         {currentStage === 'intro' && <Stage1Intro />}
         {currentStage === 'type-selection' && <Stage2TypeSelection />}
         {currentStage === 'configuration' && <Stage3Configuration />}

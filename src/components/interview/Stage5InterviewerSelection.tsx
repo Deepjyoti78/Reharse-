@@ -69,7 +69,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-8 animate-fade-in-up">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
         <h2 className="font-serif text-3xl sm:text-4xl text-[#2a170f] font-normal leading-tight">
@@ -82,17 +82,18 @@ export const Stage5InterviewerSelection: React.FC = () => {
 
       {/* Grid of Interviewers */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-        {AI_INTERVIEWERS.map((interviewer) => {
+        {AI_INTERVIEWERS.map((interviewer, idx) => {
           const isSelected = selectedInterviewer.id === interviewer.id;
           const isPlaying = isPlayingPreview === interviewer.id;
+          const staggerClass = `stagger-${Math.min(idx + 1, 8)}`;
 
           return (
             <div
               key={interviewer.id}
               onClick={() => handleSelect(interviewer)}
-              className={`relative rounded-2xl p-5 sm:p-6 transition-all duration-200 cursor-pointer border flex flex-col justify-between ${
+              className={`relative rounded-2xl p-5 sm:p-6 transition-all duration-300 cursor-pointer border flex flex-col justify-between interactive-card animate-fade-in-up ${staggerClass} ${
                 isSelected
-                  ? 'bg-[#faf1dc] border-[#b4532a] shadow-md ring-2 ring-[#b4532a]/30'
+                  ? 'bg-[#faf1dc] border-[#b4532a] shadow-lg ring-2 ring-[#b4532a]/30 -translate-y-1'
                   : 'bg-[#faf5e8] border-[#3a2318]/15 hover:border-[#3a2318]/40 hover:bg-[#faf3e2]'
               }`}
             >

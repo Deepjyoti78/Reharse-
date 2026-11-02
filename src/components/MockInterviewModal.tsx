@@ -171,10 +171,10 @@ export const MockInterviewModal: React.FC<MockInterviewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#1a0d08]/75 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#1a0d08]/75 backdrop-blur-md animate-backdrop-fade">
       
       {/* Modal Surface */}
-      <div className="relative bg-[#fbf6ec] text-[#2a170f] max-w-4xl w-full rounded-3xl shadow-[0_30px_90px_rgba(26,13,8,0.45)] border border-[#3a2318]/25 max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative bg-[#fbf6ec] text-[#2a170f] max-w-4xl w-full rounded-3xl shadow-[0_30px_90px_rgba(26,13,8,0.45)] border border-[#3a2318]/25 max-h-[92vh] flex flex-col overflow-hidden animate-modal-pop">
         
         {/* ================= Header Bar ================= */}
         <div className="px-6 sm:px-8 py-4 bg-[#23120a] text-[#f6ebd4] flex items-center justify-between border-b border-[#dfa84c]/20 shrink-0">

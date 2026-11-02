@@ -10,23 +10,23 @@ export const Stage1Intro: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-8 animate-fade-in-up">
       {/* Main Hero Card */}
-      <div className="relative rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 shadow-md overflow-hidden p-5 sm:p-8 md:p-10">
+      <div className="relative rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 shadow-md overflow-hidden p-5 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
         
         {/* Top Header inside Card with Improved Back to Overview Button */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-7 sm:mb-9">
           <button
             onClick={exitToDashboard}
             type="button"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98]"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
             <span>Back to overview</span>
           </button>
 
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#b4532a]/10 border border-[#b4532a]/20 text-[#b4532a] text-[11px] font-sans font-medium tracking-wide uppercase">
-            <Sparkles className="w-3 h-3 text-[#b4532a]" />
+            <Sparkles className="w-3 h-3 text-[#b4532a] animate-subtle-float" />
             <span>Personalized AI Mock Interview Setup</span>
           </div>
         </div>
@@ -56,18 +56,19 @@ export const Stage1Intro: React.FC = () => {
                   'Software Development Engineer',
                   'Data Analyst',
                   'UI/UX Designer'
-                ].map(role => {
+                ].map((role, idx) => {
                   const isSelected = config.jobRole === role;
                   return (
                     <button
                       key={role}
                       type="button"
                       onClick={() => handleSelectQuickRole(role)}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer border ${
+                      className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer border hover:scale-[1.03] active:scale-[0.98] ${
                         isSelected
                           ? 'bg-[#2a170f] text-[#f8eed8] border-[#2a170f] shadow-xs'
                           : 'bg-[#f0e3c5]/80 text-[#2a170f] border-[#3a2318]/15 hover:bg-[#e6d6b2] hover:border-[#3a2318]/30'
                       }`}
+                      style={{ animationDelay: `${idx * 40}ms` }}
                     >
                       {role}
                     </button>
@@ -80,15 +81,15 @@ export const Stage1Intro: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 onClick={() => setCurrentStage('type-selection')}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Choose Interview Type</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
 
               <button
                 onClick={exitToDashboard}
-                className="px-5 py-3 rounded-full bg-transparent hover:bg-[#3a2318]/8 text-[#3a2318] font-sans text-sm font-medium transition-all cursor-pointer text-center"
+                className="px-5 py-3 rounded-full bg-transparent hover:bg-[#3a2318]/8 text-[#3a2318] font-sans text-sm font-medium transition-all cursor-pointer text-center hover:scale-[1.01] active:scale-[0.99]"
               >
                 Cancel & return
               </button>

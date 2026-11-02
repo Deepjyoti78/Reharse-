@@ -36,7 +36,7 @@ export const Stage9Processing: React.FC = () => {
 
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 sm:px-6 py-12">
-      <div className="rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 p-8 sm:p-12 max-w-xl w-full text-center shadow-lg relative overflow-hidden">
+      <div className="rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 p-8 sm:p-12 max-w-xl w-full text-center shadow-lg relative overflow-hidden animate-modal-pop">
         {/* Subtle decorative glow */}
         <div className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-[#dfa84c]/20 blur-2xl pointer-events-none" />
 

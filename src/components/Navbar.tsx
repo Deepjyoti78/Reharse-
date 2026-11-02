@@ -134,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
 
             {/* Dropdown Menu */}
             {userDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#faf4e8] text-[#2a170f] p-3 shadow-2xl border border-[#3a2318]/20 z-50 animate-in fade-in zoom-in-95 font-sans">
+              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#faf4e8] text-[#2a170f] p-3 shadow-2xl border border-[#3a2318]/20 z-50 animate-modal-pop font-sans">
                 <div className="px-3 py-2 border-b border-[#3a2318]/10 mb-1">
                   <div className="font-semibold text-xs text-[#2a170f] truncate">{user.name}</div>
                   <div className="text-[11px] text-[#3a2318]/60 truncate font-mono">{user.email}</div>

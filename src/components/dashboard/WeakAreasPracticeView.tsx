@@ -99,7 +99,7 @@ export const WeakAreasPracticeView: React.FC = () => {
         {WEAK_AREA_DRILLS.map((drill) => (
           <div
             key={drill.id}
-            className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-6 shadow-xs hover:border-[#b4532a]/40 hover:bg-[#faf2de] transition-all flex flex-col justify-between"
+            className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-6 shadow-xs hover:border-[#b4532a]/40 hover:bg-[#faf2de] transition-all flex flex-col justify-between interactive-card"
           >
             <div>
               <div className="flex items-center justify-between mb-2">

@@ -115,7 +115,7 @@ export const InterviewHistoryView: React.FC = () => {
           {filteredReports.map((report) => (
             <div
               key={report.id}
-              className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-5 shadow-xs hover:border-[#3a2318]/30 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+              className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-5 shadow-xs hover:border-[#3a2318]/30 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 interactive-card"
             >
               <div className="flex items-start gap-4">
                 {/* Score badge */}

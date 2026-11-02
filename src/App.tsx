@@ -47,54 +47,56 @@ const AppContent: React.FC = () => {
         <Navbar onOpenDemo={handleOpenDemo} onOpenAuth={handleOpenAuth} />
       )}
 
-      {/* Dynamic View Controller */}
-      {currentView === 'interview-flow' ? (
-        <div className="py-4 sm:py-8">
-          <InterviewFlow />
-        </div>
-      ) : currentView === 'history' ? (
-        <div className="pt-20 sm:pt-24">
-          <InterviewHistoryView />
-        </div>
-      ) : currentView === 'dashboard' ? (
-        <div className="pt-20 sm:pt-24">
-          <ProgressDashboardView />
-        </div>
-      ) : currentView === 'weak-areas' ? (
-        <div className="pt-20 sm:pt-24">
-          <WeakAreasPracticeView />
-        </div>
-      ) : (
-        /* Main Landing Page */
-        <main id="top">
-          {/* 1. Hero Section using uploaded painting as stage / background */}
-          <Hero onOpenDemo={handleOpenDemo} />
+      {/* Dynamic View Controller with Smooth Page Switch Transitions */}
+      <div key={currentView} className="animate-fade-in-up">
+        {currentView === 'interview-flow' ? (
+          <div className="py-4 sm:py-8">
+            <InterviewFlow />
+          </div>
+        ) : currentView === 'history' ? (
+          <div className="pt-20 sm:pt-24">
+            <InterviewHistoryView />
+          </div>
+        ) : currentView === 'dashboard' ? (
+          <div className="pt-20 sm:pt-24">
+            <ProgressDashboardView />
+          </div>
+        ) : currentView === 'weak-areas' ? (
+          <div className="pt-20 sm:pt-24">
+            <WeakAreasPracticeView />
+          </div>
+        ) : (
+          /* Main Landing Page */
+          <main id="top" className="animate-fade-in-up">
+            {/* 1. Hero Section using uploaded painting as stage / background */}
+            <Hero onOpenDemo={handleOpenDemo} />
 
-          {/* 2. Practice built for the interview, not the quiz */}
-          <HowItWorks />
+            {/* 2. Practice built for the interview, not the quiz */}
+            <HowItWorks />
 
-          {/* 3. Sage Section: Your first mock round */}
-          <MockRoundShowcase onOpenDemo={handleOpenDemo} />
+            {/* 3. Sage Section: Your first mock round */}
+            <MockRoundShowcase onOpenDemo={handleOpenDemo} />
 
-          {/* 4. Designed around how interviews actually go */}
-          <InterviewPillars />
+            {/* 4. Designed around how interviews actually go */}
+            <InterviewPillars />
 
-          {/* 5. Sand Section: One interviewer, every kind of role */}
-          <RolesSection onSelectRole={handleOpenDemoWithRole} />
+            {/* 5. Sand Section: One interviewer, every kind of role */}
+            <RolesSection onSelectRole={handleOpenDemoWithRole} />
 
-          {/* 6. Big Rust Section: What you can expect */}
-          <ExpectationSection />
+            {/* 6. Big Rust Section: What you can expect */}
+            <ExpectationSection />
 
-          {/* 7. The Rehearse notebook */}
-          <NotebookSection />
+            {/* 7. The Rehearse notebook */}
+            <NotebookSection />
 
-          {/* 8. Gold CTA: Walk into your next interview already warmed up */}
-          <CtaSection onOpenDemo={handleOpenDemo} />
+            {/* 8. Gold CTA: Walk into your next interview already warmed up */}
+            <CtaSection onOpenDemo={handleOpenDemo} />
 
-          {/* Footer with huge typographic Rehearse */}
-          <Footer />
-        </main>
-      )}
+            {/* Footer with huge typographic Rehearse */}
+            <Footer />
+          </main>
+        )}
+      </div>
 
       {/* Live Interactive Mock Interview Studio Modal (Quick Sandbox fallback) */}
       <MockInterviewModal

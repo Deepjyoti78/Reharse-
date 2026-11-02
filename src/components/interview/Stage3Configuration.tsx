@@ -154,7 +154,7 @@ export const Stage3Configuration: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-8 animate-fade-in-up">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
         <h2 className="font-serif text-3xl sm:text-4xl text-[#2a170f] font-normal leading-tight">
@@ -167,7 +167,7 @@ export const Stage3Configuration: React.FC = () => {
 
       <div className="space-y-6">
         {/* 1. Job Role Card */}
-        <div className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-5 sm:p-6 shadow-xs">
+        <div className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-5 sm:p-6 shadow-xs hover:shadow-sm transition-shadow">
           <div className="flex items-center gap-2 mb-3">
             <SlidersHorizontal className="w-4 h-4 text-[#b4532a]" />
             <h3 className="font-serif text-xl text-[#2a170f]">Target Job Role</h3>
@@ -182,7 +182,7 @@ export const Stage3Configuration: React.FC = () => {
                 key={role}
                 type="button"
                 onClick={() => handleRoleSelect(role)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all hover:scale-[1.02] active:scale-[0.98] ${
                   !isCustomRole && config.jobRole === role
                     ? 'bg-[#b4532a] text-[#fdfaf3] shadow-xs'
                     : 'bg-[#f0e4c6] text-[#2a170f] hover:bg-[#e6d6b2]'
@@ -198,7 +198,7 @@ export const Stage3Configuration: React.FC = () => {
                 setIsCustomRole(true);
                 if (customRoleInput) updateConfig({ jobRole: customRoleInput });
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all hover:scale-[1.02] active:scale-[0.98] ${
                 isCustomRole
                   ? 'bg-[#b4532a] text-[#fdfaf3] shadow-xs'
                   : 'bg-[#f0e4c6] text-[#2a170f] hover:bg-[#e6d6b2]'
@@ -209,7 +209,7 @@ export const Stage3Configuration: React.FC = () => {
           </div>
 
           {isCustomRole && (
-            <div className="mt-3 pt-3 border-t border-[#3a2318]/10 animate-in fade-in duration-200">
+            <div className="mt-3 pt-3 border-t border-[#3a2318]/10 animate-fade-in-up">
               <label className="block text-[11px] uppercase font-mono text-[#3a2318]/70 mb-1.5">
                 Enter your exact target position
               </label>

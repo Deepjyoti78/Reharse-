@@ -102,8 +102,8 @@ export const MockRoundShowcase: React.FC<MockRoundShowcaseProps> = ({ onOpenDemo
               </div>
             </div>
 
-            {/* Conversation Transcript Snippet */}
-            <div className="p-4 rounded-xl bg-[#e8dcbf] border border-[#3a2318]/15">
+            {/* Conversation Transcript Snippet with Smooth Transition */}
+            <div key={currentStep} className="p-4 rounded-xl bg-[#e8dcbf] border border-[#3a2318]/15 animate-fade-in-up">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-mono font-bold text-[#b4532a]">
                   {steps[currentStep].speaker}
