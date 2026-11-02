@@ -37,7 +37,7 @@ interface InterviewContextType {
   deleteReportFromHistory: (reportId: string) => void;
   startInterviewFlow: (role?: string, type?: InterviewType) => void;
   restartWithSameConfig: () => void;
-  finishInterview: () => void;
+  finishInterview: (finalTurns?: UserTurn[]) => void;
   exitToDashboard: () => void;
 }
 
@@ -193,9 +193,13 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const finishInterview = () => {
-    // Generate report
-    const report = generatePerformanceReport(config, turns);
+  const finishInterview = (finalTurns?: UserTurn[]) => {
+    // Generate report using supplied or committed turns
+    const candidateTurns = finalTurns || turns;
+    const report = generatePerformanceReport(config, candidateTurns);
+    if (finalTurns) {
+      setTurns(finalTurns);
+    }
     setActiveReport(report);
     saveReportToHistory(report);
     setCurrentStage('processing');

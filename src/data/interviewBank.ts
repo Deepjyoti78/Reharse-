@@ -318,6 +318,145 @@ export function getQuestionsForConfig(config: InterviewConfiguration): QuestionI
   return QUESTION_BANKS['Software Development Engineer'].slice(0, typeof config.questionCount === 'number' ? config.questionCount : 5);
 }
 
+// Helper to evaluate an individual turn's answer quality realistically
+function evaluateCandidateAnswer(
+  turn: UserTurn,
+  expectedConcepts: string[] = [],
+  isTech: boolean,
+  jobRole: string
+) {
+  const primaryAnswer = (turn.userAnswerText || '').trim();
+  const lowerAnswer = primaryAnswer.toLowerCase();
+  const words = primaryAnswer.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+
+  const followUpAnswer = (turn.userFollowUpAnswerText || '').trim();
+  const lowerFollowUp = followUpAnswer.toLowerCase();
+  const followUpWordCount = followUpAnswer.split(/\s+/).filter(Boolean).length;
+
+  // 1. Check for non-answers, refusal, or explicit admissions of ignorance
+  const ignorancePatterns = [
+    /\b(don'?t know|do not know|no idea|no clue|dunno|not sure|have no idea|cannot answer|can't answer|skip|pass|nothing|idk|n\/a|not familiar|no experience|have no knowledge|zero idea|dont know)\b/i,
+    /\b(i have no idea|i dont have any idea|no clue about this|never worked with|never heard of)\b/i
+  ];
+
+  const expressesIgnorance = ignorancePatterns.some(p => p.test(lowerAnswer));
+  const isTooShort = wordCount < 6;
+  const isRepetitiveGibberish = wordCount > 5 && new Set(words.map(w => w.toLowerCase())).size <= 3;
+
+  // If candidate admitted ignorance, gave empty answer, or gibberish
+  if (expressesIgnorance || isTooShort || isRepetitiveGibberish) {
+    const score = Number((Math.random() * 0.8 + 1.2).toFixed(1)); // 1.2 - 2.0 / 10
+
+    return {
+      score,
+      strengths: [
+        'Candidate was candid about their lack of knowledge on this question rather than guessing inaccurately.',
+        'Acknowledged domain boundaries promptly.'
+      ],
+      improvements: [
+        `This fundamental question on "${turn.questionText.slice(0, 50)}..." was unanswered or skipped.`,
+        expectedConcepts.length > 0 
+          ? `Urgent revision needed for core concepts: ${expectedConcepts.slice(0, 3).join(', ')}.`
+          : `Review foundational theory and practical application for ${jobRole}.`
+      ],
+      missingConcepts: expectedConcepts.length > 0 
+        ? expectedConcepts 
+        : ['Foundational concept comprehension', 'Concrete architectural application', 'Structured explanation'],
+      aiFeedback: `You stated that you did not know the answer or passed on this question ("${primaryAnswer || 'No response provided'}"). In an actual ${jobRole} interview, leaving core questions unanswered creates an immediate knowledge gap. Study the calibrated model answer below to understand how to approach this topic.`,
+      followUpEvaluation: turn.followUpText ? {
+        question: turn.followUpText,
+        answer: followUpAnswer || 'No follow-up response provided.',
+        evaluation: followUpWordCount > 8 && !ignorancePatterns.some(p => p.test(lowerFollowUp))
+          ? 'Candidate attempted to provide partial context in the follow-up.'
+          : 'Follow-up was also unanswered or lacked technical content.'
+      } : undefined
+    };
+  }
+
+  // 2. Keyword relevance check
+  const matchedConcepts = expectedConcepts.filter(concept => {
+    const conceptWords = concept.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    return conceptWords.some(w => lowerAnswer.includes(w));
+  });
+
+  const keywordCoverageRatio = expectedConcepts.length > 0 
+    ? matchedConcepts.length / expectedConcepts.length 
+    : 0.5;
+
+  // 3. Technical & structural score calculation
+  let baseScore = 4.5;
+
+  if (wordCount >= 100) baseScore += 2.8;
+  else if (wordCount >= 60) baseScore += 2.2;
+  else if (wordCount >= 30) baseScore += 1.4;
+  else if (wordCount >= 15) baseScore += 0.6;
+
+  // Keyword bonus
+  baseScore += keywordCoverageRatio * 2.2;
+
+  // Check for STAR indicators (Situation, Task, Action, Result) or metrics
+  const hasMetrics = /\d+(%|ms|s|x|k|m|gb|mb)/i.test(primaryAnswer);
+  const hasTradeoffs = /\b(trade-off|tradeoff|pros|cons|however|whereas|alternatively|versus|vs|compromise)\b/i.test(lowerAnswer);
+  const hasStructure = /\b(first|then|finally|result|because|outcome|achieved|implemented)\b/i.test(lowerAnswer);
+
+  if (hasMetrics) baseScore += 0.5;
+  if (hasTradeoffs) baseScore += 0.4;
+  if (hasStructure) baseScore += 0.3;
+
+  // Follow-up adjustment
+  if (turn.followUpText) {
+    if (followUpWordCount > 25 && !ignorancePatterns.some(p => p.test(lowerFollowUp))) {
+      baseScore += 0.6;
+    } else if (ignorancePatterns.some(p => p.test(lowerFollowUp)) || followUpWordCount < 5) {
+      baseScore -= 0.6;
+    }
+  }
+
+  // Clamp score between 3.0 and 9.7
+  const score = Number(Math.min(9.7, Math.max(3.0, baseScore)).toFixed(1));
+
+  // Dynamic feedback and strengths based on actual content
+  const strengths: string[] = [];
+  if (hasStructure) strengths.push('Structured the response with a clear sequential progression.');
+  if (hasMetrics) strengths.push('Effectively grounded claims with quantified impact and performance metrics.');
+  if (hasTradeoffs) strengths.push('Demonstrated architectural maturity by analyzing trade-offs between alternative designs.');
+  if (matchedConcepts.length > 0) strengths.push(`Demonstrated familiarity with ${matchedConcepts.slice(0, 2).join(' and ')}.`);
+  if (strengths.length === 0) strengths.push('Provided an initial high-level verbal response to the prompt.');
+
+  const improvements: string[] = [];
+  if (!hasMetrics) improvements.push('Incorporate measurable metrics (e.g., latency reduction percentages, throughput numbers, team time saved).');
+  if (!hasTradeoffs) improvements.push('Address alternative approaches and explain why you chose this design over other options.');
+  if (wordCount < 45) improvements.push('Provide more depth by explaining production failure modes, edge cases, and recovery strategies.');
+  if (matchedConcepts.length < expectedConcepts.length && expectedConcepts.length > 0) {
+    const missing = expectedConcepts.filter(c => !matchedConcepts.includes(c));
+    if (missing.length > 0) improvements.push(`Deepen coverage of: ${missing.slice(0, 2).join(', ')}.`);
+  }
+
+  const missingConcepts = expectedConcepts.filter(c => !matchedConcepts.includes(c));
+
+  return {
+    score,
+    strengths,
+    improvements: improvements.slice(0, 2),
+    missingConcepts: missingConcepts.length > 0 
+      ? missingConcepts 
+      : (isTech ? ['Low-level concurrency edge cases under peak scale'] : ['Long-term team retrospectives']),
+    aiFeedback: score >= 8.5
+      ? `Strong, well-articulated response for ${jobRole}. You communicated key concepts with clarity. To reach staff-level excellence, continue sharpening edge-case handling under extreme load.`
+      : score >= 6.5
+        ? `Decent foundational start. Your answer touches the core idea but lacks the deeper architectural justification and metrics required to stand out at the senior bar.`
+        : `Your response was overly brief or missed critical technical concepts for ${jobRole}. Anchor your answers around practical implementation details and explicit trade-offs.`,
+    followUpEvaluation: turn.followUpText ? {
+      question: turn.followUpText,
+      answer: followUpAnswer || 'No follow-up response provided.',
+      evaluation: followUpWordCount > 20
+        ? 'Responded effectively to interviewer probing with additional nuance.'
+        : 'Follow-up answer was brief; try to elaborate more when challenged on failure cases.'
+    } : undefined
+  };
+}
+
 // Generate an intelligent, realistic, multi-criteria Performance Report
 export function generatePerformanceReport(
   config: InterviewConfiguration,
@@ -326,72 +465,148 @@ export function generatePerformanceReport(
   const isTech = config.interviewType === 'technical' || config.interviewType === 'coding';
   const totalQuestions = turns.length || 5;
 
-  // Compute realistic scores based on answer depth
+  // Retrieve matching questions to cross-reference expected concepts
+  const availableQuestions = getQuestionsForConfig(config);
+
+  // Compute realistic scores based on actual answer depth and accuracy
   let totalScoreSum = 0;
   const questionEvaluations = turns.map((turn, idx) => {
-    const wordCount = turn.userAnswerText.trim().split(/\s+/).filter(Boolean).length;
-    // Score scaling: brief answers get 5.5-7.0, thorough answers get 8.5-9.6
-    let baseScore = 7.0;
-    if (wordCount > 60) baseScore = 8.8;
-    else if (wordCount > 30) baseScore = 7.9;
-    else if (wordCount > 10) baseScore = 6.8;
-    else baseScore = 5.2;
+    const matchedQ = availableQuestions.find(q => q.id === turn.questionId || q.question === turn.questionText) 
+      || availableQuestions[idx % availableQuestions.length];
 
-    // Slight variance
-    const score = Math.min(9.8, Math.max(5.0, Number((baseScore + (idx % 2 === 0 ? 0.4 : -0.3)).toFixed(1))));
-    totalScoreSum += score;
+    const expectedConcepts = matchedQ?.expectedConcepts || [];
+    const evaluation = evaluateCandidateAnswer(turn, expectedConcepts, isTech, config.jobRole);
+
+    totalScoreSum += evaluation.score;
 
     return {
       questionId: turn.questionId,
       questionNumber: idx + 1,
-      category: isTech ? 'Technical & System Concepts' : 'Behavioral & STAR Structure',
+      category: matchedQ?.category || (isTech ? 'Technical Architecture' : 'Behavioral & Leadership'),
       originalQuestion: turn.questionText,
-      submittedAnswer: turn.userAnswerText || 'Candidate provided a brief verbal summary of the approach.',
-      score,
-      strengths: [
-        'Articulated the core principle with good foundational clarity.',
-        'Maintained structured logic and used relevant industry terminology.',
-        wordCount > 40 ? 'Provided concrete practical context from prior implementation experience.' : 'Addressed the question promptly without rambling.'
-      ],
-      improvements: [
-        wordCount < 50 ? 'Could quantify performance metrics (e.g. latency reductions, memory usage percentages).' : 'Could elaborate more on failure modes and edge case recovery.',
-        'Frame responses using explicit trade-off analyses (pros vs. cons of chosen design).'
-      ],
-      missingConcepts: [
-        isTech ? 'Explicit concurrency controls & memory footprint trade-offs' : 'Measurable business impact numbers and follow-up retrospective'
-      ],
-      aiFeedback: `Your response demonstrated solid familiarity with ${config.jobRole} requirements. To move from a strong answer to an exceptional one, anchor the resolution around production metrics and architectural trade-offs.`,
-      suggestedAnswer: `In our production environment, I approach this systematically by first identifying the critical path bottlenecks using telemetry profiling. For instance, rather than a monolithic rewrite, we introduce bounded context isolation with strict contracts, automated integration tests, and staged canary rollouts. This reduced latency by 34% while preventing downstream regressions.`,
-      followUpExchange: turn.followUpText ? {
-        question: turn.followUpText,
-        answer: turn.userFollowUpAnswerText || 'Addressed the follow-up with additional edge case specifications.',
-        evaluation: 'Candidate responded calmly to pushback and demonstrated flexibility in design constraints.'
-      } : undefined
+      submittedAnswer: turn.userAnswerText || 'Candidate did not provide an answer.',
+      score: evaluation.score,
+      strengths: evaluation.strengths,
+      improvements: evaluation.improvements,
+      missingConcepts: evaluation.missingConcepts,
+      aiFeedback: evaluation.aiFeedback,
+      suggestedAnswer: matchedQ?.sampleFollowUp 
+        ? `A comprehensive answer should start by framing the context, explaining the technical principles (${expectedConcepts.slice(0, 3).join(', ')}), and quantifying the outcome. For example: "In our production system, we resolved this by implementing ${expectedConcepts[0] || 'bounded context isolation'}, which reduced error rates by 42% under load."`
+        : `In our production environment, I approach this systematically by first identifying the critical path bottlenecks using telemetry profiling. Rather than a monolithic rewrite, we introduce bounded context isolation with strict contracts, automated integration tests, and staged canary rollouts. This reduced p99 latency by 34% while preventing downstream regressions.`,
+      followUpExchange: evaluation.followUpEvaluation
     };
   });
 
-  const avgScoreOutOf10 = questionEvaluations.length > 0 ? (totalScoreSum / questionEvaluations.length) : 8.2;
-  const overallScore = Math.round(avgScoreOutOf10 * 10);
+  const avgScoreOutOf10 = questionEvaluations.length > 0 ? (totalScoreSum / questionEvaluations.length) : 2.0;
+  const overallScore = Math.min(100, Math.max(10, Math.round(avgScoreOutOf10 * 10)));
 
+  // Dynamic performance label reflecting actual answers
   let performanceLabel: PerformanceReport['performanceLabel'] = 'Strong Hire';
-  if (overallScore >= 90) performanceLabel = 'Exceptional Hire';
-  else if (overallScore >= 80) performanceLabel = 'Strong Hire';
-  else if (overallScore >= 70) performanceLabel = 'Promising Candidate';
-  else if (overallScore >= 60) performanceLabel = 'Needs Preparation';
+  if (overallScore >= 88) performanceLabel = 'Exceptional Hire';
+  else if (overallScore >= 78) performanceLabel = 'Strong Hire';
+  else if (overallScore >= 65) performanceLabel = 'Promising Candidate';
+  else if (overallScore >= 45) performanceLabel = 'Needs Preparation';
   else performanceLabel = 'Developing Fundamentals';
 
+  // Dynamic skills breakdown scaled accurately with candidate's actual score
   const skillsBreakdown = isTech ? [
-    { name: 'Technical Depth & Concepts', score: Math.min(96, overallScore + 3), weight: 30, summary: 'Command over language semantics, runtime architecture, and core paradigms.' },
-    { name: 'Problem-Solving & Tradeoffs', score: Math.min(94, overallScore - 1), weight: 25, summary: 'Ability to deconstruct edge cases and weigh operational trade-offs.' },
-    { name: 'Communication & Structure', score: Math.min(98, overallScore + 2), weight: 20, summary: 'Clarity, conciseness, and logical flow of explanations.' },
-    { name: 'Production Readiness & Security', score: Math.min(92, overallScore - 4), weight: 15, summary: 'Awareness of observability, testing hygiene, and attack vectors.' },
-    { name: 'STAR / Example Relevance', score: Math.min(95, overallScore + 1), weight: 10, summary: 'Grounding concepts in tangible real-world project experience.' }
+    { 
+      name: 'Technical Depth & Concepts', 
+      score: Math.min(98, Math.max(8, overallScore + (overallScore > 50 ? 2 : -4))), 
+      weight: 30, 
+      summary: overallScore > 50 
+        ? 'Command over language semantics, runtime architecture, and core paradigms.' 
+        : 'Significant conceptual gaps in core language semantics and runtime fundamentals.'
+    },
+    { 
+      name: 'Problem-Solving & Tradeoffs', 
+      score: Math.min(96, Math.max(10, overallScore - (overallScore > 50 ? 2 : 2))), 
+      weight: 25, 
+      summary: overallScore > 50 
+        ? 'Ability to deconstruct edge cases and weigh operational trade-offs.' 
+        : 'Needs systematic framework to analyze edge cases and evaluate design alternatives.'
+    },
+    { 
+      name: 'Communication & Structure', 
+      score: Math.min(98, Math.max(12, overallScore + (overallScore > 50 ? 4 : 5))), 
+      weight: 20, 
+      summary: 'Clarity, conciseness, and logical flow of explanations.' 
+    },
+    { 
+      name: 'Production Readiness & Security', 
+      score: Math.min(94, Math.max(8, overallScore - (overallScore > 50 ? 4 : 5))), 
+      weight: 15, 
+      summary: overallScore > 50 
+        ? 'Awareness of observability, testing hygiene, and attack vectors.' 
+        : 'Production hardening, observability, and security constraints were not addressed.'
+    },
+    { 
+      name: 'STAR / Example Relevance', 
+      score: Math.min(95, Math.max(10, overallScore + 1)), 
+      weight: 10, 
+      summary: overallScore > 50 
+        ? 'Grounding concepts in tangible real-world project experience.' 
+        : 'Few concrete project outcomes or real-world examples cited.'
+    }
   ] : [
-    { name: 'Communication Clarity', score: Math.min(96, overallScore + 4), weight: 30, summary: 'Articulate tone, cadence, and active listening skills.' },
-    { name: 'Situational Reasoning & STAR', score: Math.min(92, overallScore - 2), weight: 25, summary: 'Clear framing of Situation, Task, Action, and measurable Results.' },
-    { name: 'Ownership & Accountability', score: Math.min(94, overallScore + 1), weight: 20, summary: 'Blameless retrospectives and strong team execution focus.' },
-    { name: 'Conflict Resolution', score: Math.min(90, overallScore - 3), weight: 15, summary: 'Data-driven persuasion and collaborative consensus building.' },
-    { name: 'Authenticity & Self-Awareness', score: Math.min(97, overallScore + 2), weight: 10, summary: 'Grounded reflections on growth areas and continuous learning.' }
+    { 
+      name: 'Communication Clarity', 
+      score: Math.min(98, Math.max(12, overallScore + 4)), 
+      weight: 30, 
+      summary: 'Articulate tone, cadence, and active listening skills.' 
+    },
+    { 
+      name: 'Situational Reasoning & STAR', 
+      score: Math.min(94, Math.max(10, overallScore - 2)), 
+      weight: 25, 
+      summary: 'Framing of Situation, Task, Action, and measurable Results.' 
+    },
+    { 
+      name: 'Ownership & Accountability', 
+      score: Math.min(95, Math.max(10, overallScore + 1)), 
+      weight: 20, 
+      summary: 'Blameless retrospectives and strong team execution focus.' 
+    },
+    { 
+      name: 'Conflict Resolution', 
+      score: Math.min(92, Math.max(8, overallScore - 4)), 
+      weight: 15, 
+      summary: 'Data-driven persuasion and collaborative consensus building.' 
+    },
+    { 
+      name: 'Authenticity & Self-Awareness', 
+      score: Math.min(98, Math.max(15, overallScore + 3)), 
+      weight: 10, 
+      summary: 'Grounded reflections on growth areas and continuous learning.' 
+    }
+  ];
+
+  // Dynamic top strengths and improvement areas
+  const topStrengths = overallScore >= 70 ? [
+    'Strong conceptual intuition and structured explanations that avoided technical rambles.',
+    'Demonstrated composure when challenged with follow-up probing questions.',
+    'Clear articulation of architectural separation of concerns.',
+    'Polished communication delivery with thoughtful pacing.'
+  ] : overallScore >= 45 ? [
+    'Showed good willingness to engage and provide initial high-level concepts.',
+    'Maintained a professional tone throughout the session.',
+    'Communicated clearly on familiar topics.'
+  ] : [
+    'Candidate was honest about unfamiliar areas rather than presenting fabricated facts.',
+    'Demonstrated awareness of baseline knowledge boundaries.',
+    'Clear baseline to build upon with structured preparation.'
+  ];
+
+  const keyAreasToImprove = overallScore >= 70 ? [
+    'Incorporate more quantified metrics in project outcomes (e.g. "shaved 180ms p99 latency").',
+    'Spend more time proactively analyzing edge cases before settling on the initial design.',
+    'Deepen mastery of concurrency primitives and fault-tolerance patterns.',
+    'Structure behavioral answers strictly around the Action and measurable Business Result.'
+  ] : [
+    `Develop foundational mastery of ${config.jobRole} core concepts before the next interview round.`,
+    'Avoid skipping questions or providing answers consisting solely of "I don\'t know".',
+    'Structure responses using the STAR method: Situation, Task, Action, and measurable Result.',
+    'Study the model answers provided in this debrief for every question.'
   ];
 
   return {
@@ -410,19 +625,9 @@ export function generatePerformanceReport(
     interviewerName: config.interviewer.name,
     skillsBreakdown,
     questionEvaluations,
-    topStrengths: [
-      'Strong conceptual intuition and structured explanations that avoided technical rambles.',
-      'Demonstrated composure when challenged with follow-up probing questions.',
-      'Clear articulation of architectural separation of concerns.',
-      'Polished communication delivery with thoughtful pacing.'
-    ],
-    keyAreasToImprove: [
-      'Incorporate more quantified metrics in project outcomes (e.g. "shaved 180ms p99 latency").',
-      'Spend more time proactively analyzing edge cases before settling on the initial design.',
-      'Deepen mastery of concurrency primitives and fault-tolerance patterns.',
-      'Structure behavioral answers strictly around the Action and measurable Business Result.'
-    ],
-    nextStepsRoadmap: [
+    topStrengths,
+    keyAreasToImprove,
+    nextStepsRoadmap: overallScore >= 70 ? [
       {
         topic: 'Distributed Caching & Concurrency Primitives',
         category: 'concept',
@@ -450,6 +655,28 @@ export function generatePerformanceReport(
         priority: 'Medium',
         description: 'Run another 15-minute high-pressure drill with Jordan to sharpen edge-case justifications.',
         actionableExercise: 'Start a targeted mock interview on System Design & Scalability.'
+      }
+    ] : [
+      {
+        topic: `${config.jobRole} Core Technical Foundations`,
+        category: 'concept',
+        priority: 'High',
+        description: `Deeply review the primary questions from this interview and memorize their core architectural principles.`,
+        actionableExercise: 'Write out written summaries for each question missed in this round.'
+      },
+      {
+        topic: 'Structured Verbal Framing (STAR)',
+        category: 'exercise',
+        priority: 'High',
+        description: 'When unsure of a full solution, outline your problem-solving framework aloud instead of passing immediately.',
+        actionableExercise: 'Practice thinking aloud: state assumptions, propose an initial brute-force approach, then refine.'
+      },
+      {
+        topic: 'Foundations Diagnostic Rehearsal',
+        category: 'mock',
+        priority: 'High',
+        description: 'Run a 10-minute Easy session with Alex (Supportive Mentor) to build rhythm and confidence.',
+        actionableExercise: 'Configure an Easy difficulty round and practice answering every question.'
       }
     ],
     transcript: turns.flatMap((t, idx) => [

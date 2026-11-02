@@ -89,7 +89,7 @@ export const Stage9Report: React.FC = () => {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 md:py-10 font-sans print:p-0 print:max-w-none">
       
       {/* Top Header & Actions Bar (Hidden during print) */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8 print:hidden">
         <button
           onClick={exitToDashboard}
           className="inline-flex items-center gap-1.5 text-xs text-[#3a2318]/70 hover:text-[#3a2318] font-medium transition-colors cursor-pointer"
@@ -98,26 +98,26 @@ export const Stage9Report: React.FC = () => {
           <span>Back to Dashboard</span>
         </button>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowFullTranscript(!showFullTranscript)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#ede0c3] hover:bg-[#e4d3af] text-[#2a170f] text-xs font-medium transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-[#ede0c3] hover:bg-[#e4d3af] text-[#2a170f] text-xs font-medium transition-colors cursor-pointer"
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>{showFullTranscript ? 'Hide Full Transcript' : 'View Full Transcript'}</span>
+            <span>{showFullTranscript ? 'Hide Transcript' : 'Full Transcript'}</span>
           </button>
 
           <button
             onClick={handlePrintPdf}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#ede0c3] hover:bg-[#e4d3af] text-[#2a170f] text-xs font-medium transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-[#ede0c3] hover:bg-[#e4d3af] text-[#2a170f] text-xs font-medium transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Download Report (PDF)</span>
+            <span>Download PDF</span>
           </button>
 
           <button
             onClick={restartWithSameConfig}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-colors shadow-sm cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-colors shadow-sm cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Practice Again</span>

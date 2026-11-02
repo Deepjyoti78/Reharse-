@@ -13,8 +13,9 @@ import {
   Clock, 
   ChevronRight, 
   ShieldCheck,
-  Radio,
-  AlertCircle
+  AlertCircle,
+  Square,
+  Trash2
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
 import { getQuestionsForConfig } from '../../data/interviewBank';
@@ -25,6 +26,7 @@ export const Stage8LiveRoom: React.FC = () => {
     config, 
     selectedInterviewer, 
     deviceState, 
+    turns,
     addTurn, 
     finishInterview, 
     exitToDashboard 
@@ -35,8 +37,7 @@ export const Stage8LiveRoom: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const activeQuestion = questions[currentQuestionIndex] || questions[0];
 
-  // Conversation & AI States
-  // 'ai-speaking' | 'listening' | 'processing'
+  // Conversation & AI States: 'ai-speaking' | 'listening' | 'processing'
   const [aiState, setAiState] = useState<'ai-speaking' | 'listening' | 'processing'>('ai-speaking');
   
   // Follow-up interaction tracking
@@ -53,7 +54,7 @@ export const Stage8LiveRoom: React.FC = () => {
 
   // Speech Recognition state
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
-  const [isSpeechListening, setIsSpeechListening] = useState(false);
+  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
 
   // Audio level meter
@@ -74,6 +75,7 @@ export const Stage8LiveRoom: React.FC = () => {
   const animFrameRef = useRef<number | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+  const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Synchronized state refs for event listeners
   const aiStateRef = useRef(aiState);
@@ -82,6 +84,8 @@ export const Stage8LiveRoom: React.FC = () => {
   isMutedRef.current = isMuted;
   const hasAskedFollowUpRef = useRef(hasAskedFollowUp);
   hasAskedFollowUpRef.current = hasAskedFollowUp;
+  const isRecordingVoiceRef = useRef(isRecordingVoice);
+  isRecordingVoiceRef.current = isRecordingVoice;
 
   // Timer tick
   useEffect(() => {
@@ -200,7 +204,7 @@ export const Stage8LiveRoom: React.FC = () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onstart = () => {
-        setIsSpeechListening(true);
+        setIsRecordingVoice(true);
         setSpeechError(null);
       };
 
@@ -239,24 +243,31 @@ export const Stage8LiveRoom: React.FC = () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
-        if (event.error !== 'no-speech') {
-          console.warn('Speech recognition warning:', event.error);
-          if (event.error === 'not-allowed') {
-            setSpeechError('Microphone permission blocked for speech recognition.');
-            setIsSpeechListening(false);
-          }
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          setSpeechError('Microphone permission blocked. Please click the camera/microphone icon in your browser address bar to allow access.');
+          setIsRecordingVoice(false);
+        } else if (event.error === 'network') {
+          setSpeechError('Speech recognition network service is currently unreachable in this browser session. You can type directly below.');
+          setIsRecordingVoice(false);
         }
+        // 'no-speech' is non-fatal in continuous mode
       };
 
       recognition.onend = () => {
-        setIsSpeechListening(false);
-        // If still supposed to listen and not muted, seamlessly restart
-        if (aiStateRef.current === 'listening' && !isMutedRef.current) {
-          try {
-            recognition.start();
-          } catch {
-            // Ignore start collisions
-          }
+        // If user is actively recording and not muted, seamlessly restart after brief pause
+        if (isRecordingVoiceRef.current && !isMutedRef.current && aiStateRef.current === 'listening') {
+          if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current);
+          restartTimeoutRef.current = setTimeout(() => {
+            if (isRecordingVoiceRef.current && !isMutedRef.current) {
+              try {
+                recognition.start();
+              } catch {
+                // Ignore start collision
+              }
+            }
+          }, 200);
+        } else {
+          setIsRecordingVoice(false);
         }
       };
 
@@ -267,6 +278,7 @@ export const Stage8LiveRoom: React.FC = () => {
     }
 
     return () => {
+      if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current);
       if (recognitionRef.current) {
         try {
           recognitionRef.current.abort();
@@ -278,26 +290,45 @@ export const Stage8LiveRoom: React.FC = () => {
     };
   }, [config.language]);
 
-  // Manage start / stop of speech recognition according to AI state and mute status
-  useEffect(() => {
-    if (!recognitionRef.current) return;
-
-    if (aiState === 'listening' && !isMuted) {
-      try {
-        recognitionRef.current.start();
-      } catch {
-        // Recognition might already be running
+  // Direct toggle for candidate speech recording (satisfies browser user gesture policy)
+  const handleToggleVoiceRecording = () => {
+    if (!recognitionRef.current) {
+      if (!isSpeechSupported) {
+        setSpeechError('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari, or type your answer directly.');
       }
-    } else {
+      return;
+    }
+
+    if (isRecordingVoice) {
+      // Stop recording
+      setIsRecordingVoice(false);
       try {
         recognitionRef.current.stop();
       } catch {
-        // Recognition might already be stopped
+        // ignore
       }
-      setIsSpeechListening(false);
-      setInterimTranscript('');
+      if (interimTranscript.trim()) {
+        const text = interimTranscript.trim();
+        if (!hasAskedFollowUp) {
+          setUserAnswerText(prev => prev.trim() ? `${prev.trim()} ${text}` : text);
+        } else {
+          setUserFollowUpAnswerText(prev => prev.trim() ? `${prev.trim()} ${text}` : text);
+        }
+        setInterimTranscript('');
+      }
+    } else {
+      // Start recording with explicit user click
+      setSpeechError(null);
+      setIsRecordingVoice(true);
+      if (isMuted) setIsMuted(false);
+
+      try {
+        recognitionRef.current.start();
+      } catch (e) {
+        console.warn('Speech recognition start error:', e);
+      }
     }
-  }, [aiState, isMuted]);
+  };
 
   // Speak AI question using SpeechSynthesis
   const speakText = (text: string, onDone?: () => void) => {
@@ -322,7 +353,7 @@ export const Stage8LiveRoom: React.FC = () => {
     }
   };
 
-  // When question changes, speak question
+  // When question changes, speak question and prepare candidate turn
   useEffect(() => {
     setAiState('ai-speaking');
     setHasAskedFollowUp(false);
@@ -331,8 +362,23 @@ export const Stage8LiveRoom: React.FC = () => {
     setUserFollowUpAnswerText('');
     setInterimTranscript('');
 
+    // Stop recording while AI speaks
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+    }
+    setIsRecordingVoice(false);
+
     speakText(activeQuestion.question, () => {
       setAiState('listening');
+      // Automatically attempt to start voice listening if permitted
+      if (recognitionRef.current && !isMutedRef.current) {
+        try {
+          recognitionRef.current.start();
+          setIsRecordingVoice(true);
+        } catch {
+          // May require click gesture on some browser configs; fallback button is visible
+        }
+      }
     });
 
     return () => {
@@ -347,26 +393,41 @@ export const Stage8LiveRoom: React.FC = () => {
     const textToSpeak = hasAskedFollowUp && activeFollowUpText ? activeFollowUpText : activeQuestion.question;
     setAiState('ai-speaking');
     setInterimTranscript('');
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+    }
+    setIsRecordingVoice(false);
+
     speakText(textToSpeak, () => {
       setAiState('listening');
+      if (recognitionRef.current && !isMutedRef.current) {
+        try {
+          recognitionRef.current.start();
+          setIsRecordingVoice(true);
+        } catch {}
+      }
     });
   };
 
-  // Handle Submit Answer
+  // Handle Submit Primary Answer
   const handleSubmitPrimaryAnswer = () => {
-    const answerToSubmit = (userAnswerText + (interimTranscript ? ' ' + interimTranscript : '')).trim();
-    if (!answerToSubmit) return;
+    // Commit any remaining interim speech
+    const fullText = (userAnswerText + (interimTranscript ? ' ' + interimTranscript : '')).trim();
+    if (!fullText) return;
 
-    if (interimTranscript) {
-      setUserAnswerText(answerToSubmit);
-      setInterimTranscript('');
+    setUserAnswerText(fullText);
+    setInterimTranscript('');
+
+    // Stop recording while AI evaluates & asks follow-up
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
     }
+    setIsRecordingVoice(false);
 
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
 
-    // Trigger AI Follow-up probing
     setAiState('processing');
 
     setTimeout(() => {
@@ -379,6 +440,12 @@ export const Stage8LiveRoom: React.FC = () => {
 
       speakText(followUp, () => {
         setAiState('listening');
+        if (recognitionRef.current && !isMutedRef.current) {
+          try {
+            recognitionRef.current.start();
+            setIsRecordingVoice(true);
+          } catch {}
+        }
       });
     }, 1200);
   };
@@ -387,6 +454,11 @@ export const Stage8LiveRoom: React.FC = () => {
   const handleCompleteQuestion = () => {
     const finalPrimary = userAnswerText.trim();
     const finalFollowUp = (userFollowUpAnswerText + (interimTranscript ? ' ' + interimTranscript : '')).trim();
+
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+    }
+    setIsRecordingVoice(false);
 
     const turnData: UserTurn = {
       questionId: activeQuestion.id,
@@ -398,12 +470,13 @@ export const Stage8LiveRoom: React.FC = () => {
       userFollowUpAnswerText: finalFollowUp || undefined
     };
 
+    const updatedTurns = [...turns, turnData];
     addTurn(turnData);
 
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      finishInterview();
+      finishInterview(updatedTurns);
     }
   };
 
@@ -420,55 +493,65 @@ export const Stage8LiveRoom: React.FC = () => {
     setInterimTranscript('');
   };
 
+  const handleClearCurrentAnswer = () => {
+    if (!hasAskedFollowUp) {
+      setUserAnswerText('');
+    } else {
+      setUserFollowUpAnswerText('');
+    }
+    setInterimTranscript('');
+  };
+
   return (
     <div className="min-h-screen bg-[#f3e7c9] text-[#2a170f] flex flex-col font-sans select-none">
       
-      {/* 1. Top Status & Information Bar (Editorial Warm Header) */}
-      <header className="h-14 sm:h-16 px-4 sm:px-8 border-b border-[#3a2318]/15 bg-[#faf4e6]/95 backdrop-blur-md flex items-center justify-between z-30 shadow-xs">
+      {/* 1. Top Status & Information Bar (Mobile Responsive Header) */}
+      <header className="px-3 sm:px-6 md:px-8 py-2.5 sm:py-3 border-b border-[#3a2318]/15 bg-[#faf4e6]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 z-30 shadow-xs">
         
         {/* Left: Role & Track */}
-        <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-serif text-base sm:text-lg text-[#2a170f] leading-none font-semibold">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="font-serif text-sm sm:text-base md:text-lg text-[#2a170f] leading-none font-semibold truncate">
                 {config.jobRole}
               </span>
-              <span className="text-[10px] font-mono uppercase bg-[#dfa84c]/20 text-[#8d3e1b] border border-[#dfa84c]/40 px-2 py-0.5 rounded font-medium">
+              <span className="text-[9px] sm:text-[10px] font-mono uppercase bg-[#dfa84c]/20 text-[#8d3e1b] border border-[#dfa84c]/40 px-1.5 sm:px-2 py-0.5 rounded font-medium shrink-0">
                 {config.difficulty}
               </span>
             </div>
-            <div className="text-[11px] text-[#3a2318]/65 font-sans hidden sm:block">
-              {activeQuestion.category} • {config.interviewType.toUpperCase()} ROUND
+            <div className="text-[10px] sm:text-[11px] text-[#3a2318]/65 font-sans hidden sm:block truncate">
+              {activeQuestion.category} • {config.interviewType.toUpperCase()}
             </div>
           </div>
         </div>
 
         {/* Center: Question Progress */}
-        <div className="flex items-center gap-2 bg-[#f0e3c5] px-3.5 py-1 rounded-full border border-[#3a2318]/15 text-xs font-mono text-[#2a170f]">
-          <span className="text-[#b4532a] font-semibold">Question {currentQuestionIndex + 1}</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#f0e3c5] px-2.5 sm:px-3.5 py-1 rounded-full border border-[#3a2318]/15 text-[11px] sm:text-xs font-mono text-[#2a170f]">
+          <span className="text-[#b4532a] font-semibold">Q {currentQuestionIndex + 1}</span>
           <span className="opacity-40">/</span>
           <span>{questions.length}</span>
         </div>
 
-        {/* Right: Elapsed Timer & Quick Controls */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 font-mono text-xs text-[#2a170f] bg-[#f0e3c5] px-2.5 py-1 rounded-lg border border-[#3a2318]/15">
-            <Clock className="w-3.5 h-3.5 text-[#b4532a]" />
+        {/* Right: Elapsed Timer & Controls */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 font-mono text-[11px] sm:text-xs text-[#2a170f] bg-[#f0e3c5] px-2 sm:px-2.5 py-1 rounded-lg border border-[#3a2318]/15">
+            <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#b4532a]" />
             <span>{formatTime(elapsedSeconds)}</span>
           </div>
 
           <button
             onClick={() => setIsPauseModalOpen(true)}
-            className="p-2 rounded-lg bg-[#f0e3c5] hover:bg-[#e7d8b5] text-[#2a170f] border border-[#3a2318]/15 transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-lg bg-[#f0e3c5] hover:bg-[#e7d8b5] text-[#2a170f] border border-[#3a2318]/15 transition-colors cursor-pointer"
             title="Pause Interview"
+            aria-label="Pause Interview"
           >
-            <Pause className="w-4 h-4" />
+            <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
           <button
             onClick={() => setIsEndModalOpen(true)}
-            className="px-3 py-1.5 rounded-lg bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
           >
             <StopCircle className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">End Round</span>
@@ -476,20 +559,20 @@ export const Stage8LiveRoom: React.FC = () => {
         </div>
       </header>
 
-      {/* 2. Main Stage: Virtual Room (Split Stage Light Theme) */}
-      <main className="flex-1 p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 max-w-7xl mx-auto w-full overflow-hidden">
+      {/* 2. Main Stage: Virtual Room (Mobile Responsive Stack & Scroll) */}
+      <main className="flex-1 p-3 sm:p-5 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 max-w-7xl mx-auto w-full overflow-y-auto">
         
         {/* Left Column (Lg: 7 cols) — AI Interviewer & Live Prompt */}
-        <section className="lg:col-span-7 flex flex-col justify-between rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 p-5 sm:p-7 relative overflow-hidden shadow-sm">
+        <section className="lg:col-span-7 flex flex-col justify-between rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 p-4 sm:p-6 md:p-7 relative overflow-hidden shadow-sm">
           
           {/* Subtle ambient vintage background aura */}
           <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#dfa84c]/15 blur-3xl pointer-events-none" />
 
           {/* AI Header & Avatar Row */}
           <div>
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div className="flex items-center gap-3.5">
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 border-[#b4532a]/40 bg-[#f0e3c5] shrink-0 shadow-sm">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border-2 border-[#b4532a]/40 bg-[#f0e3c5] shrink-0 shadow-sm">
                   <img
                     src={selectedInterviewer.portraitUrl}
                     alt={selectedInterviewer.name}
@@ -504,25 +587,25 @@ export const Stage8LiveRoom: React.FC = () => {
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-serif text-2xl text-[#2a170f] leading-none font-semibold">
+                    <h2 className="font-serif text-xl sm:text-2xl text-[#2a170f] leading-none font-semibold">
                       {selectedInterviewer.name}
                     </h2>
-                    <span className="text-[10px] font-mono uppercase text-[#8d3e1b] bg-[#f0e3c5] px-2 py-0.5 rounded-full border border-[#3a2318]/15">
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase text-[#8d3e1b] bg-[#f0e3c5] px-2 py-0.5 rounded-full border border-[#3a2318]/15">
                       AI Lead
                     </span>
                   </div>
-                  <div className="text-xs text-[#3a2318]/70 mt-1 font-sans">
+                  <div className="text-[11px] sm:text-xs text-[#3a2318]/70 mt-1 font-sans">
                     {selectedInterviewer.personality} • {selectedInterviewer.accent}
                   </div>
                 </div>
               </div>
 
               {/* AI State Pill */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f0e3c5] border border-[#3a2318]/15 text-xs font-mono">
+              <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#f0e3c5] border border-[#3a2318]/15 text-[11px] sm:text-xs font-mono shrink-0">
                 {aiState === 'ai-speaking' ? (
                   <>
                     <span className="w-2 h-2 rounded-full bg-[#b4532a] animate-pulse" />
-                    <span className="text-[#8d3e1b] font-medium">AI is speaking</span>
+                    <span className="text-[#8d3e1b] font-medium">AI speaking</span>
                   </>
                 ) : aiState === 'listening' ? (
                   <>
@@ -532,33 +615,33 @@ export const Stage8LiveRoom: React.FC = () => {
                 ) : (
                   <>
                     <span className="w-2 h-2 rounded-full bg-amber-600 animate-bounce" />
-                    <span className="text-amber-800 font-medium">Evaluating response</span>
+                    <span className="text-amber-800 font-medium">Evaluating</span>
                   </>
                 )}
               </div>
             </div>
 
             {/* Audio Waveform Graphic */}
-            <div className="h-9 flex items-center justify-center gap-1 my-3 bg-[#f0e3c5]/70 rounded-xl px-4 border border-[#3a2318]/15">
+            <div className="h-8 sm:h-9 flex items-center justify-center gap-1 my-3 bg-[#f0e3c5]/70 rounded-xl px-4 border border-[#3a2318]/15">
               {[12, 24, 40, 16, 28, 50, 32, 14, 45, 20, 36, 18, 48, 22, 16, 30].map((h, i) => {
                 const isAiSpeaking = aiState === 'ai-speaking';
-                const isUserSpeaking = aiState === 'listening' && (audioVolume > 15 || isSpeechListening);
+                const isUserSpeaking = (isRecordingVoice || audioVolume > 15) && aiState === 'listening';
                 
                 let barHeight = 4;
                 let barColor = '#3a2318]/25';
 
                 if (isAiSpeaking) {
-                  barHeight = Math.max(6, Math.min(32, (h * 0.7) + (Math.sin(elapsedSeconds * 4 + i) * 10)));
+                  barHeight = Math.max(6, Math.min(30, (h * 0.7) + (Math.sin(elapsedSeconds * 4 + i) * 10)));
                   barColor = '#b4532a';
                 } else if (isUserSpeaking) {
-                  barHeight = Math.max(6, Math.min(32, (audioVolume * 0.3) + (Math.sin(i * 1.5) * 6)));
+                  barHeight = Math.max(6, Math.min(30, (audioVolume * 0.3) + (Math.sin(i * 1.5) * 6)));
                   barColor = '#5b8076';
                 }
 
                 return (
                   <div
                     key={i}
-                    className="w-1.5 rounded-full transition-all duration-150"
+                    className="w-1 sm:w-1.5 rounded-full transition-all duration-150"
                     style={{
                       height: `${barHeight}px`,
                       backgroundColor: barColor === '#b4532a' ? '#b4532a' : barColor === '#5b8076' ? '#5b8076' : 'rgba(58, 35, 24, 0.25)'
@@ -569,24 +652,24 @@ export const Stage8LiveRoom: React.FC = () => {
             </div>
 
             {/* Current Primary Question Card */}
-            <div className="mt-4 p-5 sm:p-6 rounded-2xl bg-[#f5ecda] border border-[#3a2318]/15 shadow-xs">
-              <div className="flex items-center justify-between text-[11px] font-mono text-[#b4532a] mb-2 uppercase tracking-wider font-semibold">
-                <span>Primary Interview Question</span>
-                <span>Category: {activeQuestion.category}</span>
+            <div className="mt-3 sm:mt-4 p-4 sm:p-6 rounded-2xl bg-[#f5ecda] border border-[#3a2318]/15 shadow-xs">
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-[#b4532a] mb-2 uppercase tracking-wider font-semibold">
+                <span>Primary Question</span>
+                <span className="truncate max-w-[180px] sm:max-w-none">{activeQuestion.category}</span>
               </div>
-              <p className="font-serif text-lg sm:text-xl lg:text-[22px] leading-snug text-[#2a170f] font-normal">
+              <p className="font-serif text-base sm:text-xl lg:text-[22px] leading-snug text-[#2a170f] font-normal">
                 "{activeQuestion.question}"
               </p>
             </div>
 
             {/* Follow-up Probing Card (Appears after candidate first responds) */}
             {hasAskedFollowUp && activeFollowUpText && (
-              <div className="mt-3.5 p-4 sm:p-5 rounded-2xl bg-[#faf2e1] border-2 border-[#b4532a]/30 shadow-xs animate-in fade-in duration-300">
-                <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#b4532a] mb-1.5 uppercase font-semibold">
+              <div className="mt-3 p-3.5 sm:p-5 rounded-2xl bg-[#faf2e1] border-2 border-[#b4532a]/30 shadow-xs animate-in fade-in duration-300">
+                <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono text-[#b4532a] mb-1.5 uppercase font-semibold">
                   <Sparkles className="w-3.5 h-3.5 text-[#b4532a]" />
                   <span>AI Adaptive Follow-Up Question</span>
                 </div>
-                <p className="font-serif text-base sm:text-lg text-[#2a170f] italic leading-snug">
+                <p className="font-serif text-sm sm:text-lg text-[#2a170f] italic leading-snug">
                   "{activeFollowUpText}"
                 </p>
               </div>
@@ -594,10 +677,10 @@ export const Stage8LiveRoom: React.FC = () => {
           </div>
 
           {/* Bottom helper actions on AI side */}
-          <div className="mt-6 pt-4 border-t border-[#3a2318]/15 flex items-center justify-between text-xs text-[#3a2318]/70">
+          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-[#3a2318]/15 flex items-center justify-between text-xs text-[#3a2318]/70">
             <button
               onClick={handleRepeatQuestion}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#f0e3c5] hover:bg-[#e7d8b5] border border-[#3a2318]/15 text-[#2a170f] transition-colors cursor-pointer font-medium shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#f0e3c5] hover:bg-[#e7d8b5] border border-[#3a2318]/15 text-[#2a170f] transition-colors cursor-pointer font-medium shadow-xs text-xs"
             >
               <RotateCcw className="w-3.5 h-3.5 text-[#b4532a]" />
               <span>Repeat question aloud</span>
@@ -610,10 +693,10 @@ export const Stage8LiveRoom: React.FC = () => {
         </section>
 
         {/* Right Column (Lg: 5 cols) — Candidate Cam Feed & Live Voice/Text Response Area */}
-        <section className="lg:col-span-5 flex flex-col justify-between rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 p-5 sm:p-6 shadow-sm">
+        <section className="lg:col-span-5 flex flex-col justify-between rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 p-4 sm:p-6 shadow-sm">
           
-          {/* Top Half: Candidate Camera Monitor */}
-          <div className="relative rounded-2xl bg-[#ede0c2] border border-[#3a2318]/15 overflow-hidden aspect-[16/10] flex items-center justify-center mb-4 shadow-inner">
+          {/* Top Half: Candidate Camera Monitor (Optimized for Mobile Height) */}
+          <div className="relative rounded-2xl bg-[#ede0c2] border border-[#3a2318]/15 overflow-hidden aspect-[16/10] max-h-[170px] sm:max-h-[220px] lg:max-h-none flex items-center justify-center mb-4 shadow-inner">
             {isCameraActive ? (
               <video
                 ref={videoRef}
@@ -623,36 +706,37 @@ export const Stage8LiveRoom: React.FC = () => {
                 className="w-full h-full object-cover -scale-x-100"
               />
             ) : (
-              <div className="text-center p-4">
-                <div className="w-14 h-14 rounded-full bg-[#b4532a] text-[#fdfaf3] flex items-center justify-center font-serif text-2xl font-bold mx-auto mb-2 shadow-md">
+              <div className="text-center p-3">
+                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-[#b4532a] text-[#fdfaf3] flex items-center justify-center font-serif text-xl sm:text-2xl font-bold mx-auto mb-1.5 shadow-md">
                   You
                 </div>
-                <div className="text-xs font-mono text-[#3a2318]/70">Camera Disabled • Audio Active</div>
+                <div className="text-[11px] font-mono text-[#3a2318]/70">Camera Disabled • Audio Active</div>
               </div>
             )}
 
             {/* Candidate status tag with live volume meter */}
-            <div className="absolute top-2.5 left-2.5 bg-[#2a170f]/75 backdrop-blur-xs px-2.5 py-1 rounded-md text-[10px] font-mono text-[#faf4e6] flex items-center gap-2 border border-white/10 shadow-xs">
+            <div className="absolute top-2 left-2 bg-[#2a170f]/80 backdrop-blur-xs px-2 py-1 rounded-md text-[9px] sm:text-[10px] font-mono text-[#faf4e6] flex items-center gap-1.5 border border-white/10 shadow-xs">
               <span className={`w-2 h-2 rounded-full ${!isMuted ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
-              <span>{!isMuted ? 'Microphone Active' : 'Muted'}</span>
+              <span>{!isMuted ? (isRecordingVoice ? 'Recording' : 'Mic Active') : 'Muted'}</span>
               {!isMuted && audioVolume > 5 && (
-                <div className="flex items-center gap-0.5 ml-1">
-                  <span className="w-1 h-2 rounded-full bg-emerald-400" />
-                  <span className={`w-1 h-3 rounded-full ${audioVolume > 20 ? 'bg-emerald-400' : 'bg-emerald-400/30'}`} />
-                  <span className={`w-1 h-4 rounded-full ${audioVolume > 40 ? 'bg-emerald-400' : 'bg-emerald-400/30'}`} />
+                <div className="flex items-center gap-0.5 ml-0.5">
+                  <span className="w-0.5 sm:w-1 h-2 rounded-full bg-emerald-400" />
+                  <span className={`w-0.5 sm:w-1 h-3 rounded-full ${audioVolume > 20 ? 'bg-emerald-400' : 'bg-emerald-400/30'}`} />
+                  <span className={`w-0.5 sm:w-1 h-4 rounded-full ${audioVolume > 40 ? 'bg-emerald-400' : 'bg-emerald-400/30'}`} />
                 </div>
               )}
             </div>
 
             {/* Quick in-video toggles */}
-            <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
+            <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => setIsMuted(!isMuted)}
                 className={`p-1.5 rounded-lg text-xs backdrop-blur-xs transition-colors cursor-pointer ${
-                  isMuted ? 'bg-red-600 text-white' : 'bg-[#2a170f]/75 text-[#faf4e6] hover:bg-[#2a170f]'
+                  isMuted ? 'bg-red-600 text-white' : 'bg-[#2a170f]/80 text-[#faf4e6] hover:bg-[#2a170f]'
                 }`}
                 title={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+                aria-label="Toggle mute"
               >
                 {isMuted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
               </button>
@@ -661,9 +745,10 @@ export const Stage8LiveRoom: React.FC = () => {
                 type="button"
                 onClick={() => setIsCameraActive(!isCameraActive)}
                 className={`p-1.5 rounded-lg text-xs backdrop-blur-xs transition-colors cursor-pointer ${
-                  !isCameraActive ? 'bg-red-600 text-white' : 'bg-[#2a170f]/75 text-[#faf4e6] hover:bg-[#2a170f]'
+                  !isCameraActive ? 'bg-red-600 text-white' : 'bg-[#2a170f]/80 text-[#faf4e6] hover:bg-[#2a170f]'
                 }`}
                 title={isCameraActive ? 'Turn off camera' : 'Turn on camera'}
+                aria-label="Toggle camera"
               >
                 {isCameraActive ? <Camera className="w-3.5 h-3.5" /> : <CameraOff className="w-3.5 h-3.5" />}
               </button>
@@ -673,63 +758,93 @@ export const Stage8LiveRoom: React.FC = () => {
           {/* Bottom Half: Live Speech-to-Text Transcription Box */}
           <div className="flex-1 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] font-mono text-[#b4532a] uppercase tracking-wider flex items-center gap-1.5 font-semibold">
+              <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+                <span className="text-[10.5px] sm:text-[11px] font-mono text-[#b4532a] uppercase tracking-wider flex items-center gap-1.5 font-semibold">
                   <Mic className="w-3.5 h-3.5" />
-                  <span>Spoken Answer (Live Transcribed)</span>
+                  <span>Candidate Response</span>
                 </span>
 
-                {/* Instant STAR Answer Pre-fill Helper */}
-                {!hasAskedFollowUp ? (
-                  <button
-                    type="button"
-                    onClick={handleLoadSampleStarAnswer}
-                    className="text-[10.5px] font-mono text-[#b4532a] hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Load STAR sample</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleLoadFollowUpAnswer}
-                    className="text-[10.5px] font-mono text-[#b4532a] hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Load follow-up sample</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Real-time Voice Transcription Banner */}
-              <div className="mb-2.5 p-2 rounded-xl bg-[#f0e3c5]/80 border border-[#3a2318]/15 flex items-center justify-between text-xs">
+                {/* Instant STAR Answer Pre-fill & Clear Helpers */}
                 <div className="flex items-center gap-2">
-                  <div className={`w-2.5 h-2.5 rounded-full ${
-                    aiState === 'listening' && !isMuted 
-                      ? 'bg-emerald-600 animate-ping' 
-                      : 'bg-[#3a2318]/30'
-                  }`} />
-                  <span className="font-mono text-[11px] text-[#2a170f]">
-                    {aiState === 'ai-speaking' 
-                      ? 'Interviewer is speaking...' 
-                      : isMuted 
-                        ? 'Microphone muted' 
-                        : isSpeechListening 
-                          ? 'Voice system active — speak clearly now' 
-                          : 'Microphone listening...'}
-                  </span>
-                </div>
+                  {(userAnswerText || userFollowUpAnswerText) && (
+                    <button
+                      type="button"
+                      onClick={handleClearCurrentAnswer}
+                      className="text-[10px] sm:text-[10.5px] font-mono text-[#9c3a1a] hover:underline flex items-center gap-0.5 cursor-pointer"
+                      title="Clear answer"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Clear</span>
+                    </button>
+                  )}
 
-                <div className="flex items-center gap-1 text-[10.5px] font-mono text-[#3a2318]/65">
-                  <Radio className="w-3 h-3 text-[#b4532a] animate-pulse" />
-                  <span>Real-time STT</span>
+                  {!hasAskedFollowUp ? (
+                    <button
+                      type="button"
+                      onClick={handleLoadSampleStarAnswer}
+                      className="text-[10px] sm:text-[10.5px] font-mono text-[#b4532a] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>STAR sample</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleLoadFollowUpAnswer}
+                      className="text-[10px] sm:text-[10.5px] font-mono text-[#b4532a] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Follow-up sample</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
+              {/* Dedicated "TAP TO SPEAK" Interactive Control Button */}
+              <div className="mb-2.5">
+                <button
+                  type="button"
+                  onClick={handleToggleVoiceRecording}
+                  className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-medium transition-all flex items-center justify-between shadow-xs cursor-pointer border ${
+                    isRecordingVoice
+                      ? 'bg-[#b4532a] hover:bg-[#97421f] text-white border-[#b4532a] ring-2 ring-[#b4532a]/30'
+                      : 'bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] border-[#3a2318]/20'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {isRecordingVoice ? (
+                      <>
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-200 animate-ping" />
+                        <span className="font-semibold">Recording voice... (Speak now)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-4 h-4 text-[#b4532a]" />
+                        <span>Tap to speak into microphone</span>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 font-mono text-[10.5px]">
+                    {isRecordingVoice ? (
+                      <span className="bg-black/20 px-2 py-0.5 rounded flex items-center gap-1">
+                        <Square className="w-3 h-3 fill-current" /> Tap when done
+                      </span>
+                    ) : (
+                      <span className="opacity-75">Click to talk</span>
+                    )}
+                  </div>
+                </button>
+              </div>
+
+              {/* Error Message if Browser Blocks Speech Recognition */}
               {speechError && (
-                <div className="mb-2 p-2 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                  <span>{speechError} You can still type directly in the box below.</span>
+                <div className="mb-2 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                  <div className="text-[11.5px] leading-tight">
+                    <span>{speechError}</span>
+                    <span className="block mt-0.5 font-medium">You can also type your answer directly in the box below.</span>
+                  </div>
                 </div>
               )}
 
@@ -744,17 +859,21 @@ export const Stage8LiveRoom: React.FC = () => {
                       setInterimTranscript('');
                     }}
                     placeholder={
-                      isSpeechSupported 
-                        ? "Speak your answer into your microphone (words will transcribe here automatically) or type directly..."
-                        : "Type your answer here to simulate your response..."
+                      isRecordingVoice
+                        ? "Transcribing your spoken answer live... (You can also type to edit)"
+                        : isSpeechSupported
+                          ? "Click 'Tap to speak into microphone' above or type your answer directly here..."
+                          : "Type your answer here..."
                     }
-                    className="w-full p-3.5 rounded-xl bg-white border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none shadow-xs leading-relaxed"
+                    className="w-full p-3 sm:p-3.5 rounded-xl bg-white border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none shadow-xs leading-relaxed"
                   />
+
+                  {/* Real-time live interim spoken phrase indicator */}
                   {interimTranscript && (
-                    <div className="mt-1 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300/60 text-emerald-900 text-xs italic flex items-center gap-1.5">
+                    <div className="mt-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300/60 text-emerald-900 text-xs italic flex items-center gap-1.5 animate-in fade-in">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
-                      <span className="font-medium">Live speech:</span>
-                      <span>"{interimTranscript}"</span>
+                      <span className="font-medium not-italic text-[11px] text-emerald-800">Hearing:</span>
+                      <span className="truncate">"{interimTranscript}"</span>
                     </div>
                   )}
                 </div>
@@ -772,14 +891,19 @@ export const Stage8LiveRoom: React.FC = () => {
                         setUserFollowUpAnswerText(e.target.value);
                         setInterimTranscript('');
                       }}
-                      placeholder="Speak or type your follow-up answer addressing the AI's question..."
-                      className="w-full p-3.5 rounded-xl bg-white border border-[#b4532a]/40 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none shadow-xs leading-relaxed"
+                      placeholder={
+                        isRecordingVoice
+                          ? "Transcribing your follow-up answer live..."
+                          : "Speak or type your follow-up answer addressing the AI's question..."
+                      }
+                      className="w-full p-3 sm:p-3.5 rounded-xl bg-white border border-[#b4532a]/40 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none shadow-xs leading-relaxed"
                     />
+
                     {interimTranscript && (
-                      <div className="mt-1 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300/60 text-emerald-900 text-xs italic flex items-center gap-1.5">
+                      <div className="mt-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300/60 text-emerald-900 text-xs italic flex items-center gap-1.5 animate-in fade-in">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
-                        <span className="font-medium">Live speech:</span>
-                        <span>"{interimTranscript}"</span>
+                        <span className="font-medium not-italic text-[11px] text-emerald-800">Hearing:</span>
+                        <span className="truncate">"{interimTranscript}"</span>
                       </div>
                     )}
                   </div>
@@ -788,11 +912,11 @@ export const Stage8LiveRoom: React.FC = () => {
             </div>
 
             {/* Answer Submit Controls */}
-            <div className="mt-4 pt-3 border-t border-[#3a2318]/15 flex items-center justify-between">
-              <span className="text-[11px] font-mono text-[#3a2318]/60">
+            <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-[#3a2318]/15 flex items-center justify-between gap-2">
+              <span className="text-[10px] sm:text-[11px] font-mono text-[#3a2318]/60">
                 {!hasAskedFollowUp 
-                  ? `${userAnswerText.trim().split(/\s+/).filter(Boolean).length} words spoken` 
-                  : `${userFollowUpAnswerText.trim().split(/\s+/).filter(Boolean).length} words spoken`}
+                  ? `${userAnswerText.trim().split(/\s+/).filter(Boolean).length} words` 
+                  : `${userFollowUpAnswerText.trim().split(/\s+/).filter(Boolean).length} words`}
               </span>
 
               {!hasAskedFollowUp ? (
@@ -800,20 +924,20 @@ export const Stage8LiveRoom: React.FC = () => {
                   type="button"
                   onClick={handleSubmitPrimaryAnswer}
                   disabled={!userAnswerText.trim() && !interimTranscript.trim()}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#b4532a] hover:bg-[#97421f] disabled:opacity-40 text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#b4532a] hover:bg-[#97421f] disabled:opacity-40 text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer"
                 >
-                  <span>Submit & Hear Follow-up</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <span>Submit Answer</span>
+                  <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleCompleteQuestion}
                   disabled={!userFollowUpAnswerText.trim() && !interimTranscript.trim()}
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#5b8076] hover:bg-[#47655d] disabled:opacity-40 text-white text-xs font-medium transition-all shadow-sm cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#5b8076] hover:bg-[#47655d] disabled:opacity-40 text-white text-xs font-medium transition-all shadow-sm cursor-pointer"
                 >
                   <span>{currentQuestionIndex + 1 < questions.length ? 'Next Question' : 'Complete Interview'}</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               )}
             </div>
@@ -821,12 +945,12 @@ export const Stage8LiveRoom: React.FC = () => {
         </section>
       </main>
 
-      {/* 3. Bottom Controls Dock (Light Editorial Theme) */}
-      <footer className="h-16 px-6 border-t border-[#3a2318]/15 bg-[#faf4e6]/95 backdrop-blur-md flex items-center justify-between text-xs font-sans">
-        <div className="flex items-center gap-3">
+      {/* 3. Bottom Controls Dock (Mobile Responsive Dock) */}
+      <footer className="px-3 sm:px-6 py-2.5 sm:py-3 border-t border-[#3a2318]/15 bg-[#faf4e6]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs font-sans">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs ${
               isMuted
                 ? 'bg-red-100 border-red-300 text-red-800'
                 : 'bg-[#f0e3c5] hover:bg-[#e7d8b5] border-[#3a2318]/15 text-[#2a170f]'
@@ -838,19 +962,19 @@ export const Stage8LiveRoom: React.FC = () => {
 
           <button
             onClick={() => setIsCameraActive(!isCameraActive)}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs ${
               !isCameraActive
                 ? 'bg-red-100 border-red-300 text-red-800'
                 : 'bg-[#f0e3c5] hover:bg-[#e7d8b5] border-[#3a2318]/15 text-[#2a170f]'
             }`}
           >
             {isCameraActive ? <Camera className="w-3.5 h-3.5 text-emerald-700" /> : <CameraOff className="w-3.5 h-3.5 text-red-600" />}
-            <span>{isCameraActive ? 'Camera On' : 'Camera Off'}</span>
+            <span className="hidden sm:inline">{isCameraActive ? 'Camera On' : 'Camera Off'}</span>
           </button>
 
           <button
             onClick={() => setShowCaptions(!showCaptions)}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs ${
               showCaptions
                 ? 'bg-[#dfa84c]/20 border-[#dfa84c]/60 text-[#8d3e1b]'
                 : 'bg-[#f0e3c5] hover:bg-[#e7d8b5] border-[#3a2318]/15 text-[#2a170f]/70'
@@ -861,18 +985,19 @@ export const Stage8LiveRoom: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex items-center gap-4 text-[11px] font-mono text-[#3a2318]/70">
+        <div className="flex items-center gap-3 text-[10.5px] sm:text-[11px] font-mono text-[#3a2318]/70">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-            <span>Encrypted Room v2.4</span>
+            <span className="hidden sm:inline">Encrypted Room v2.4</span>
+            <span className="sm:hidden">Encrypted</span>
           </div>
         </div>
       </footer>
 
-      {/* PAUSE MODAL (Light Theme) */}
+      {/* PAUSE MODAL (Mobile Responsive) */}
       {isPauseModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="rounded-3xl bg-[#faf4e6] border border-[#3a2318]/20 p-6 sm:p-7 max-w-md w-full shadow-2xl text-center text-[#2a170f]">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="rounded-3xl bg-[#faf4e6] border border-[#3a2318]/20 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f]">
             <div className="w-12 h-12 rounded-full bg-[#dfa84c]/20 text-[#8d3e1b] flex items-center justify-center mx-auto mb-3">
               <Pause className="w-6 h-6" />
             </div>
@@ -903,10 +1028,10 @@ export const Stage8LiveRoom: React.FC = () => {
         </div>
       )}
 
-      {/* END ROUND CONFIRMATION MODAL (Light Theme) */}
+      {/* END ROUND CONFIRMATION MODAL (Mobile Responsive) */}
       {isEndModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="rounded-3xl bg-[#faf4e6] border border-red-200 p-6 sm:p-7 max-w-md w-full shadow-2xl text-center text-[#2a170f]">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="rounded-3xl bg-[#faf4e6] border border-red-200 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f]">
             <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center mx-auto mb-3">
               <StopCircle className="w-6 h-6" />
             </div>
@@ -915,7 +1040,7 @@ export const Stage8LiveRoom: React.FC = () => {
               You have completed {currentQuestionIndex + (userAnswerText ? 1 : 0)} of {questions.length} questions. Ending now will analyze your submitted answers and generate your full AI performance report.
             </p>
             
-            <div className="p-3.5 rounded-xl bg-[#f5ecda] border border-[#3a2318]/15 text-left text-xs mb-6 space-y-1.5 font-mono text-[#2a170f]">
+            <div className="p-3 rounded-xl bg-[#f5ecda] border border-[#3a2318]/15 text-left text-xs mb-5 space-y-1.5 font-mono text-[#2a170f]">
               <div className="flex justify-between">
                 <span>Total Elapsed Time:</span>
                 <span className="text-[#b4532a] font-semibold">{formatTime(elapsedSeconds)}</span>
@@ -930,9 +1055,9 @@ export const Stage8LiveRoom: React.FC = () => {
               <button
                 onClick={() => {
                   setIsEndModalOpen(false);
-                  // Commit current turn if answer exists
+                  let finalTurns = [...turns];
                   if (userAnswerText.trim() || interimTranscript.trim()) {
-                    addTurn({
+                    const currentTurn: UserTurn = {
                       questionId: activeQuestion.id,
                       questionText: activeQuestion.question,
                       userAnswerText: (userAnswerText + (interimTranscript ? ' ' + interimTranscript : '')).trim(),
@@ -940,9 +1065,11 @@ export const Stage8LiveRoom: React.FC = () => {
                       answeredAt: new Date().toLocaleTimeString(),
                       followUpText: activeFollowUpText || undefined,
                       userFollowUpAnswerText: userFollowUpAnswerText.trim() || undefined
-                    });
+                    };
+                    addTurn(currentTurn);
+                    finalTurns = [...finalTurns, currentTurn];
                   }
-                  finishInterview();
+                  finishInterview(finalTurns);
                 }}
                 className="w-full py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
               >

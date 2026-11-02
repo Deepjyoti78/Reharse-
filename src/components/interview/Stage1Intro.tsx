@@ -12,7 +12,7 @@ export const Stage1Intro: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-8">
       {/* Main Hero Card */}
-      <div className="relative rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 shadow-md overflow-hidden p-6 sm:p-10">
+      <div className="relative rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 shadow-md overflow-hidden p-5 sm:p-8 md:p-10">
         
         {/* Top Header inside Card with Improved Back to Overview Button */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-7 sm:mb-9">
@@ -77,10 +77,10 @@ export const Stage1Intro: React.FC = () => {
             </div>
 
             {/* Action Bar */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 onClick={() => setCurrentStage('type-selection')}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
               >
                 <span>Choose Interview Type</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -88,7 +88,7 @@ export const Stage1Intro: React.FC = () => {
 
               <button
                 onClick={exitToDashboard}
-                className="px-5 py-3 rounded-full bg-transparent hover:bg-[#3a2318]/8 text-[#3a2318] font-sans text-sm font-medium transition-all cursor-pointer"
+                className="px-5 py-3 rounded-full bg-transparent hover:bg-[#3a2318]/8 text-[#3a2318] font-sans text-sm font-medium transition-all cursor-pointer text-center"
               >
                 Cancel & return
               </button>

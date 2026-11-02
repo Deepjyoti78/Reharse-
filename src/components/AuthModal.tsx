@@ -156,7 +156,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           {/* Social Authentication Buttons */}
-          <div className="grid grid-cols-2 gap-2.5 pt-0.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
             {/* Google */}
             <button
               type="button"
