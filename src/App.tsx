@@ -42,12 +42,14 @@ const AppContent: React.FC = () => {
       {/* Subtle organic noise overlay for vintage editorial atmosphere */}
       <div className="grain-overlay" />
 
-      {/* Navigation */}
-      <Navbar onOpenDemo={handleOpenDemo} onOpenAuth={handleOpenAuth} />
+      {/* Navigation - hidden completely in interview flow */}
+      {currentView !== 'interview-flow' && (
+        <Navbar onOpenDemo={handleOpenDemo} onOpenAuth={handleOpenAuth} />
+      )}
 
       {/* Dynamic View Controller */}
       {currentView === 'interview-flow' ? (
-        <div className="pt-16 sm:pt-20">
+        <div className="py-4 sm:py-8">
           <InterviewFlow />
         </div>
       ) : currentView === 'history' ? (

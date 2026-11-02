@@ -10,27 +10,31 @@ export const Stage1Intro: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-10">
-      {/* Return button */}
-      <button
-        onClick={exitToDashboard}
-        className="inline-flex items-center gap-1.5 text-xs text-[#3a2318]/70 hover:text-[#3a2318] mb-6 font-medium transition-colors"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        <span>Return to overview</span>
-      </button>
-
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-8">
       {/* Main Hero Card */}
       <div className="relative rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 shadow-sm overflow-hidden p-6 sm:p-10">
+        
+        {/* Top Header inside Card with Back Button */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8 pb-4 border-b border-[#3a2318]/10">
+          <button
+            onClick={exitToDashboard}
+            type="button"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#3a2318]/8 hover:bg-[#3a2318]/15 text-[#3a2318] text-xs font-medium font-sans transition-all cursor-pointer group"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+            <span>Back to home</span>
+          </button>
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#b4532a]/10 border border-[#b4532a]/20 text-[#b4532a] text-[11px] font-sans font-medium tracking-wide uppercase">
+            <Sparkles className="w-3 h-3 text-[#b4532a]" />
+            <span>Personalized AI Mock Interview Setup</span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Left Text Column */}
           <div className="lg:col-span-7">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#b4532a]/10 border border-[#b4532a]/20 text-[#b4532a] text-[11px] font-sans font-medium tracking-wide uppercase mb-4">
-              <Sparkles className="w-3 h-3 text-[#b4532a]" />
-              <span>Personalized AI Mock Interview Setup</span>
-            </div>
-
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-[42px] leading-[1.1] text-[#2a170f] font-normal mb-3">
               Let’s prepare for your <br />
               <em className="italic text-[#b4532a]">next interview.</em>
