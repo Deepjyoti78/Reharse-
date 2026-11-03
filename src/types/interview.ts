@@ -96,6 +96,7 @@ export interface AIInterviewerProfile {
   voiceGender: 'male' | 'female';
   speakingPace: number; // 0.8 to 1.2
   accent: string;
+  voiceId?: string; // ElevenLabs voice ID
 }
 
 export interface DeviceCheckState {

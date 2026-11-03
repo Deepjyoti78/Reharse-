@@ -11,7 +11,8 @@ export const AI_INTERVIEWERS: AIInterviewerProfile[] = [
     portraitUrl: '/images/rehearse/ai-interviewer/adaptive-listening-robot.webp',
     voiceGender: 'male',
     speakingPace: 1.0,
-    accent: 'Neutral American'
+    accent: 'Neutral American',
+    voiceId: 'JBFqnCBsd6RMkjVDRZzb' // George - Warm, Engaging & Conversational
   },
   {
     id: 'morgan',
@@ -23,7 +24,8 @@ export const AI_INTERVIEWERS: AIInterviewerProfile[] = [
     portraitUrl: '/images/rehearse/ai-interviewer/robot-interviewer-notes.webp',
     voiceGender: 'female',
     speakingPace: 1.0,
-    accent: 'British Formal'
+    accent: 'British Formal',
+    voiceId: 'Xb7hH8MSUJpSbSDYk0k2' // Alice - Clear, Articulate & Professional
   },
   {
     id: 'jordan',
@@ -35,7 +37,8 @@ export const AI_INTERVIEWERS: AIInterviewerProfile[] = [
     portraitUrl: '/images/rehearse/ai-interviewer/pushback-probing-robot.webp',
     voiceGender: 'male',
     speakingPace: 1.05,
-    accent: 'Fast-paced Technical'
+    accent: 'Fast-paced Technical',
+    voiceId: 'pNInz6obpgDQGcFmaJgB' // Adam - Dominant, Firm & Authoritative
   },
   {
     id: 'taylor',
@@ -47,7 +50,8 @@ export const AI_INTERVIEWERS: AIInterviewerProfile[] = [
     portraitUrl: '/images/rehearse/ai-interviewer/robot-evaluator-portrait.webp',
     voiceGender: 'female',
     speakingPace: 0.95,
-    accent: 'Analytical Calm'
+    accent: 'Analytical Calm',
+    voiceId: 'EXAVITQu4vr4xnSDxMaL' // Sarah - Mature, Confident & Reassuring
   }
 ];
 

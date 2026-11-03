@@ -20,6 +20,7 @@ import {
 import { useInterview } from '../../context/InterviewContext';
 import { getQuestionsForConfig } from '../../data/interviewBank';
 import type { QuestionItem, UserTurn } from '../../types/interview';
+import { playElevenLabsSpeech, stopElevenLabsSpeech, isElevenLabsConfigured } from '../../services/elevenlabs';
 
 export const Stage8LiveRoom: React.FC = () => {
   const { 
@@ -330,27 +331,26 @@ export const Stage8LiveRoom: React.FC = () => {
     }
   };
 
-  // Speak AI question using SpeechSynthesis
+  // Speak AI question using ElevenLabs studio voice (with SpeechSynthesis fallback)
   const speakText = (text: string, onDone?: () => void) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = selectedInterviewer.speakingPace || 1.0;
-      utterance.pitch = selectedInterviewer.voiceGender === 'female' ? 1.15 : 0.95;
+    stopElevenLabsSpeech();
 
-      utterance.onend = () => {
+    playElevenLabsSpeech({
+      text,
+      voiceId: selectedInterviewer.voiceId,
+      speakingRate: selectedInterviewer.speakingPace || 1.0,
+      voiceGender: selectedInterviewer.voiceGender,
+      onStart: () => {
+        setAiState('ai-speaking');
+      },
+      onEnded: () => {
         if (onDone) onDone();
-      };
-      utterance.onerror = () => {
+      },
+      onError: (err) => {
+        console.warn('Voice playback note:', err);
         if (onDone) onDone();
-      };
-
-      window.speechSynthesis.speak(utterance);
-    } else {
-      setTimeout(() => {
-        if (onDone) onDone();
-      }, 3500);
-    }
+      }
+    });
   };
 
   // When question changes, speak question and prepare candidate turn
@@ -382,9 +382,7 @@ export const Stage8LiveRoom: React.FC = () => {
     });
 
     return () => {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopElevenLabsSpeech();
     };
   }, [currentQuestionIndex]);
 
@@ -424,9 +422,7 @@ export const Stage8LiveRoom: React.FC = () => {
     }
     setIsRecordingVoice(false);
 
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    stopElevenLabsSpeech();
 
     setAiState('processing');
 
@@ -541,7 +537,10 @@ export const Stage8LiveRoom: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setIsPauseModalOpen(true)}
+            onClick={() => {
+              stopElevenLabsSpeech();
+              setIsPauseModalOpen(true);
+            }}
             className="p-1.5 sm:p-2 rounded-lg bg-[#f0e3c5] hover:bg-[#e7d8b5] text-[#2a170f] border border-[#3a2318]/15 transition-colors cursor-pointer"
             title="Pause Interview"
             aria-label="Pause Interview"
@@ -550,7 +549,10 @@ export const Stage8LiveRoom: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setIsEndModalOpen(true)}
+            onClick={() => {
+              stopElevenLabsSpeech();
+              setIsEndModalOpen(true);
+            }}
             className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
           >
             <StopCircle className="w-3.5 h-3.5" />
@@ -593,6 +595,12 @@ export const Stage8LiveRoom: React.FC = () => {
                     <span className="text-[9px] sm:text-[10px] font-mono uppercase text-[#8d3e1b] bg-[#f0e3c5] px-2 py-0.5 rounded-full border border-[#3a2318]/15">
                       AI Lead
                     </span>
+                    {isElevenLabsConfigured() && (
+                      <span className="hidden sm:inline-flex items-center gap-1 text-[9px] font-mono uppercase text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300">
+                        <Sparkles className="w-2.5 h-2.5 text-emerald-700" />
+                        ElevenLabs Studio Voice
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] sm:text-xs text-[#3a2318]/70 mt-1 font-sans">
                     {selectedInterviewer.personality} • {selectedInterviewer.accent}

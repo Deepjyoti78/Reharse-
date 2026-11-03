@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useInterview } from '../../context/InterviewContext';
+import { playElevenLabsSpeech, stopElevenLabsSpeech } from '../../services/elevenlabs';
 
 export const Stage9Report: React.FC = () => {
   const { 
@@ -68,21 +69,17 @@ export const Stage9Report: React.FC = () => {
 
   const handlePlayAudioAnswer = (qId: string, answer: string) => {
     if (isPlayingAudioAnswer === qId) {
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      stopElevenLabsSpeech();
       setIsPlayingAudioAnswer(null);
       return;
     }
     setIsPlayingAudioAnswer(qId);
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(answer);
-      u.rate = 1.0;
-      u.onend = () => setIsPlayingAudioAnswer(null);
-      u.onerror = () => setIsPlayingAudioAnswer(null);
-      window.speechSynthesis.speak(u);
-    } else {
-      setTimeout(() => setIsPlayingAudioAnswer(null), 3000);
-    }
+    
+    playElevenLabsSpeech({
+      text: answer,
+      onEnded: () => setIsPlayingAudioAnswer(null),
+      onError: () => setIsPlayingAudioAnswer(null),
+    });
   };
 
   return (

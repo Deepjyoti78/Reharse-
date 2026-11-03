@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Volume2, 
   ArrowRight, 
   ArrowLeft, 
   CheckCircle2, 
   AudioWaveform,
-  Sliders
+  Sliders,
+  Sparkles
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
 import { AI_INTERVIEWERS } from '../../data/interviewBank';
 import type { AIInterviewerProfile } from '../../types/interview';
+import { playElevenLabsSpeech, stopElevenLabsSpeech, isElevenLabsConfigured } from '../../services/elevenlabs';
 
 export const Stage5InterviewerSelection: React.FC = () => {
   const { 
@@ -22,11 +24,15 @@ export const Stage5InterviewerSelection: React.FC = () => {
   const [isPlayingPreview, setIsPlayingPreview] = useState<string | null>(null);
   const [speakingPace, setSpeakingPace] = useState(selectedInterviewer.speakingPace || 1.0);
 
+  useEffect(() => {
+    return () => {
+      stopElevenLabsSpeech();
+    };
+  }, []);
+
   const handlePreviewVoice = (interviewer: AIInterviewerProfile) => {
     if (isPlayingPreview === interviewer.id) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopElevenLabsSpeech();
       setIsPlayingPreview(null);
       return;
     }
@@ -35,26 +41,21 @@ export const Stage5InterviewerSelection: React.FC = () => {
 
     const sampleText = `Hello! I'm ${interviewer.name}. I'll be guiding your interview today. I'm looking forward to exploring your problem-solving approaches. Take your time, think through the trade-offs, and speak clearly.`;
 
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(sampleText);
-      utterance.rate = speakingPace;
-      utterance.pitch = interviewer.voiceGender === 'female' ? 1.15 : 0.95;
-
-      utterance.onend = () => {
+    playElevenLabsSpeech({
+      text: sampleText,
+      voiceId: interviewer.voiceId,
+      speakingRate: speakingPace,
+      voiceGender: interviewer.voiceGender,
+      onStart: () => {
+        setIsPlayingPreview(interviewer.id);
+      },
+      onEnded: () => {
         setIsPlayingPreview(null);
-      };
-      utterance.onerror = () => {
+      },
+      onError: () => {
         setIsPlayingPreview(null);
-      };
-
-      window.speechSynthesis.speak(utterance);
-    } else {
-      // Audio fallback simulation timer
-      setTimeout(() => {
-        setIsPlayingPreview(null);
-      }, 3500);
-    }
+      }
+    });
   };
 
   const handleSelect = (interviewer: AIInterviewerProfile) => {
@@ -168,8 +169,14 @@ export const Stage5InterviewerSelection: React.FC = () => {
                   <span>{isPlaying ? 'Playing Sample...' : 'Preview Voice'}</span>
                 </button>
 
-                <div className="text-[11px] font-mono text-[#3a2318]/60">
-                  {interviewer.voiceGender === 'female' ? 'Female timbre' : 'Male timbre'}
+                <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#3a2318]/60">
+                  {isElevenLabsConfigured() && (
+                    <span className="inline-flex items-center gap-0.5 text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <Sparkles className="w-2.5 h-2.5" />
+                      Studio
+                    </span>
+                  )}
+                  <span>{interviewer.voiceGender === 'female' ? 'Female timbre' : 'Male timbre'}</span>
                 </div>
               </div>
             </div>
