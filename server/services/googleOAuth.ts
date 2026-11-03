@@ -166,3 +166,4 @@ export async function handleGoogleCallback(
     destination: stateRecord.destination || '/',
   };
 }
+

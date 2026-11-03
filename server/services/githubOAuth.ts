@@ -181,3 +181,4 @@ export async function handleGitHubCallback(
     destination: stateRecord.destination || '/',
   };
 }
+
