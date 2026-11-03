@@ -25,3 +25,8 @@ dist-ssr
 .playwright-mcp
 .env
 .env.local
+
+# Database
+data/*.db
+data/*.db-*
+!data/.gitkeep

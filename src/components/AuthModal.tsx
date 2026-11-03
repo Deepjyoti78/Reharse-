@@ -42,7 +42,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   initialMode = 'signup'
 }) => {
-  const { signUp, login, loginWithGitHub, isLoading, error, clearError } = useAuth();
+  const { signUp, login, loginWithGoogle, loginWithGitHub, isLoading, error, clearError, providers } = useAuth();
   const [mode, setMode] = useState<'signup' | 'login'>(initialMode);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -102,12 +102,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const handleSocialGoogle = () => {
-    setIsGoogleDialogOpen(true);
+    if (providers.googleConfigured) {
+      loginWithGoogle();
+    } else {
+      setIsGoogleDialogOpen(true);
+    }
   };
 
-  const handleSocialGitHub = async () => {
-    const ok = await loginWithGitHub();
-    if (ok) onClose();
+  const handleSocialGitHub = () => {
+    loginWithGitHub();
   };
 
   const fillDemoCredentials = () => {

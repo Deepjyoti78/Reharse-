@@ -5,15 +5,18 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
   provider?: 'email' | 'google' | 'github';
   targetRole?: string;
   readinessScore?: number;
   completedSessions?: number;
+  createdAt?: string;
+  lastLoginAt?: string;
 }
 
-interface StoredAccount extends User {
-  password?: string;
+export interface AuthProvidersStatus {
+  googleConfigured: boolean;
+  githubConfigured: boolean;
 }
 
 interface AuthContextType {
@@ -21,90 +24,106 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  providers: AuthProvidersStatus;
   clearError: () => void;
   signUp: (name: string, email: string, password: string) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
-  loginWithGoogle: (profile?: { name: string; email: string; avatarUrl?: string }) => Promise<boolean>;
-  loginWithGitHub: () => Promise<boolean>;
-  logout: () => void;
+  loginWithGoogle: () => Promise<void>;
+  loginWithGitHub: () => Promise<void>;
+  logout: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
-
-const DEFAULT_ACCOUNTS: StoredAccount[] = [
-  {
-    id: 'demo-1',
-    name: 'Aman Verma',
-    email: 'demo@rehearse.ai',
-    password: 'password123',
-    provider: 'email',
-    targetRole: 'Software engineering',
-    readinessScore: 94,
-    completedSessions: 8,
-  }
-];
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Load existing session on initial mount
-  useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem('rehearse_current_user');
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      }
-
-      // Ensure demo accounts are in localStorage if not already present
-      const storedAccounts = localStorage.getItem('rehearse_accounts');
-      if (!storedAccounts) {
-        localStorage.setItem('rehearse_accounts', JSON.stringify(DEFAULT_ACCOUNTS));
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
+  const [providers, setProviders] = useState<AuthProvidersStatus>({
+    googleConfigured: false,
+    githubConfigured: false,
+  });
 
   const clearError = () => setError(null);
 
-  // Get current list of stored accounts
-  const getStoredAccounts = (): StoredAccount[] => {
+  // Check backend session & provider configuration on initial mount
+  const refreshSession = async () => {
     try {
-      const raw = localStorage.getItem('rehearse_accounts');
-      return raw ? JSON.parse(raw) : DEFAULT_ACCOUNTS;
+      // 1. Fetch configured OAuth providers
+      fetch('/api/auth/providers')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (data) {
+            setProviders({
+              googleConfigured: Boolean(data.googleConfigured),
+              githubConfigured: Boolean(data.githubConfigured),
+            });
+          }
+        })
+        .catch(() => {});
+
+      // 2. Fetch authenticated user from backend session cookie
+      const res = await fetch('/api/auth/me', {
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          localStorage.setItem('rehearse_current_user', JSON.stringify(data.user));
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // 3. Fallback to cached user if offline or unauthenticated
+      const cached = localStorage.getItem('rehearse_current_user');
+      if (cached) {
+        setUser(JSON.parse(cached));
+      } else {
+        setUser(null);
+      }
     } catch {
-      return DEFAULT_ACCOUNTS;
+      const cached = localStorage.getItem('rehearse_current_user');
+      if (cached) {
+        setUser(JSON.parse(cached));
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const saveStoredAccounts = (accounts: StoredAccount[]) => {
-    try {
-      localStorage.setItem('rehearse_accounts', JSON.stringify(accounts));
-    } catch {
-      // Ignore storage errors
-    }
-  };
+  useEffect(() => {
+    // 1. Check for OAuth callback redirect parameters in URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const authStatus = searchParams.get('auth');
+    const authError = searchParams.get('auth_error');
 
-  const setSessionUser = (userData: User) => {
-    setUser(userData);
-    try {
-      localStorage.setItem('rehearse_current_user', JSON.stringify(userData));
-    } catch {
-      // Ignore storage errors
+    if (authStatus === 'success') {
+      confetti({
+        particleCount: 75,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335', '#b8542c'],
+      });
+      // Clean query params from address bar
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (authError) {
+      setError(decodeURIComponent(authError));
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-  };
+
+    refreshSession();
+  }, []);
 
   const signUp = async (name: string, email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
-    // Simulate authentic network latency
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    const cleanEmail = email.trim().toLowerCase();
     const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
     if (!cleanName) {
       setError('Please provide your full name.');
@@ -124,147 +143,116 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
-    const accounts = getStoredAccounts();
-    const existing = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name: cleanName, email: cleanEmail, password }),
+      });
 
-    if (existing) {
-      setError('An account with this email already exists. Please log in instead.');
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Registration failed.');
+        setIsLoading(false);
+        return false;
+      }
+
+      setUser(data.user);
+      localStorage.setItem('rehearse_current_user', JSON.stringify(data.user));
+      setIsLoading(false);
+
+      confetti({
+        particleCount: 70,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#b8542c', '#dfa84c', '#5b8076', '#f3e7c9'],
+      });
+
+      return true;
+    } catch {
+      setError('Unable to reach server. Please check your network connection.');
       setIsLoading(false);
       return false;
     }
-
-    const newAccount: StoredAccount = {
-      id: `user-${Date.now()}`,
-      name: cleanName,
-      email: cleanEmail,
-      password,
-      provider: 'email',
-      targetRole: 'Software engineering',
-      readinessScore: 78,
-      completedSessions: 1,
-    };
-
-    saveStoredAccounts([...accounts, newAccount]);
-    setSessionUser(newAccount);
-    setIsLoading(false);
-
-    confetti({
-      particleCount: 70,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#b8542c', '#dfa84c', '#5b8076', '#f3e7c9']
-    });
-
-    return true;
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 550));
-
     const cleanEmail = email.trim().toLowerCase();
-    const accounts = getStoredAccounts();
-    const match = accounts.find((a) => a.email.toLowerCase() === cleanEmail);
 
-    if (!match || match.password !== password) {
-      setError('Invalid email or password. Try demo@rehearse.ai / password123');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: cleanEmail, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Invalid email or password.');
+        setIsLoading(false);
+        return false;
+      }
+
+      setUser(data.user);
+      localStorage.setItem('rehearse_current_user', JSON.stringify(data.user));
+      setIsLoading(false);
+
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#b8542c', '#dfa84c', '#5b8076', '#f3e7c9'],
+      });
+
+      return true;
+    } catch {
+      setError('Unable to reach server. Please check your network connection.');
       setIsLoading(false);
       return false;
     }
-
-    setSessionUser(match);
-    setIsLoading(false);
-
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#b8542c', '#dfa84c', '#5b8076', '#f3e7c9']
-    });
-
-    return true;
   };
 
-  const loginWithGoogle = async (profile?: { name: string; email: string; avatarUrl?: string }): Promise<boolean> => {
-    setIsLoading(true);
+  /**
+   * Initiates real Google OAuth 2.0 redirection flow
+   */
+  const loginWithGoogle = async (): Promise<void> => {
     setError(null);
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const accountName = profile?.name?.trim() || 'Deepjyoti Das';
-    const accountEmail = profile?.email?.trim().toLowerCase() || 'deepjyotidas78@gmail.com';
-    const avatarUrl = profile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(accountName)}&background=b8542c&color=fdfaf3&bold=true`;
-
-    const accounts = getStoredAccounts();
-    const existing = accounts.find((a) => a.email.toLowerCase() === accountEmail);
-
-    const googleUser: StoredAccount = existing
-      ? { ...existing, provider: 'google', avatarUrl: avatarUrl || existing.avatarUrl }
-      : {
-          id: `google-${Date.now()}`,
-          name: accountName,
-          email: accountEmail,
-          avatarUrl,
-          provider: 'google',
-          targetRole: 'Full Stack Engineer',
-          readinessScore: 92,
-          completedSessions: 4,
-        };
-
-    if (!existing) {
-      saveStoredAccounts([...accounts, googleUser]);
-    }
-
-    setSessionUser(googleUser);
-    setIsLoading(false);
-
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335']
-    });
-
-    return true;
-  };
-
-  const loginWithGitHub = async (): Promise<boolean> => {
     setIsLoading(true);
-    setError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    const gitHubUser: User = {
-      id: `github-${Date.now()}`,
-      name: 'Alex Rivera',
-      email: 'alex@github.com',
-      provider: 'github',
-      targetRole: 'Distributed Systems Lead',
-      readinessScore: 95,
-      completedSessions: 7,
-    };
-
-    setSessionUser(gitHubUser);
-    setIsLoading(false);
-
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#24292e', '#dfa84c', '#b8542c', '#f3e7c9']
-    });
-
-    return true;
+    // Save current route so user returns where they left off
+    const currentPath = window.location.pathname;
+    window.location.href = `/api/auth/google?destination=${encodeURIComponent(currentPath)}`;
   };
 
-  const logout = () => {
-    setUser(null);
+  /**
+   * Initiates real GitHub OAuth authorization redirection flow
+   */
+  const loginWithGitHub = async (): Promise<void> => {
+    setError(null);
+    setIsLoading(true);
+
+    const currentPath = window.location.pathname;
+    window.location.href = `/api/auth/github?destination=${encodeURIComponent(currentPath)}`;
+  };
+
+  const logout = async (): Promise<void> => {
     try {
-      localStorage.removeItem('rehearse_current_user');
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
     } catch {
-      // Ignore storage errors
+      // ignore
+    } finally {
+      localStorage.removeItem('rehearse_current_user');
+      setUser(null);
     }
   };
 
@@ -272,15 +260,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated: Boolean(user),
         isLoading,
         error,
+        providers,
         clearError,
         signUp,
         login,
         loginWithGoogle,
         loginWithGitHub,
         logout,
+        refreshSession,
       }}
     >
       {children}
@@ -288,11 +278,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
-
