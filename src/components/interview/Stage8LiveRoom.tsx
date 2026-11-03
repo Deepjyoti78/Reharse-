@@ -20,7 +20,12 @@ import {
 import { useInterview } from '../../context/InterviewContext';
 import { getQuestionsForConfig } from '../../data/interviewBank';
 import type { QuestionItem, UserTurn } from '../../types/interview';
-import { playElevenLabsSpeech, stopElevenLabsSpeech, isElevenLabsConfigured } from '../../services/elevenlabs';
+import { 
+  playElevenLabsSpeech, 
+  stopElevenLabsSpeech, 
+  isElevenLabsConfigured, 
+  transcribeSpeechWithElevenLabs 
+} from '../../services/elevenlabs';
 
 export const Stage8LiveRoom: React.FC = () => {
   const { 
@@ -53,9 +58,10 @@ export const Stage8LiveRoom: React.FC = () => {
   const [isCameraActive, setIsCameraActive] = useState(deviceState.cameraEnabled);
   const [showCaptions, setShowCaptions] = useState(true);
 
-  // Speech Recognition state
+  // Speech Recognition & Audio Recording state
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
 
   // Audio level meter
@@ -71,6 +77,8 @@ export const Stage8LiveRoom: React.FC = () => {
   // Video / Audio / Speech refs
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
@@ -187,6 +195,17 @@ export const Stage8LiveRoom: React.FC = () => {
     };
   }, [isCameraActive]);
 
+  // Helper to commit transcript chunk to current active answer
+  const appendToCurrentAnswer = (chunk: string) => {
+    const text = chunk.trim();
+    if (!text) return;
+    if (!hasAskedFollowUpRef.current) {
+      setUserAnswerText(prev => prev.trim() ? `${prev.trim()} ${text}` : text);
+    } else {
+      setUserFollowUpAnswerText(prev => prev.trim() ? `${prev.trim()} ${text}` : text);
+    }
+  };
+
   // Handle Speech Recognition setup (Web Speech API)
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -205,7 +224,6 @@ export const Stage8LiveRoom: React.FC = () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onstart = () => {
-        setIsRecordingVoice(true);
         setSpeechError(null);
       };
 
@@ -224,18 +242,7 @@ export const Stage8LiveRoom: React.FC = () => {
         }
 
         if (finalChunk.trim()) {
-          const cleanedChunk = finalChunk.trim();
-          if (!hasAskedFollowUpRef.current) {
-            setUserAnswerText(prev => {
-              const current = prev.trim();
-              return current ? `${current} ${cleanedChunk}` : cleanedChunk;
-            });
-          } else {
-            setUserFollowUpAnswerText(prev => {
-              const current = prev.trim();
-              return current ? `${current} ${cleanedChunk}` : cleanedChunk;
-            });
-          }
+          appendToCurrentAnswer(finalChunk);
           setInterimTranscript('');
         } else {
           setInterimTranscript(interim);
@@ -244,18 +251,17 @@ export const Stage8LiveRoom: React.FC = () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
+        console.warn('Web speech engine note:', event.error);
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           setSpeechError('Microphone permission blocked. Please click the camera/microphone icon in your browser address bar to allow access.');
-          setIsRecordingVoice(false);
-        } else if (event.error === 'network') {
-          setSpeechError('Speech recognition network service is currently unreachable in this browser session. You can type directly below.');
-          setIsRecordingVoice(false);
+          stopRecordingAudio();
         }
-        // 'no-speech' is non-fatal in continuous mode
+        // Note: 'network' and 'no-speech' are non-fatal!
+        // We do NOT abort; MediaRecorder captures audio locally and ElevenLabs Scribe transcribes it.
       };
 
       recognition.onend = () => {
-        // If user is actively recording and not muted, seamlessly restart after brief pause
+        // Seamless restart if user is actively recording and not muted
         if (isRecordingVoiceRef.current && !isMutedRef.current && aiStateRef.current === 'listening') {
           if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current);
           restartTimeoutRef.current = setTimeout(() => {
@@ -267,8 +273,6 @@ export const Stage8LiveRoom: React.FC = () => {
               }
             }
           }, 200);
-        } else {
-          setIsRecordingVoice(false);
         }
       };
 
@@ -291,43 +295,114 @@ export const Stage8LiveRoom: React.FC = () => {
     };
   }, [config.language]);
 
-  // Direct toggle for candidate speech recording (satisfies browser user gesture policy)
-  const handleToggleVoiceRecording = () => {
-    if (!recognitionRef.current) {
-      if (!isSpeechSupported) {
-        setSpeechError('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari, or type your answer directly.');
+  // Start real audio recording via MediaRecorder + parallel Web Speech
+  const startRecordingAudio = async () => {
+    setSpeechError(null);
+    setIsRecordingVoice(true);
+    if (isMuted) setIsMuted(false);
+    audioChunksRef.current = [];
+
+    // 1. Start browser MediaRecorder (runs 100% locally on the device, immune to network drops or adblockers)
+    try {
+      let stream = mediaStreamRef.current;
+      if (!stream || !stream.getAudioTracks().some(t => t.readyState === 'live')) {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
       }
-      return;
+
+      let mimeType = 'audio/webm;codecs=opus';
+      if (typeof MediaRecorder !== 'undefined') {
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = MediaRecorder.isTypeSupported('audio/webm') 
+            ? 'audio/webm' 
+            : MediaRecorder.isTypeSupported('audio/mp4') 
+              ? 'audio/mp4' 
+              : '';
+        }
+
+        const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            audioChunksRef.current.push(e.data);
+          }
+        };
+        recorder.start(250);
+        mediaRecorderRef.current = recorder;
+      }
+    } catch (e) {
+      console.warn('MediaRecorder init note:', e);
     }
 
-    if (isRecordingVoice) {
-      // Stop recording
-      setIsRecordingVoice(false);
+    // 2. Start Web Speech recognition in parallel (live preview if available)
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.start();
+      } catch {
+        // Ignore already started errors
+      }
+    }
+  };
+
+  // Stop recording and process transcription with ElevenLabs Scribe
+  const stopRecordingAudio = () => {
+    setIsRecordingVoice(false);
+
+    // Stop Web Speech
+    if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
       } catch {
         // ignore
       }
-      if (interimTranscript.trim()) {
-        const text = interimTranscript.trim();
-        if (!hasAskedFollowUp) {
-          setUserAnswerText(prev => prev.trim() ? `${prev.trim()} ${text}` : text);
-        } else {
-          setUserFollowUpAnswerText(prev => prev.trim() ? `${prev.trim()} ${text}` : text);
+    }
+
+    // Commit any interim text
+    if (interimTranscript.trim()) {
+      appendToCurrentAnswer(interimTranscript);
+      setInterimTranscript('');
+    }
+
+    // Stop MediaRecorder and transcribe audio chunks
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      const recorder = mediaRecorderRef.current;
+      
+      recorder.onstop = async () => {
+        const chunks = audioChunksRef.current;
+        if (chunks.length > 0) {
+          const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+          
+          if (blob.size > 1200 && isElevenLabsConfigured()) {
+            try {
+              setIsTranscribing(true);
+              const language = config.language === 'Hindi' ? 'hi' : 'en';
+              const transcribedText = await transcribeSpeechWithElevenLabs(blob, language);
+              
+              if (transcribedText) {
+                appendToCurrentAnswer(transcribedText);
+              }
+            } catch (err) {
+              console.warn('ElevenLabs STT transcription note:', err);
+            } finally {
+              setIsTranscribing(false);
+            }
+          }
         }
-        setInterimTranscript('');
-      }
-    } else {
-      // Start recording with explicit user click
-      setSpeechError(null);
-      setIsRecordingVoice(true);
-      if (isMuted) setIsMuted(false);
+      };
 
       try {
-        recognitionRef.current.start();
-      } catch (e) {
-        console.warn('Speech recognition start error:', e);
+        recorder.stop();
+      } catch {
+        // ignore
       }
+    }
+  };
+
+  // Direct toggle for candidate speech recording
+  const handleToggleVoiceRecording = () => {
+    if (isRecordingVoice) {
+      stopRecordingAudio();
+    } else {
+      startRecordingAudio();
     }
   };
 
@@ -844,6 +919,19 @@ export const Stage8LiveRoom: React.FC = () => {
                   </div>
                 </button>
               </div>
+
+              {/* Transcribing with ElevenLabs Scribe AI Status */}
+              {isTranscribing && (
+                <div className="mb-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center justify-between animate-pulse">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-600 animate-spin" />
+                    <span className="font-medium text-[11.5px]">Transcribing your voice with ElevenLabs Scribe AI...</span>
+                  </div>
+                  <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                    High Accuracy
+                  </span>
+                </div>
+              )}
 
               {/* Error Message if Browser Blocks Speech Recognition */}
               {speechError && (

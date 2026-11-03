@@ -213,3 +213,47 @@ export async function playElevenLabsSpeech(options: ElevenLabsSpeechOptions): Pr
     return null;
   }
 }
+
+/**
+ * Transcribes recorded speech using ElevenLabs Scribe API.
+ * Provides high-accuracy transcription for candidate audio blobs.
+ */
+export async function transcribeSpeechWithElevenLabs(
+  audioBlob: Blob,
+  languageCode: string = 'en'
+): Promise<string> {
+  const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
+  if (!apiKey) {
+    throw new Error('ElevenLabs API key is missing.');
+  }
+
+  if (!audioBlob || audioBlob.size < 500) {
+    return '';
+  }
+
+  const formData = new FormData();
+  // Ensure a recognizable audio filename for the API
+  const filename = audioBlob.type.includes('mp4') ? 'speech.mp4' : 'speech.webm';
+  formData.append('file', audioBlob, filename);
+  formData.append('model_id', 'scribe_v1');
+  if (languageCode) {
+    formData.append('language_code', languageCode === 'hi' ? 'hi' : 'en');
+  }
+
+  const response = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`ElevenLabs STT error (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  const transcriptText = (data.text || data.transcript || '').trim();
+  return transcriptText;
+}

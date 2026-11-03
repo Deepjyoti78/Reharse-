@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Star, ChevronLeft, ChevronRight, Check, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { GoogleAuthDialog } from './GoogleAuthDialog';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -41,13 +42,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   initialMode = 'signup'
 }) => {
-  const { signUp, login, loginWithGoogle, loginWithGitHub, isLoading, error, clearError } = useAuth();
+  const { signUp, login, loginWithGitHub, isLoading, error, clearError } = useAuth();
   const [mode, setMode] = useState<'signup' | 'login'>(initialMode);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
+  const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
 
   // Close modal when pressing Escape key
   useEffect(() => {
@@ -99,9 +101,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleSocialGoogle = async () => {
-    const ok = await loginWithGoogle();
-    if (ok) onClose();
+  const handleSocialGoogle = () => {
+    setIsGoogleDialogOpen(true);
   };
 
   const handleSocialGitHub = async () => {
@@ -434,6 +435,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
       </div>
+
+      {/* Google OAuth Dialog */}
+      <GoogleAuthDialog
+        isOpen={isGoogleDialogOpen}
+        onClose={() => setIsGoogleDialogOpen(false)}
+        onSuccess={onClose}
+      />
     </div>
   );
 };

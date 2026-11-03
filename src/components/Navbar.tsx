@@ -125,9 +125,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
               className="inline-flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-[#f8eed8] text-[#28140d] hover:bg-white hover:shadow-md transition-all text-xs font-medium cursor-pointer shadow-xs border border-[#3a2318]/15"
             >
-              <span className="w-6 h-6 rounded-full bg-[#b8542c] text-[#fdfaf3] flex items-center justify-center text-[11px] font-serif font-bold">
-                {user.name.charAt(0).toUpperCase()}
-              </span>
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="w-6 h-6 rounded-full object-cover border border-[#3a2318]/20 shrink-0"
+                />
+              ) : (
+                <span className="w-6 h-6 rounded-full bg-[#b8542c] text-[#fdfaf3] flex items-center justify-center text-[11px] font-serif font-bold shrink-0">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              )}
               <span className="max-w-[110px] truncate">{user.name.split(' ')[0]}</span>
               <ChevronDown className="w-3 h-3 opacity-60" />
             </button>

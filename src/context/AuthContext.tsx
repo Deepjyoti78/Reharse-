@@ -5,6 +5,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  avatarUrl?: string;
   provider?: 'email' | 'google' | 'github';
   targetRole?: string;
   readinessScore?: number;
@@ -23,7 +24,7 @@ interface AuthContextType {
   clearError: () => void;
   signUp: (name: string, email: string, password: string) => Promise<boolean>;
   login: (email: string, password: string) => Promise<boolean>;
-  loginWithGoogle: () => Promise<boolean>;
+  loginWithGoogle: (profile?: { name: string; email: string; avatarUrl?: string }) => Promise<boolean>;
   loginWithGitHub: () => Promise<boolean>;
   logout: () => void;
 }
@@ -186,21 +187,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const loginWithGoogle = async (): Promise<boolean> => {
+  const loginWithGoogle = async (profile?: { name: string; email: string; avatarUrl?: string }): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const googleUser: User = {
-      id: `google-${Date.now()}`,
-      name: 'Alex Rivera',
-      email: 'alex.rivera@gmail.com',
-      provider: 'google',
-      targetRole: 'Software engineering',
-      readinessScore: 92,
-      completedSessions: 5,
-    };
+    const accountName = profile?.name?.trim() || 'Deepjyoti Das';
+    const accountEmail = profile?.email?.trim().toLowerCase() || 'deepjyotidas78@gmail.com';
+    const avatarUrl = profile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(accountName)}&background=b8542c&color=fdfaf3&bold=true`;
+
+    const accounts = getStoredAccounts();
+    const existing = accounts.find((a) => a.email.toLowerCase() === accountEmail);
+
+    const googleUser: StoredAccount = existing
+      ? { ...existing, provider: 'google', avatarUrl: avatarUrl || existing.avatarUrl }
+      : {
+          id: `google-${Date.now()}`,
+          name: accountName,
+          email: accountEmail,
+          avatarUrl,
+          provider: 'google',
+          targetRole: 'Full Stack Engineer',
+          readinessScore: 92,
+          completedSessions: 4,
+        };
+
+    if (!existing) {
+      saveStoredAccounts([...accounts, googleUser]);
+    }
 
     setSessionUser(googleUser);
     setIsLoading(false);
