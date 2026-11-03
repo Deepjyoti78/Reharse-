@@ -11,27 +11,45 @@ export const Stage1Intro: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-8 animate-fade-in-up">
-      {/* Main Hero Card */}
-      <div className="relative rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 shadow-md overflow-hidden p-5 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
+      {/* Main Hero Card with Warm Theme and Subtle Grid Effect */}
+      <div className="relative rounded-3xl bg-gradient-to-br from-[#fbf4e6] via-[#f5e7ce] to-[#ebd8be] border border-[#b4532a]/20 shadow-[0_16px_50px_-12px_rgba(58,35,24,0.16),0_2px_10px_rgba(180,83,42,0.08)] overflow-hidden p-5 sm:p-8 md:p-10 transition-all hover:shadow-[0_20px_60px_-12px_rgba(58,35,24,0.2),0_4px_16px_rgba(180,83,42,0.12)]">
         
+        {/* Subtle Architectural Grid Pattern Overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-65"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(90, 52, 32, 0.11) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(90, 52, 32, 0.11) 1px, transparent 1px)
+            `,
+            backgroundSize: '28px 28px',
+            maskImage: 'radial-gradient(ellipse 90% 85% at 50% 40%, black 50%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 40%, black 50%, transparent 100%)',
+          }}
+        />
+
+        {/* Ambient Warm Glow Accents */}
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#b4532a]/12 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-[#d97706]/10 blur-3xl pointer-events-none" />
+
         {/* Top Header inside Card with Improved Back to Overview Button */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-7 sm:mb-9">
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 mb-7 sm:mb-9">
           <button
             onClick={exitToDashboard}
             type="button"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ebd8be]/90 hover:bg-[#e2c7a5] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98]"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
             <span>Back to overview</span>
           </button>
 
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#b4532a]/10 border border-[#b4532a]/20 text-[#b4532a] text-[11px] font-sans font-medium tracking-wide uppercase">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#b4532a]/12 border border-[#b4532a]/25 text-[#b4532a] text-[11px] font-sans font-medium tracking-wide uppercase backdrop-blur-xs">
             <Sparkles className="w-3 h-3 text-[#b4532a] animate-subtle-float" />
             <span>Personalized AI Mock Interview Setup</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           
           {/* Left Text Column */}
           <div className="lg:col-span-7">
@@ -46,7 +64,7 @@ export const Stage1Intro: React.FC = () => {
 
             {/* Quick Role Pickers */}
             <div className="mb-8">
-              <div className="text-[11px] uppercase tracking-wider text-[#3a2318]/60 font-mono mb-3">
+              <div className="text-[11px] uppercase tracking-wider text-[#3a2318]/65 font-mono mb-3">
                 Quick select target role:
               </div>
               <div className="flex flex-wrap gap-2">
@@ -66,7 +84,7 @@ export const Stage1Intro: React.FC = () => {
                       className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer border hover:scale-[1.03] active:scale-[0.98] ${
                         isSelected
                           ? 'bg-[#2a170f] text-[#f8eed8] border-[#2a170f] shadow-xs'
-                          : 'bg-[#f0e3c5]/80 text-[#2a170f] border-[#3a2318]/15 hover:bg-[#e6d6b2] hover:border-[#3a2318]/30'
+                          : 'bg-[#ebd8be]/75 text-[#2a170f] border-[#3a2318]/15 hover:bg-[#e2c7a5] hover:border-[#3a2318]/30'
                       }`}
                       style={{ animationDelay: `${idx * 40}ms` }}
                     >
@@ -98,7 +116,7 @@ export const Stage1Intro: React.FC = () => {
 
           {/* Right Visual Column */}
           <div className="lg:col-span-5 flex flex-col items-center">
-            <div className="relative w-full aspect-square max-w-[320px] rounded-2xl overflow-hidden border border-[#3a2318]/20 shadow-md bg-[#eddcc0]">
+            <div className="relative w-full aspect-square max-w-[320px] rounded-2xl overflow-hidden border border-[#3a2318]/25 shadow-md bg-[#eddcc0]">
               <img
                 src="/images/rehearse/practice/candidate-preparation.webp"
                 alt="Candidate preparing for interview with notes and vintage study lamp"
@@ -114,21 +132,21 @@ export const Stage1Intro: React.FC = () => {
           </div>
         </div>
 
-        {/* 4 Feature Pillars footer without harsh dividing lines */}
-        <div className="mt-9 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-sans text-[#3a2318]/85">
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
+        {/* 4 Feature Pillars footer */}
+        <div className="relative z-10 mt-9 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-sans text-[#3a2318]/85">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#ebd8be]/60 hover:bg-[#ebd8be]/90 border border-[#3a2318]/10 transition-colors">
             <Target className="w-4 h-4 text-[#b4532a] shrink-0" />
             <span className="font-medium text-[11.5px]">Role-tailored banks</span>
           </div>
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#ebd8be]/60 hover:bg-[#ebd8be]/90 border border-[#3a2318]/10 transition-colors">
             <Cpu className="w-4 h-4 text-[#5b8076] shrink-0" />
             <span className="font-medium text-[11.5px]">Live voice & transcript</span>
           </div>
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#ebd8be]/60 hover:bg-[#ebd8be]/90 border border-[#3a2318]/10 transition-colors">
             <ShieldCheck className="w-4 h-4 text-[#b4532a] shrink-0" />
             <span className="font-medium text-[11.5px]">Private & encrypted</span>
           </div>
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f0e3c5]/50 border border-[#3a2318]/8">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[#ebd8be]/60 hover:bg-[#ebd8be]/90 border border-[#3a2318]/10 transition-colors">
             <Award className="w-4 h-4 text-[#dfa84c] shrink-0" />
             <span className="font-medium text-[11.5px]">STAR rubrics & debrief</span>
           </div>
