@@ -1074,7 +1074,7 @@ export const Stage8LiveRoom: React.FC = () => {
                           ? "Click 'Tap to speak into microphone' above or type your answer directly here..."
                           : "Type your answer here..."
                     }
-                    className="w-full p-3 sm:p-3.5 rounded-xl bg-white border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none shadow-xs leading-relaxed"
+                    className="w-full p-3 sm:p-3.5 rounded-xl bg-[#f8eed8] border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a]/35 focus:bg-[#fbf5e6] font-sans resize-none shadow-xs leading-relaxed transition-colors"
                   />
 
                   {/* Real-time live interim spoken phrase indicator */}
@@ -1105,7 +1105,7 @@ export const Stage8LiveRoom: React.FC = () => {
                           ? "Transcribing your follow-up answer live..."
                           : "Speak or type your follow-up answer addressing the AI's question..."
                       }
-                      className="w-full p-3 sm:p-3.5 rounded-xl bg-white border border-[#b4532a]/40 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none shadow-xs leading-relaxed"
+                      className="w-full p-3 sm:p-3.5 rounded-xl bg-[#f8eed8] border border-[#b4532a]/40 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a]/35 focus:bg-[#fbf5e6] font-sans resize-none shadow-xs leading-relaxed transition-colors"
                     />
 
                     {interimTranscript && (

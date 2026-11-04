@@ -87,7 +87,7 @@ export const InterviewHistoryView: React.FC = () => {
             placeholder="Search by role, interviewer or score..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-[#3a2318]/20 text-xs text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#f5e9d0] border border-[#3a2318]/20 text-xs text-[#2a170f] placeholder:text-[#3a2318]/45 focus:outline-none focus:border-[#b4532a] focus:bg-[#fbf5e6] transition-colors"
           />
         </div>
 

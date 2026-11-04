@@ -219,7 +219,7 @@ export const Stage3Configuration: React.FC = () => {
                     value={customRoleInput}
                     onChange={handleCustomRoleChange}
                     placeholder="Enter custom title (e.g. SRE, AI Architect)"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white/95 border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] focus:outline-none focus:border-[#b4532a]"
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#f5e9d0] border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/45 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a]/35 focus:bg-[#fbf5e6] transition-colors"
                   />
                 </div>
               )}

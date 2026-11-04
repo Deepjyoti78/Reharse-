@@ -367,7 +367,7 @@ export const Stage4Personalization: React.FC = () => {
                   onChange={handleJdTextChange}
                   placeholder="Paste job posting text here (responsibilities, requirements, qualifications)..."
                   maxLength={3000}
-                  className="w-full p-3.5 rounded-2xl bg-white/95 border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none"
+                  className="w-full p-3.5 rounded-2xl bg-[#f5e9d0] border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/45 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a]/35 focus:bg-[#fbf5e6] font-sans resize-none transition-colors"
                 />
                 <div className="flex items-center justify-between text-xs text-[#3a2318]/65 mt-2 px-1">
                   <button

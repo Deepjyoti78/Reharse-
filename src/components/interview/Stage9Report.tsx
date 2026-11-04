@@ -165,7 +165,7 @@ export const Stage9Report: React.FC = () => {
                 className={`p-3.5 rounded-2xl border transition-colors ${
                   t.speaker === 'ai' 
                     ? 'bg-[#f4e8cc] border-[#3a2318]/15 text-[#2a170f]' 
-                    : 'bg-white border-[#3a2318]/15 text-[#2a170f] shadow-2xs'
+                    : 'bg-[#fbf5e6] border-[#3a2318]/15 text-[#2a170f] shadow-2xs'
                 }`}
               >
                 <div className="flex items-center justify-between text-[10.5px] font-mono text-[#3a2318]/60 mb-1.5">
