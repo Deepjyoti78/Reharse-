@@ -60,7 +60,7 @@ export const InterviewFlow: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] pt-2 sm:pt-4 pb-8 px-2.5 sm:px-6 lg:px-8 font-sans flex flex-col justify-start overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] pt-6 sm:pt-10 lg:pt-12 pb-12 px-2.5 sm:px-6 lg:px-8 font-sans flex flex-col justify-start overflow-x-hidden">
       {/* Outer Architectural Blueprint Grid Pattern - Clean, non-multiplying outer backdrop */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-[0.25] z-0"
