@@ -163,12 +163,12 @@ export const Stage3Configuration: React.FC = () => {
         </p>
       </div>
 
-      {/* Unified Master Card (Spacious, Well-Organized Layout) */}
-      <div className="relative z-10 rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 shadow-md p-6 sm:p-8 md:p-9">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+      {/* Unified Master Card with Warm Parchment Palette and Stacked Layout */}
+      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-6 sm:p-8 md:p-9">
+        <div className="space-y-7 sm:space-y-8">
           
-          {/* ============ Column 1: Role, Experience & Difficulty ============ */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* ============ Top Section: Role, Experience & Difficulty ============ */}
+          <div className="space-y-6">
             {/* Target Job Role */}
             <div>
               <div className="flex items-center justify-between mb-2.5">
@@ -185,10 +185,10 @@ export const Stage3Configuration: React.FC = () => {
                     key={role}
                     type="button"
                     onClick={() => handleRoleSelect(role)}
-                    className={`px-3 py-1.5 rounded-xl text-xs sm:text-[12.5px] font-medium transition-all cursor-pointer border ${
+                    className={`px-3.5 py-2 rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer border ${
                       !isCustomRole && config.jobRole === role
                         ? 'bg-[#b4532a] text-[#fdfaf3] border-[#b4532a] shadow-xs'
-                        : 'bg-[#f0e4c6] text-[#2a170f] border-transparent hover:bg-[#e6d6b2]'
+                        : 'bg-[#f2e5cb] text-[#2a170f] border-transparent hover:bg-[#e7d8b8]'
                     }`}
                   >
                     {role}
@@ -201,10 +201,10 @@ export const Stage3Configuration: React.FC = () => {
                     setIsCustomRole(true);
                     if (customRoleInput) updateConfig({ jobRole: customRoleInput });
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-[12.5px] font-medium transition-all cursor-pointer border ${
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer border ${
                     isCustomRole
                       ? 'bg-[#b4532a] text-[#fdfaf3] border-[#b4532a] shadow-xs'
-                      : 'bg-[#f0e4c6] text-[#2a170f] border-transparent hover:bg-[#e6d6b2]'
+                      : 'bg-[#f2e5cb] text-[#2a170f] border-transparent hover:bg-[#e7d8b8]'
                   }`}
                 >
                   + Custom
@@ -218,7 +218,7 @@ export const Stage3Configuration: React.FC = () => {
                     value={customRoleInput}
                     onChange={handleCustomRoleChange}
                     placeholder="Enter custom title (e.g. SRE, AI Architect)"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] focus:outline-none focus:border-[#b4532a]"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white/95 border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] focus:outline-none focus:border-[#b4532a]"
                   />
                 </div>
               )}
@@ -230,7 +230,7 @@ export const Stage3Configuration: React.FC = () => {
                 <GraduationCap className="w-4 h-4 text-[#5b8076]" />
                 <span>Experience Level</span>
               </div>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5">
                 {EXPERIENCE_LEVELS.map(level => {
                   const isSelected = config.experienceLevel === level;
                   return (
@@ -238,7 +238,7 @@ export const Stage3Configuration: React.FC = () => {
                       key={level}
                       type="button"
                       onClick={() => updateConfig({ experienceLevel: level })}
-                      className={`py-2 px-1 rounded-xl text-center text-xs sm:text-[12.5px] font-medium transition-all border cursor-pointer ${
+                      className={`py-2 px-1 rounded-xl text-center text-xs sm:text-[13px] font-medium transition-all border cursor-pointer ${
                         isSelected
                           ? 'bg-[#3a2318] text-[#f8eed8] border-[#3a2318] shadow-xs'
                           : 'bg-[#f5ebd2] text-[#3a2318] border-transparent hover:bg-[#ebdaba]'
@@ -251,7 +251,7 @@ export const Stage3Configuration: React.FC = () => {
               </div>
             </div>
 
-            {/* Interview Difficulty */}
+            {/* Interview Difficulty (4 Columns when full width) */}
             <div>
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans">
@@ -264,7 +264,7 @@ export const Stage3Configuration: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {DIFFICULTIES.map(diff => {
                   const isSelected = config.difficulty === diff.value;
                   return (
@@ -273,8 +273,8 @@ export const Stage3Configuration: React.FC = () => {
                       onClick={() => updateConfig({ difficulty: diff.value })}
                       className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-[#faf0d7] border-[#b4532a] ring-2 ring-[#b4532a]/30 shadow-xs'
-                          : 'bg-[#f7edd7] border-[#3a2318]/15 hover:border-[#3a2318]/30 hover:bg-[#f3e5ca]'
+                          ? 'bg-[#f8ebce] border-[#b4532a] ring-2 ring-[#b4532a]/30 shadow-xs'
+                          : 'bg-[#f5e7c8] border-[#3a2318]/15 hover:border-[#3a2318]/30 hover:bg-[#eeddbb]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
@@ -295,10 +295,13 @@ export const Stage3Configuration: React.FC = () => {
             </div>
           </div>
 
-          {/* ============ Column 2: Duration, Style & Disposition ============ */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* Section Divider */}
+          <div className="border-t border-[#3a2318]/12" />
+
+          {/* ============ Bottom Section: Duration, Cadence, Language & Tone (Placed Below Left Side) ============ */}
+          <div className="space-y-6">
             {/* Duration & Questions Row */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* Duration */}
               <div>
                 <div className="flex items-center gap-2 mb-2 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans">
@@ -313,10 +316,10 @@ export const Stage3Configuration: React.FC = () => {
                         key={dur.value}
                         type="button"
                         onClick={() => updateConfig({ durationMinutes: dur.value })}
-                        className={`py-2 px-1 text-center rounded-xl text-xs sm:text-[12.5px] font-medium transition-all cursor-pointer ${
+                        className={`py-2 px-1 text-center rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-[#3a2318] text-[#f8eed8] shadow-xs'
-                            : 'bg-[#f2e6cb] text-[#2a170f] hover:bg-[#e7d8b8]'
+                            : 'bg-[#f2e5cb] text-[#2a170f] hover:bg-[#e7d8b8]'
                         }`}
                       >
                         {dur.label}
@@ -343,10 +346,10 @@ export const Stage3Configuration: React.FC = () => {
                           setIsCustomQuestions(false);
                           updateConfig({ questionCount: cnt });
                         }}
-                        className={`py-2 px-1 text-center rounded-xl text-xs sm:text-[12.5px] font-medium transition-all cursor-pointer ${
+                        className={`py-2 px-1 text-center rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-[#3a2318] text-[#f8eed8] shadow-xs'
-                            : 'bg-[#f2e6cb] text-[#2a170f] hover:bg-[#e7d8b8]'
+                            : 'bg-[#f2e5cb] text-[#2a170f] hover:bg-[#e7d8b8]'
                         }`}
                       >
                         {cnt} Qs
@@ -362,20 +365,20 @@ export const Stage3Configuration: React.FC = () => {
               <div className="text-xs sm:text-sm font-semibold text-[#2a170f] font-sans mb-2.5">
                 Interview Cadence
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {STYLES.map(st => {
                   const isSelected = config.interviewStyle === st.value;
                   return (
                     <div
                       key={st.value}
                       onClick={() => updateConfig({ interviewStyle: st.value })}
-                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                      className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-[#faf0d7] border-[#b4532a] ring-2 ring-[#b4532a]/30'
-                          : 'bg-[#f7edd7] border-[#3a2318]/15 hover:bg-[#f3e5ca]'
+                          ? 'bg-[#f8ebce] border-[#b4532a] ring-2 ring-[#b4532a]/30'
+                          : 'bg-[#f5e7c8] border-[#3a2318]/15 hover:bg-[#eeddbb]'
                       }`}
                     >
-                      <div className="text-xs sm:text-[13px] font-semibold text-[#2a170f] mb-1">{st.label}</div>
+                      <div className="text-xs sm:text-[13.5px] font-semibold text-[#2a170f] mb-1">{st.label}</div>
                       <div className="text-xs text-[#3a2318]/75 leading-relaxed">{st.description}</div>
                     </div>
                   );
@@ -384,7 +387,7 @@ export const Stage3Configuration: React.FC = () => {
             </div>
 
             {/* Spoken Language & AI Disposition Dropdown */}
-            <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-end">
               <div>
                 <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans mb-2">
                   <Globe2 className="w-4 h-4 text-[#5b8076]" />
@@ -396,10 +399,10 @@ export const Stage3Configuration: React.FC = () => {
                       key={lang}
                       type="button"
                       onClick={() => updateConfig({ language: lang })}
-                      className={`px-3 py-1.5 rounded-xl text-xs sm:text-[12.5px] font-medium transition-all cursor-pointer ${
+                      className={`px-3.5 py-2 rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
                         config.language === lang
                           ? 'bg-[#5b8076] text-white shadow-xs'
-                          : 'bg-[#f0e3c5] text-[#2a170f] hover:bg-[#e4d4b1]'
+                          : 'bg-[#f2e5cb] text-[#2a170f] hover:bg-[#e7d8b8]'
                       }`}
                     >
                       {lang}
@@ -415,7 +418,7 @@ export const Stage3Configuration: React.FC = () => {
                 <select
                   value={config.aiTone}
                   onChange={(e) => updateConfig({ aiTone: e.target.value as AIBehaviorTone })}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-[#3a2318]/20 text-xs sm:text-[13px] text-[#2a170f] focus:outline-none focus:border-[#b4532a] cursor-pointer"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white/95 border border-[#3a2318]/20 text-xs sm:text-[13px] text-[#2a170f] focus:outline-none focus:border-[#b4532a] cursor-pointer"
                 >
                   {AI_TONES.map(tone => (
                     <option key={tone.value} value={tone.value}>
@@ -427,7 +430,7 @@ export const Stage3Configuration: React.FC = () => {
             </div>
 
             {/* Session Blueprint Summary Banner */}
-            <div className="p-3.5 rounded-2xl bg-[#f0e4c8]/70 border border-[#3a2318]/10 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-[#2a170f]">
+            <div className="p-3.5 rounded-2xl bg-[#ede0c3]/80 border border-[#3a2318]/10 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-[#2a170f]">
               <span className="font-mono text-[11px] text-[#3a2318]/65 uppercase">Session Blueprint:</span>
               <span className="font-medium text-xs sm:text-[13px] text-[#b4532a]">
                 {config.jobRole} • {config.experienceLevel} • {config.difficulty} • {config.durationMinutes}m
@@ -437,7 +440,7 @@ export const Stage3Configuration: React.FC = () => {
         </div>
 
         {/* Footer Navigation Bar inside Master Card */}
-        <div className="mt-8 pt-5 border-t border-[#3a2318]/10 flex items-center justify-between gap-4">
+        <div className="mt-8 pt-6 border-t border-[#3a2318]/12 flex items-center justify-between gap-4">
           <button
             onClick={() => setCurrentStage('type-selection')}
             type="button"

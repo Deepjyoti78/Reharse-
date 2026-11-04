@@ -75,7 +75,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-4 pb-20 sm:pb-24 animate-fade-in-up">
+    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -106,8 +106,8 @@ export const Stage5InterviewerSelection: React.FC = () => {
               onClick={() => handleSelect(interviewer)}
               className={`relative rounded-3xl p-5 sm:p-6 transition-all duration-300 cursor-pointer border flex flex-col justify-between interactive-card animate-fade-in-up ${staggerClass} ${
                 isSelected
-                  ? 'bg-[#faf0d8] border-[#b4532a] shadow-lg ring-2 ring-[#b4532a]/35 -translate-y-0.5'
-                  : 'bg-[#faf4e6] border-[#3a2318]/15 hover:border-[#3a2318]/40 hover:bg-[#faf1dc]'
+                  ? 'bg-[#f7e9c9] border-[#b4532a] shadow-lg ring-2 ring-[#b4532a]/35 -translate-y-0.5'
+                  : 'bg-[#faf0d8] border-[#3a2318]/15 hover:border-[#3a2318]/40 hover:bg-[#f5e7c8]'
               }`}
             >
               <div>
@@ -213,8 +213,8 @@ export const Stage5InterviewerSelection: React.FC = () => {
         })}
       </div>
 
-      {/* Speaking Pace & Preferences Controls */}
-      <div className="relative z-10 rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 p-5 sm:p-6 mb-6 shadow-xs">
+      {/* Speaking Pace & Preferences Controls with Warmer Palette */}
+      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-5 sm:p-6 mb-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -249,34 +249,32 @@ export const Stage5InterviewerSelection: React.FC = () => {
         </div>
       </div>
 
-      {/* Persistent / Sticky Bottom Navigation Bar so the Next button is ALWAYS visible */}
-      <div className="fixed bottom-0 inset-x-0 z-50 bg-[#faf3e3]/95 backdrop-blur-md border-t border-[#3a2318]/15 px-4 py-3 sm:py-3.5 shadow-lg">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
-          <button
-            onClick={() => setCurrentStage('personalization')}
-            type="button"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs sm:text-sm font-medium font-sans border border-[#3a2318]/20 transition-all cursor-pointer group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
-            <span>Back to Personalization</span>
-          </button>
+      {/* Bottom Navigation Buttons (Transparent, No White Background Bar) */}
+      <div className="mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <button
+          onClick={() => setCurrentStage('personalization')}
+          type="button"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs sm:text-sm font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
+          <span>Back to Personalization</span>
+        </button>
 
-          <div className="hidden sm:flex items-center gap-2 text-xs text-[#2a170f]">
-            <span className="text-[#3a2318]/60">Selected:</span>
-            <span className="font-semibold text-[#b4532a]">{selectedInterviewer.name}</span>
-            <span className="text-[#3a2318]/40">•</span>
-            <span className="text-[#3a2318]/80">{selectedInterviewer.personality}</span>
-          </div>
-
-          <button
-            onClick={handleContinue}
-            type="button"
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <span>Next: Review Summary</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-          </button>
+        <div className="hidden sm:flex items-center gap-2 text-xs text-[#2a170f]">
+          <span className="text-[#3a2318]/60">Selected:</span>
+          <span className="font-semibold text-[#b4532a]">{selectedInterviewer.name}</span>
+          <span className="text-[#3a2318]/40">•</span>
+          <span className="text-[#3a2318]/80">{selectedInterviewer.personality}</span>
         </div>
+
+        <button
+          onClick={handleContinue}
+          type="button"
+          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <span>Next: Review Summary</span>
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+        </button>
       </div>
     </div>
   );

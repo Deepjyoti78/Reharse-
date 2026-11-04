@@ -11,8 +11,8 @@ export const Stage1Intro: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
-      {/* Main Hero Card with Clean Solid Warm Palette & Generous Spacing */}
-      <div className="relative rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 shadow-md p-6 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
+      {/* Main Hero Card with Warm Parchment Palette & Generous Spacing */}
+      <div className="relative rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-6 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
         
         {/* Top Header inside Card with Back to Overview Button */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8">

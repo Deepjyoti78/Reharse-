@@ -165,8 +165,8 @@ export const Stage2TypeSelection: React.FC = () => {
               onClick={() => handleSelectType(card.type)}
               className={`relative rounded-2xl p-5 sm:p-6 transition-all duration-200 cursor-pointer flex flex-col justify-between border interactive-card animate-fade-in-up ${staggerClass} ${
                 isSelected
-                  ? 'bg-[#faf0d8] border-[#b4532a] shadow-md ring-2 ring-[#b4532a]/35 -translate-y-0.5'
-                  : 'bg-[#faf4e6] border-[#3a2318]/15 hover:border-[#3a2318]/35 hover:bg-[#faf1dc] hover:shadow-xs'
+                  ? 'bg-[#f7e9c9] border-[#b4532a] shadow-md ring-2 ring-[#b4532a]/35 -translate-y-0.5'
+                  : 'bg-[#faf0d8] border-[#3a2318]/15 hover:border-[#3a2318]/35 hover:bg-[#f5e7c8] hover:shadow-xs'
               }`}
             >
               <div>
