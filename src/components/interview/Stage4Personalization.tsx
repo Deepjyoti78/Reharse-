@@ -176,7 +176,7 @@ export const Stage4Personalization: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+    <div className="relative max-w-6xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -195,7 +195,7 @@ export const Stage4Personalization: React.FC = () => {
       </div>
 
       {/* Unified Master Card (Warm Parchment Palette & Spacious Side-by-Side 2-Column) */}
-      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-6 sm:p-8 md:p-9">
+      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-4 sm:p-8 md:p-9">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
           
           {/* ============ Column 1: Candidate Resume ============ */}
@@ -413,7 +413,7 @@ export const Stage4Personalization: React.FC = () => {
         </div>
 
         {/* Footer Navigation Inside Master Card */}
-        <div className="mt-8 pt-5 border-t border-[#3a2318]/10 flex items-center justify-between gap-4">
+        <div className="mt-6 sm:mt-8 pt-5 border-t border-[#3a2318]/10 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <button
             onClick={() => setCurrentStage('configuration')}
             type="button"

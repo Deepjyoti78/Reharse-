@@ -75,7 +75,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+    <div className="relative max-w-6xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -104,7 +104,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
             <div
               key={interviewer.id}
               onClick={() => handleSelect(interviewer)}
-              className={`relative rounded-3xl p-5 sm:p-6 transition-all duration-300 cursor-pointer border flex flex-col justify-between interactive-card animate-fade-in-up ${staggerClass} ${
+              className={`relative rounded-3xl p-4 sm:p-6 transition-all duration-300 cursor-pointer border flex flex-col justify-between interactive-card animate-fade-in-up ${staggerClass} ${
                 isSelected
                   ? 'bg-[#f7e9c9] border-[#b4532a] shadow-lg ring-2 ring-[#b4532a]/35 -translate-y-0.5'
                   : 'bg-[#faf0d8] border-[#3a2318]/15 hover:border-[#3a2318]/40 hover:bg-[#f5e7c8]'
@@ -171,7 +171,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
                     e.stopPropagation();
                     handlePreviewVoice(interviewer);
                   }}
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  className={`inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                     isPlaying
                       ? 'bg-[#b4532a] text-white shadow-xs'
                       : 'bg-[#ede0c3] hover:bg-[#e4d3af] text-[#2a170f]'
@@ -250,7 +250,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
       </div>
 
       {/* Bottom Navigation Buttons (Transparent, No White Background Bar) */}
-      <div className="mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <div className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         <button
           onClick={() => setCurrentStage('personalization')}
           type="button"

@@ -110,14 +110,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
         .catch(() => {});
 
-      // 2. Fetch authenticated user from backend session cookie
+      // 2. Fetch authenticated user with cookie + Bearer token fallback
+      const token = localStorage.getItem('rehearse_session_token');
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch('/api/auth/me', {
         credentials: 'include',
+        headers,
       });
 
       if (res.ok) {
         const data = await res.json();
-        if (data.user) {
+        if (data && data.user) {
           setUser(data.user);
           localStorage.setItem('rehearse_current_user', JSON.stringify(data.user));
           setIsLoading(false);

@@ -33,9 +33,9 @@ const STANDARD_ROLES: JobRole[] = [
 
 const EXPERIENCE_LEVELS: ExperienceLevel[] = [
   'Fresher',
-  '0–1 Years',
-  '1–3 Years',
-  '3–5 Years',
+  '0-1 Years',
+  '1-3 Years',
+  '3-5 Years',
   '5+ Years'
 ];
 
@@ -145,7 +145,7 @@ export const Stage3Configuration: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+    <div className="relative max-w-6xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -164,7 +164,7 @@ export const Stage3Configuration: React.FC = () => {
       </div>
 
       {/* Unified Master Card with Warm Parchment Palette and Stacked Layout */}
-      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-6 sm:p-8 md:p-9">
+      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-4 sm:p-8 md:p-9">
         <div className="space-y-7 sm:space-y-8">
           
           {/* ============ Top Section: Role, Experience & Difficulty ============ */}
@@ -440,7 +440,7 @@ export const Stage3Configuration: React.FC = () => {
         </div>
 
         {/* Footer Navigation Bar inside Master Card */}
-        <div className="mt-8 pt-6 border-t border-[#3a2318]/12 flex items-center justify-between gap-4">
+        <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-[#3a2318]/12 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <button
             onClick={() => setCurrentStage('type-selection')}
             type="button"

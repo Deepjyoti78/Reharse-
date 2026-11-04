@@ -228,14 +228,47 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
         )}
       </div>
 
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden flex items-center justify-center p-2 rounded-full border border-[#f6ebd4]/30 text-[#f6ebd4] hover:bg-[#f6ebd4]/10 transition-colors"
-        aria-label="Toggle Navigation Menu"
-      >
-        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
+      {/* Mobile Top Bar Controls: User Avatar / Sign In + Hamburger Menu */}
+      <div className="flex md:hidden items-center gap-2">
+        {isAuthenticated && user ? (
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f8eed8]/20 border border-[#f6ebd4]/30 text-left cursor-pointer hover:bg-[#f8eed8]/30 transition-all"
+            title={user.name}
+          >
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="w-6 h-6 rounded-full object-cover border border-[#dfa84c]"
+              />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-[#b4532a] text-[#f6ebd4] font-medium text-xs flex items-center justify-center">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="text-xs font-medium text-[#f6ebd4] max-w-[85px] truncate">
+              {user.name.split(' ')[0]}
+            </span>
+          </button>
+        ) : (
+          <button
+            onClick={onOpenAuth}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#f8eed8] text-[#28140d] text-xs font-medium cursor-pointer hover:bg-white transition-all"
+          >
+            <Sparkles className="w-3 h-3 text-[#b4532a]" />
+            <span>Sign in</span>
+          </button>
+        )}
+
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center justify-center p-2 rounded-full border border-[#f6ebd4]/30 text-[#f6ebd4] hover:bg-[#f6ebd4]/10 transition-colors"
+          aria-label="Toggle Navigation Menu"
+        >
+          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
 
       {/* Mobile Drawer */}
       {isOpen && (

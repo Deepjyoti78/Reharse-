@@ -1052,7 +1052,7 @@ export const Stage8LiveRoom: React.FC = () => {
 
       {/* 3. Bottom Controls Floating Dock */}
       <div className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-40 pointer-events-auto">
-        <footer className="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#faf0d8]/95 backdrop-blur-md border border-[#3a2318]/20 shadow-lg text-xs font-sans">
+        <footer className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#faf0d8]/95 backdrop-blur-md border border-[#3a2318]/20 shadow-lg text-xs font-sans max-w-[calc(100vw-1.5rem)] justify-center">
           <button
             onClick={() => setIsMuted(!isMuted)}
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs shadow-2xs hover:scale-[1.02] active:scale-[0.98] ${

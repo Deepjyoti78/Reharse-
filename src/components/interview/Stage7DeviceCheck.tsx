@@ -161,7 +161,7 @@ export const Stage7DeviceCheck: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+    <div className="relative max-w-5xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -254,7 +254,7 @@ export const Stage7DeviceCheck: React.FC = () => {
         <div className="md:col-span-6 flex flex-col justify-between space-y-4">
           
           {/* 1. Microphone Check */}
-          <div className="rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-5 sm:p-6 shadow-xs">
+          <div className="rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-5 sm:p-4 sm:p-6 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Mic className="w-4 h-4 text-[#b4532a]" />
@@ -288,7 +288,7 @@ export const Stage7DeviceCheck: React.FC = () => {
           </div>
 
           {/* 2. Speaker Check */}
-          <div className="rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-5 sm:p-6 shadow-xs">
+          <div className="rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-4 sm:p-6 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Volume2 className="w-4 h-4 text-[#5b8076]" />
@@ -369,7 +369,7 @@ export const Stage7DeviceCheck: React.FC = () => {
       </div>
 
       {/* Bottom Navigation Buttons (Transparent, No White Background Bar) */}
-      <div className="mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <div className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         <button
           onClick={() => setCurrentStage('preview')}
           type="button"

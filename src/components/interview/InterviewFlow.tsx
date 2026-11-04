@@ -42,7 +42,7 @@ export const InterviewFlow: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] py-6 sm:py-8 px-4 sm:px-6 lg:px-8 font-sans flex flex-col justify-center overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] py-3 sm:py-6 px-2.5 sm:px-6 lg:px-8 font-sans flex flex-col justify-start sm:justify-center overflow-x-hidden">
       {/* Outer Architectural Blueprint Grid Pattern - Uniform across the whole page */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-[0.34] mix-blend-multiply z-0"

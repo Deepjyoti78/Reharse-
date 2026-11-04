@@ -33,9 +33,13 @@ export type JobRole =
 export type ExperienceLevel = 
   | 'Fresher'
   | '0–1 Years'
+  | '0-1 Years'
   | '1–3 Years'
+  | '1-3 Years'
   | '3–5 Years'
-  | '5+ Years';
+  | '3-5 Years'
+  | '5+ Years'
+  | string;
 
 export type InterviewDifficulty = 
   | 'Easy'

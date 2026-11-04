@@ -35,7 +35,7 @@ export const Stage6SummaryPreview: React.FC = () => {
   ];
 
   return (
-    <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+    <div className="relative max-w-5xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -55,7 +55,7 @@ export const Stage6SummaryPreview: React.FC = () => {
 
       <div className="relative z-10 space-y-6">
         {/* Main Summary Grid with Warm Palette */}
-        <div className="rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-6 sm:p-7 shadow-xs">
+        <div className="rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-4 sm:p-7 shadow-xs">
           <div className="flex items-center justify-between border-b border-[#3a2318]/10 pb-4 mb-5">
             <div>
               <div className="text-xs uppercase font-mono tracking-wider text-[#b4532a]">
@@ -139,7 +139,7 @@ export const Stage6SummaryPreview: React.FC = () => {
         </div>
 
         {/* What You'll Be Evaluated On */}
-        <div className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-6 shadow-xs">
+        <div className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-4 sm:p-6 shadow-xs">
           <div className="flex items-center gap-2 mb-3">
             <UserCheck className="w-5 h-5 text-[#b4532a]" />
             <h3 className="font-serif text-xl sm:text-2xl text-[#2a170f]">What You’ll Be Evaluated On</h3>
@@ -166,7 +166,7 @@ export const Stage6SummaryPreview: React.FC = () => {
         </div>
 
         {/* Preparation Guidelines & Audio Warning */}
-        <div className="rounded-2xl bg-[#f2e6cb] border border-[#3a2318]/20 p-5 flex flex-col sm:flex-row items-start gap-4">
+        <div className="rounded-2xl bg-[#f2e6cb] border border-[#3a2318]/20 p-4 sm:p-5 flex flex-col sm:flex-row items-start gap-4">
           <div className="w-10 h-10 rounded-xl bg-[#3a2318] text-[#f8eed8] flex items-center justify-center shrink-0">
             <Mic className="w-5 h-5 text-[#dfa84c]" />
           </div>
@@ -187,7 +187,7 @@ export const Stage6SummaryPreview: React.FC = () => {
       </div>
 
       {/* Bottom Navigation Buttons (Transparent, No White Background Bar) */}
-      <div className="mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <div className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         <button
           onClick={() => setCurrentStage('interviewer')}
           type="button"
