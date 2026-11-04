@@ -299,9 +299,10 @@ authRouter.get('/google/callback', async (req: Request, res: Response) => {
     const token = createSessionToken(user);
     setSessionCookie(res, token);
 
+    const userJson = encodeURIComponent(JSON.stringify(formatUserResponse(user)));
     const redirectPath = destination && destination.startsWith('/') ? destination : '/';
     const separator = redirectPath.includes('?') ? '&' : '?';
-    res.redirect(`${frontendUrl}${redirectPath}${separator}auth=success&provider=google`);
+    res.redirect(`${frontendUrl}${redirectPath}${separator}auth=success&provider=google&user=${userJson}&token=${encodeURIComponent(token)}`);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Google authentication failed';
     console.error('Google callback error:', message);
@@ -383,9 +384,10 @@ authRouter.get('/github/callback', async (req: Request, res: Response) => {
     const token = createSessionToken(user);
     setSessionCookie(res, token);
 
+    const userJson = encodeURIComponent(JSON.stringify(formatUserResponse(user)));
     const redirectPath = destination && destination.startsWith('/') ? destination : '/';
     const separator = redirectPath.includes('?') ? '&' : '?';
-    res.redirect(`${frontendUrl}${redirectPath}${separator}auth=success&provider=github`);
+    res.redirect(`${frontendUrl}${redirectPath}${separator}auth=success&provider=github&user=${userJson}&token=${encodeURIComponent(token)}`);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'GitHub authentication failed';
     console.error('GitHub callback error:', message);

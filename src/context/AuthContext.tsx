@@ -147,8 +147,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const searchParams = new URLSearchParams(window.location.search);
     const authStatus = searchParams.get('auth');
     const authError = searchParams.get('auth_error');
+    const userParam = searchParams.get('user');
+    const tokenParam = searchParams.get('token');
 
     if (authStatus === 'success') {
+      if (userParam) {
+        try {
+          const parsedUser = JSON.parse(decodeURIComponent(userParam));
+          setUser(parsedUser);
+          localStorage.setItem('rehearse_current_user', JSON.stringify(parsedUser));
+          if (tokenParam) {
+            localStorage.setItem('rehearse_session_token', decodeURIComponent(tokenParam));
+          }
+        } catch (e) {
+          console.warn('Could not parse OAuth user payload:', e);
+        }
+      }
+
       confetti({
         particleCount: 75,
         spread: 70,
