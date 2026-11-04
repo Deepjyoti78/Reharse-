@@ -71,7 +71,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
 
   const handleContinue = () => {
     setCurrentStage('preview');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   };
 
   return (

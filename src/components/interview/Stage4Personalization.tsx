@@ -176,7 +176,7 @@ export const Stage4Personalization: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+    <div className="relative max-w-4xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -196,7 +196,7 @@ export const Stage4Personalization: React.FC = () => {
 
       {/* Unified Master Card (Warm Parchment Palette & Spacious Side-by-Side 2-Column) */}
       <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-4 sm:p-8 md:p-9">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+        <div className="space-y-6 sm:space-y-7">
           
           {/* ============ Column 1: Candidate Resume ============ */}
           <div className="flex flex-col h-full justify-between">
@@ -347,8 +347,8 @@ export const Stage4Personalization: React.FC = () => {
             </div>
           </div>
 
-          {/* ============ Column 2: Target Job Description (JD) ============ */}
-          <div className="flex flex-col h-full justify-between">
+          {/* ============ Target Job Description (JD) (Below Resume) ============ */}
+          <div className="border-t border-[#3a2318]/10 pt-6">
             <div>
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans">
@@ -426,7 +426,7 @@ export const Stage4Personalization: React.FC = () => {
           <button
             onClick={() => {
               setCurrentStage('interviewer');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.scrollTo(0, 0);
             }}
             type="button"
             className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"

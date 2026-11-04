@@ -126,7 +126,7 @@ export const Stage2TypeSelection: React.FC = () => {
 
   const handleContinue = () => {
     setCurrentStage('configuration');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   };
 
   const handleBack = () => {

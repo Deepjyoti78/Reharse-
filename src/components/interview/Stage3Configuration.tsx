@@ -8,7 +8,8 @@ import {
   Globe2, 
   GraduationCap, 
   SlidersHorizontal,
-  Flame
+  Flame,
+  Sparkles
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
 import type { 
@@ -386,46 +387,67 @@ export const Stage3Configuration: React.FC = () => {
               </div>
             </div>
 
-            {/* Spoken Language & AI Disposition Dropdown */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-end">
-              <div>
-                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans mb-2">
-                  <Globe2 className="w-4 h-4 text-[#5b8076]" />
-                  <span>Language</span>
+            {/* AI Disposition & Demeanor */}
+            <div>
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans">
+                  <Sparkles className="w-4 h-4 text-[#b4532a]" />
+                  <span>AI Disposition & Demeanor</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {LANGUAGES.slice(0, 3).map(lang => (
+                <span className="text-[11px] font-mono text-[#3a2318]/65 hidden sm:inline">
+                  {AI_TONES.find(t => t.value === config.aiTone)?.description}
+                </span>
+              </div>
+              
+              {/* 4 Sleek Styled Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                {AI_TONES.map(tone => {
+                  const isSelected = config.aiTone === tone.value;
+                  return (
                     <button
-                      key={lang}
+                      key={tone.value}
                       type="button"
-                      onClick={() => updateConfig({ language: lang })}
-                      className={`px-3.5 py-2 rounded-xl text-xs sm:text-[13px] font-medium transition-all cursor-pointer ${
-                        config.language === lang
-                          ? 'bg-[#5b8076] text-white shadow-xs'
-                          : 'bg-[#f2e5cb] text-[#2a170f] hover:bg-[#e7d8b8]'
+                      onClick={() => updateConfig({ aiTone: tone.value })}
+                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                        isSelected
+                          ? 'bg-[#3a2318] text-[#f8eed8] border-[#3a2318] shadow-sm ring-2 ring-[#b4532a]/35 -translate-y-0.5'
+                          : 'bg-[#f5e7c8] hover:bg-[#eeddbb] text-[#2a170f] border-[#3a2318]/15 hover:border-[#3a2318]/30 shadow-2xs'
                       }`}
                     >
-                      {lang}
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs sm:text-[13px] font-semibold">{tone.label}</span>
+                        <span className={`w-2 h-2 rounded-full transition-all ${isSelected ? 'bg-[#dfa84c]' : 'bg-[#3a2318]/25'}`} />
+                      </div>
+                      <div className={`text-[11px] leading-tight ${isSelected ? 'text-[#f8eed8]/80' : 'text-[#3a2318]/70'}`}>
+                        {tone.description}
+                      </div>
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
+            </div>
 
-              <div>
-                <div className="text-xs sm:text-sm font-semibold text-[#2a170f] font-sans mb-2">
-                  AI Disposition
-                </div>
-                <select
-                  value={config.aiTone}
-                  onChange={(e) => updateConfig({ aiTone: e.target.value as AIBehaviorTone })}
-                  className="w-full px-3.5 py-2 rounded-xl bg-white/95 border border-[#3a2318]/20 text-xs sm:text-[13px] text-[#2a170f] focus:outline-none focus:border-[#b4532a] cursor-pointer"
-                >
-                  {AI_TONES.map(tone => (
-                    <option key={tone.value} value={tone.value}>
-                      {tone.label}
-                    </option>
-                  ))}
-                </select>
+            {/* Spoken Language */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans">
+                <Globe2 className="w-4 h-4 text-[#5b8076]" />
+                <span>Spoken Language:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {LANGUAGES.slice(0, 3).map(lang => (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => updateConfig({ language: lang })}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                      config.language === lang
+                        ? 'bg-[#5b8076] text-white shadow-xs'
+                        : 'bg-[#f2e5cb] text-[#2a170f] hover:bg-[#e7d8b8]'
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -453,7 +475,7 @@ export const Stage3Configuration: React.FC = () => {
           <button
             onClick={() => {
               setCurrentStage('personalization');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.scrollTo(0, 0);
             }}
             type="button"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"

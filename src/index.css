@@ -85,14 +85,21 @@ body {
    ANIMATIONS & MOTION SYSTEM (Rehearse Mid-Century Editorial Aesthetic)
    ========================================================================== */
 
-@keyframes fadeSlideUp {
+@keyframes fadeIn {
   0% {
     opacity: 0;
-    transform: translateY(14px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 
@@ -197,8 +204,12 @@ body {
 }
 
 /* Custom Animation Utility Classes */
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out both;
+}
+
 .animate-fade-in-up {
-  animation: fadeSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeIn 0.25s ease-out both;
 }
 
 .animate-fade-in-down {

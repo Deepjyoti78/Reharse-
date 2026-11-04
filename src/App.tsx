@@ -48,11 +48,9 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Dynamic View Controller with Smooth Page Switch Transitions */}
-      <div key={currentView} className="animate-fade-in-up">
+      <div key={currentView} className="animate-fade-in">
         {currentView === 'interview-flow' ? (
-          <div className="py-4 sm:py-8">
-            <InterviewFlow />
-          </div>
+          <InterviewFlow />
         ) : currentView === 'history' ? (
           <div className="pt-20 sm:pt-24">
             <InterviewHistoryView />

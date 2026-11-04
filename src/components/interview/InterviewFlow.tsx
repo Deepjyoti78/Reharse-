@@ -14,10 +14,15 @@ import { Stage9Report } from './Stage9Report';
 export const InterviewFlow: React.FC = () => {
   const { currentStage } = useInterview();
 
+  // Instantly reset scroll to top on stage change without "down to up" scrolling
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentStage]);
+
   // If in live room, render full virtual room without setup header
   if (currentStage === 'live-room') {
     return (
-      <div key="live-room" className="animate-fade-in-up">
+      <div key="live-room" className="animate-fade-in">
         <Stage8LiveRoom />
       </div>
     );
@@ -26,7 +31,7 @@ export const InterviewFlow: React.FC = () => {
   // If in processing transition
   if (currentStage === 'processing') {
     return (
-      <div key="processing" className="animate-fade-in-up">
+      <div key="processing" className="animate-fade-in">
         <Stage9Processing />
       </div>
     );
@@ -35,14 +40,14 @@ export const InterviewFlow: React.FC = () => {
   // If in performance report
   if (currentStage === 'report') {
     return (
-      <div key="report" className="animate-fade-in-up">
+      <div key="report" className="animate-fade-in">
         <Stage9Report />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] py-3 sm:py-6 px-2.5 sm:px-6 lg:px-8 font-sans flex flex-col justify-start sm:justify-center overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] py-4 sm:py-6 px-2.5 sm:px-6 lg:px-8 font-sans flex flex-col justify-start sm:justify-center overflow-x-hidden">
       {/* Outer Architectural Blueprint Grid Pattern - Uniform across the whole page */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-[0.34] mix-blend-multiply z-0"
@@ -56,7 +61,7 @@ export const InterviewFlow: React.FC = () => {
       />
 
       {/* Dynamic Stage Rendering with Stage Entry Transition */}
-      <div key={currentStage} className="relative z-10 w-full animate-fade-in-up">
+      <div key={currentStage} className="relative z-10 w-full animate-fade-in">
         {currentStage === 'intro' && <Stage1Intro />}
         {currentStage === 'type-selection' && <Stage2TypeSelection />}
         {currentStage === 'configuration' && <Stage3Configuration />}

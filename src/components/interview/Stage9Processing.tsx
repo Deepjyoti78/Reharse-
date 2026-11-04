@@ -24,7 +24,7 @@ export const Stage9Processing: React.FC = () => {
           clearInterval(stepInterval);
           setTimeout(() => {
             setCurrentStage('report');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo(0, 0);
           }, 600);
           return prev;
         }

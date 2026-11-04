@@ -88,3 +88,4 @@ export default async function handler(req: any, res: any) {
     return res.redirect(`${frontendUrl}/?auth_error=${encodeURIComponent(msg)}`);
   }
 }
+

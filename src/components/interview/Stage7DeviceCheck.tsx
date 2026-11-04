@@ -382,7 +382,7 @@ export const Stage7DeviceCheck: React.FC = () => {
         <button
           onClick={() => {
             setCurrentStage('live-room');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo(0, 0);
           }}
           type="button"
           className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"

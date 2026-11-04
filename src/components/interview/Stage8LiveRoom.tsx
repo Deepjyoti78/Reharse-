@@ -1100,7 +1100,7 @@ export const Stage8LiveRoom: React.FC = () => {
 
       {/* PAUSE MODAL (Mobile Responsive) */}
       {isPauseModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-backdrop-fade">
+        <div className="fixed inset-0 z-50 bg-[#140b07]/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-backdrop-fade">
           <div className="rounded-3xl bg-[#faf4e6] border border-[#3a2318]/20 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f] animate-modal-pop">
             <div className="w-12 h-12 rounded-full bg-[#dfa84c]/20 text-[#8d3e1b] flex items-center justify-center mx-auto mb-3 animate-subtle-float">
               <Pause className="w-6 h-6" />
@@ -1134,8 +1134,8 @@ export const Stage8LiveRoom: React.FC = () => {
 
       {/* END ROUND CONFIRMATION MODAL (Mobile Responsive) */}
       {isEndModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-backdrop-fade">
-          <div className="rounded-3xl bg-[#faf4e6] border border-red-200 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl text-center text-[#2a170f] animate-modal-pop">
+        <div className="fixed inset-0 z-50 bg-[#140b07]/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-backdrop-fade">
+          <div className="rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 p-5 sm:p-7 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-[0_25px_60px_rgba(20,10,6,0.45)] text-center text-[#2a170f] animate-modal-pop">
             <div className="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center mx-auto mb-3 animate-subtle-float">
               <StopCircle className="w-6 h-6" />
             </div>
