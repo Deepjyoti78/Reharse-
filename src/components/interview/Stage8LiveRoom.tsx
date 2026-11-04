@@ -35,7 +35,10 @@ export const Stage8LiveRoom: React.FC = () => {
     turns,
     addTurn, 
     finishInterview, 
-    exitToDashboard 
+    exitToDashboard,
+    registerMediaStream,
+    unregisterMediaStream,
+    stopAllMediaHardware
   } = useInterview();
 
   // Load question bank for this session
@@ -96,6 +99,99 @@ export const Stage8LiveRoom: React.FC = () => {
   const isRecordingVoiceRef = useRef(isRecordingVoice);
   isRecordingVoiceRef.current = isRecordingVoice;
 
+  // Complete hardware teardown to guarantee 100% camera & mic turn-off
+  const teardownAllHardware = () => {
+    // 1. Cancel requestAnimationFrame
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+
+    // 2. Abort and stop Web Speech recognition
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.abort();
+      } catch {}
+      recognitionRef.current = null;
+    }
+
+    // 3. Stop MediaRecorder if running
+    if (mediaRecorderRef.current) {
+      try {
+        if (mediaRecorderRef.current.state !== 'inactive') {
+          mediaRecorderRef.current.stop();
+        }
+      } catch {}
+      mediaRecorderRef.current = null;
+    }
+
+    // 4. Detach video element and release browser camera sink
+    if (videoRef.current) {
+      try {
+        videoRef.current.pause();
+        videoRef.current.srcObject = null;
+      } catch {}
+    }
+
+    // 5. Force disable and stop all tracks in mediaStreamRef
+    if (mediaStreamRef.current) {
+      try {
+        mediaStreamRef.current.getTracks().forEach(track => {
+          try {
+            track.enabled = false;
+            track.stop();
+          } catch {}
+        });
+        unregisterMediaStream(mediaStreamRef.current);
+      } catch {}
+      mediaStreamRef.current = null;
+    }
+
+    // 6. Close AudioContext
+    if (audioContextRef.current) {
+      try {
+        if (audioContextRef.current.state !== 'closed') {
+          audioContextRef.current.close().catch(() => {});
+        }
+      } catch {}
+      audioContextRef.current = null;
+    }
+
+    // 7. Stop ElevenLabs TTS speech
+    try {
+      stopElevenLabsSpeech();
+    } catch {}
+
+    // 8. Global Context teardown for any orphan media elements
+    stopAllMediaHardware();
+  };
+
+  // Handle Camera toggling with immediate hardware track termination
+  const handleToggleCamera = () => {
+    if (isCameraActive) {
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getVideoTracks().forEach(track => {
+          try {
+            track.enabled = false;
+            track.stop();
+          } catch {}
+        });
+      }
+      if (videoRef.current) {
+        try {
+          videoRef.current.pause();
+          videoRef.current.srcObject = null;
+        } catch {}
+      }
+      setIsCameraActive(false);
+    } else {
+      setIsCameraActive(true);
+    }
+  };
+
   // Timer tick
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -121,21 +217,35 @@ export const Stage8LiveRoom: React.FC = () => {
     const startMedia = async () => {
       try {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          // If turning camera off or re-acquiring, clean previous tracks first
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(t => {
+              try { t.enabled = false; t.stop(); } catch {}
+            });
+            unregisterMediaStream(mediaStreamRef.current);
+            mediaStreamRef.current = null;
+          }
+
           const stream = await navigator.mediaDevices.getUserMedia({
             video: isCameraActive ? { width: { ideal: 640 }, height: { ideal: 480 } } : false,
             audio: true
           });
 
           if (isCancelled) {
-            stream.getTracks().forEach(t => t.stop());
+            stream.getTracks().forEach(t => {
+              try { t.enabled = false; t.stop(); } catch {}
+            });
             return;
           }
 
           mediaStreamRef.current = stream;
+          registerMediaStream(stream);
 
           if (videoRef.current && isCameraActive) {
             videoRef.current.srcObject = stream;
             videoRef.current.play().catch(() => {});
+          } else if (videoRef.current && !isCameraActive) {
+            videoRef.current.srcObject = null;
           }
 
           // Setup AudioContext Analyser to track live microphone input volume
@@ -183,15 +293,7 @@ export const Stage8LiveRoom: React.FC = () => {
 
     return () => {
       isCancelled = true;
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
-      }
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close().catch(() => {});
-      }
-      if (mediaStreamRef.current) {
-        mediaStreamRef.current.getTracks().forEach(t => t.stop());
-      }
+      teardownAllHardware();
     };
   }, [isCameraActive]);
 
@@ -307,6 +409,7 @@ export const Stage8LiveRoom: React.FC = () => {
       let stream = mediaStreamRef.current;
       if (!stream || !stream.getAudioTracks().some(t => t.readyState === 'live')) {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        registerMediaStream(stream);
         mediaStreamRef.current = stream;
       }
 
@@ -547,6 +650,7 @@ export const Stage8LiveRoom: React.FC = () => {
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
+      teardownAllHardware();
       finishInterview(updatedTurns);
     }
   };
@@ -835,7 +939,7 @@ export const Stage8LiveRoom: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setIsCameraActive(!isCameraActive)}
+                onClick={handleToggleCamera}
                 className={`p-1.5 rounded-lg text-xs backdrop-blur-xs transition-colors cursor-pointer ${
                   !isCameraActive ? 'bg-red-600 text-white' : 'bg-[#2a170f]/80 text-[#faf4e6] hover:bg-[#2a170f]'
                 }`}
@@ -1066,7 +1170,7 @@ export const Stage8LiveRoom: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setIsCameraActive(!isCameraActive)}
+            onClick={handleToggleCamera}
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs shadow-2xs hover:scale-[1.02] active:scale-[0.98] ${
               !isCameraActive
                 ? 'bg-red-100 border-red-300 text-red-800'
@@ -1121,6 +1225,7 @@ export const Stage8LiveRoom: React.FC = () => {
               <button
                 onClick={() => {
                   setIsPauseModalOpen(false);
+                  teardownAllHardware();
                   exitToDashboard();
                 }}
                 className="w-full py-2.5 rounded-full bg-transparent hover:bg-[#f0e3c5] text-[#2a170f]/80 text-xs font-medium transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.98]"
@@ -1173,6 +1278,7 @@ export const Stage8LiveRoom: React.FC = () => {
                     addTurn(currentTurn);
                     finalTurns = [...finalTurns, currentTurn];
                   }
+                  teardownAllHardware();
                   finishInterview(finalTurns);
                 }}
                 className="w-full py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5 hover:scale-[1.01] active:scale-[0.98]"

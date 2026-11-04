@@ -12,8 +12,13 @@ const PROCESSING_STEPS = [
 ];
 
 export const Stage9Processing: React.FC = () => {
-  const { setCurrentStage } = useInterview();
+  const { setCurrentStage, stopAllMediaHardware } = useInterview();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  // Guarantee all hardware is shut down on transition into processing
+  useEffect(() => {
+    stopAllMediaHardware();
+  }, [stopAllMediaHardware]);
 
   useEffect(() => {
     const stepInterval = setInterval(() => {

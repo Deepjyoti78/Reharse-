@@ -55,7 +55,7 @@ export const Stage6SummaryPreview: React.FC = () => {
 
       <div className="relative z-10 space-y-6">
         {/* Main Summary Grid with Warm Palette */}
-        <div className="rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-4 sm:p-7 shadow-xs">
+        <div className="isolate rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-4 sm:p-7 shadow-xs">
           <div className="flex items-center justify-between border-b border-[#3a2318]/10 pb-4 mb-5">
             <div>
               <div className="text-xs uppercase font-mono tracking-wider text-[#b4532a]">
@@ -139,7 +139,7 @@ export const Stage6SummaryPreview: React.FC = () => {
         </div>
 
         {/* What You'll Be Evaluated On */}
-        <div className="rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-4 sm:p-6 shadow-xs">
+        <div className="isolate rounded-2xl bg-[#faf5e8] border border-[#3a2318]/15 p-4 sm:p-6 shadow-xs">
           <div className="flex items-center gap-2 mb-3">
             <UserCheck className="w-5 h-5 text-[#b4532a]" />
             <h3 className="font-serif text-xl sm:text-2xl text-[#2a170f]">What You’ll Be Evaluated On</h3>

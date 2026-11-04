@@ -194,8 +194,8 @@ export const Stage4Personalization: React.FC = () => {
         </p>
       </div>
 
-      {/* Unified Master Card (Warm Parchment Palette & Spacious Side-by-Side 2-Column) */}
-      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-4 sm:p-8 md:p-9">
+      {/* Unified Master Card (Warm Parchment Palette & Stacked Layout) */}
+      <div className="relative isolate z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-5 sm:p-8 md:p-9">
         <div className="space-y-6 sm:space-y-7">
           
           {/* ============ Column 1: Candidate Resume ============ */}

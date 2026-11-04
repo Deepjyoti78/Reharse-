@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type {
   InterviewStage,
   AppView,
@@ -12,6 +12,7 @@ import type {
   InterviewType
 } from '../types/interview';
 import { AI_INTERVIEWERS, DEFAULT_CONFIGURATION, generatePerformanceReport } from '../data/interviewBank';
+import { stopElevenLabsSpeech } from '../services/elevenlabs';
 
 interface InterviewContextType {
   currentView: AppView;
@@ -39,6 +40,9 @@ interface InterviewContextType {
   restartWithSameConfig: () => void;
   finishInterview: (finalTurns?: UserTurn[]) => void;
   exitToDashboard: () => void;
+  registerMediaStream: (stream: MediaStream) => void;
+  unregisterMediaStream: (stream: MediaStream) => void;
+  stopAllMediaHardware: () => void;
 }
 
 const InterviewContext = createContext<InterviewContextType | undefined>(undefined);
@@ -171,7 +175,72 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setPastReports(prev => prev.filter(r => r.id !== reportId));
   };
 
+  // Global registry of all active media streams to guarantee 100% hardware release
+  const activeStreamsRef = useRef<Set<MediaStream>>(new Set());
+
+  const registerMediaStream = (stream: MediaStream) => {
+    if (stream) {
+      activeStreamsRef.current.add(stream);
+    }
+  };
+
+  const unregisterMediaStream = (stream: MediaStream) => {
+    if (stream) {
+      activeStreamsRef.current.delete(stream);
+    }
+  };
+
+  const stopAllMediaHardware = () => {
+    // 1. Force stop and disable every registered MediaStreamTrack
+    activeStreamsRef.current.forEach(stream => {
+      try {
+        stream.getTracks().forEach(track => {
+          try {
+            track.enabled = false;
+            track.stop();
+          } catch (e) {
+            console.warn('Track stop warning:', e);
+          }
+        });
+      } catch (err) {
+        console.warn('Stream stop warning:', err);
+      }
+    });
+    activeStreamsRef.current.clear();
+
+    // 2. Clear srcObject on all HTML video and audio elements in document to release browser camera/mic locks
+    if (typeof document !== 'undefined') {
+      try {
+        const mediaElements = document.querySelectorAll('video, audio');
+        mediaElements.forEach((el) => {
+          try {
+            const mediaEl = el as HTMLMediaElement;
+            mediaEl.pause();
+            if (mediaEl.srcObject) {
+              const srcObj = mediaEl.srcObject as MediaStream;
+              if (srcObj && srcObj.getTracks) {
+                srcObj.getTracks().forEach(track => {
+                  try {
+                    track.enabled = false;
+                    track.stop();
+                  } catch {}
+                });
+              }
+              mediaEl.srcObject = null;
+            }
+          } catch {}
+        });
+      } catch {}
+    }
+
+    // 3. Stop any active ElevenLabs TTS playback
+    try {
+      stopElevenLabsSpeech();
+    } catch {}
+  };
+
   const startInterviewFlow = (role?: string, type?: InterviewType) => {
+    stopAllMediaHardware();
     if (role) {
       setConfig(prev => ({ ...prev, jobRole: role }));
     }
@@ -186,6 +255,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const restartWithSameConfig = () => {
+    stopAllMediaHardware();
     setTurns([]);
     setActiveReport(null);
     setCurrentStage('preview');
@@ -194,6 +264,9 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const finishInterview = (finalTurns?: UserTurn[]) => {
+    // Crucial: immediately kill all media hardware and video/audio locks
+    stopAllMediaHardware();
+
     // Generate report using supplied or committed turns
     const candidateTurns = finalTurns || turns;
     const report = generatePerformanceReport(config, candidateTurns);
@@ -206,6 +279,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const exitToDashboard = () => {
+    stopAllMediaHardware();
     setCurrentView('landing');
     setCurrentStage('intro');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -238,7 +312,10 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         startInterviewFlow,
         restartWithSameConfig,
         finishInterview,
-        exitToDashboard
+        exitToDashboard,
+        registerMediaStream,
+        unregisterMediaStream,
+        stopAllMediaHardware
       }}
     >
       {children}

@@ -12,7 +12,7 @@ export const Stage1Intro: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Main Hero Card with Warm Parchment Palette & Generous Spacing */}
-      <div className="relative rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-4 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
+      <div className="relative isolate rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-5 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
         
         {/* Top Header inside Card with Back to Overview Button */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 mb-5 sm:mb-8">

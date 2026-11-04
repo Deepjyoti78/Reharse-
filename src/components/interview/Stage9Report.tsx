@@ -29,7 +29,8 @@ export const Stage9Report: React.FC = () => {
     activeReport, 
     restartWithSameConfig, 
     exitToDashboard, 
-    setCurrentView 
+    setCurrentView,
+    stopAllMediaHardware
   } = useInterview();
 
   const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(
@@ -37,6 +38,12 @@ export const Stage9Report: React.FC = () => {
   );
   const [showFullTranscript, setShowFullTranscript] = useState(false);
   const [isPlayingAudioAnswer, setIsPlayingAudioAnswer] = useState<string | null>(null);
+
+  // Guarantee webcam and mic hardware are 100% closed upon reaching report
+  React.useEffect(() => {
+    stopAllMediaHardware();
+    stopElevenLabsSpeech();
+  }, [stopAllMediaHardware]);
 
   // Trigger celebration confetti on high score mount
   React.useEffect(() => {

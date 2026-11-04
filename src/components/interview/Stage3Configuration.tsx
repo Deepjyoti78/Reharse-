@@ -165,7 +165,7 @@ export const Stage3Configuration: React.FC = () => {
       </div>
 
       {/* Unified Master Card with Warm Parchment Palette and Stacked Layout */}
-      <div className="relative z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-4 sm:p-8 md:p-9">
+      <div className="relative isolate z-10 rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-5 sm:p-8 md:p-9">
         <div className="space-y-7 sm:space-y-8">
           
           {/* ============ Top Section: Role, Experience & Difficulty ============ */}
