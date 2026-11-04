@@ -574,73 +574,82 @@ export const Stage8LiveRoom: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3e7c9] text-[#2a170f] flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#f3e7c9] text-[#2a170f] flex flex-col font-sans select-none relative">
       
-      {/* 1. Top Status & Information Bar (Mobile Responsive Header) */}
-      <header className="px-3 sm:px-6 md:px-8 py-2.5 sm:py-3 border-b border-[#3a2318]/15 bg-[#faf4e6]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 z-30 shadow-xs">
-        
-        {/* Left: Role & Track */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="font-serif text-sm sm:text-base md:text-lg text-[#2a170f] leading-none font-semibold truncate">
-                {config.jobRole}
-              </span>
-              <span className="text-[9px] sm:text-[10px] font-mono uppercase bg-[#dfa84c]/20 text-[#8d3e1b] border border-[#dfa84c]/40 px-1.5 sm:px-2 py-0.5 rounded font-medium shrink-0">
-                {config.difficulty}
-              </span>
+      {/* 1. Top Status & Information Bar (Floating Console Capsule) */}
+      <div className="w-full px-3 sm:px-6 md:px-8 pt-3 sm:pt-4 z-30">
+        <header className="max-w-7xl mx-auto rounded-2xl bg-[#faf0d8]/95 backdrop-blur-md border border-[#3a2318]/15 px-4 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+          
+          {/* Left: Role, Track & Level */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative flex items-center justify-center shrink-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+              <span className="absolute w-4 h-4 rounded-full bg-emerald-500/25 animate-ping" />
             </div>
-            <div className="text-[10px] sm:text-[11px] text-[#3a2318]/65 font-sans hidden sm:block truncate">
-              {activeQuestion.category} • {config.interviewType.toUpperCase()}
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-serif text-base sm:text-lg text-[#2a170f] leading-none font-semibold truncate">
+                  {config.jobRole}
+                </span>
+                <span className="text-[10px] font-mono uppercase bg-[#dfa84c]/20 text-[#8d3e1b] border border-[#dfa84c]/40 px-2 py-0.5 rounded-md font-semibold shrink-0">
+                  {config.difficulty}
+                </span>
+              </div>
+              <div className="text-[11px] text-[#3a2318]/65 font-sans hidden sm:block truncate mt-0.5">
+                {activeQuestion.category} • {config.interviewType.toUpperCase()}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Center: Question Progress */}
-        <div className="flex items-center gap-1.5 sm:gap-2 bg-[#f0e3c5] px-2.5 sm:px-3.5 py-1 rounded-full border border-[#3a2318]/15 text-[11px] sm:text-xs font-mono text-[#2a170f]">
-          <span className="text-[#b4532a] font-semibold">Q {currentQuestionIndex + 1}</span>
-          <span className="opacity-40">/</span>
-          <span>{questions.length}</span>
-        </div>
-
-        {/* Right: Elapsed Timer & Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-1 font-mono text-[11px] sm:text-xs text-[#2a170f] bg-[#f0e3c5] px-2 sm:px-2.5 py-1 rounded-lg border border-[#3a2318]/15">
-            <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#b4532a]" />
-            <span>{formatTime(elapsedSeconds)}</span>
+          {/* Center: Question Progress */}
+          <div className="flex items-center gap-2 bg-[#f0e3c5] px-3.5 py-1.5 rounded-full border border-[#3a2318]/15 text-xs font-mono text-[#2a170f]">
+            <span className="text-[#b4532a] font-bold">Q {currentQuestionIndex + 1}</span>
+            <span className="opacity-40">/</span>
+            <span className="font-medium">{questions.length}</span>
+            <span className="text-[10px] font-sans text-[#3a2318]/60 ml-1 hidden md:inline">
+              ({Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%)
+            </span>
           </div>
 
-          <button
-            onClick={() => {
-              stopElevenLabsSpeech();
-              setIsPauseModalOpen(true);
-            }}
-            className="p-1.5 sm:p-2 rounded-lg bg-[#f0e3c5] hover:bg-[#e7d8b5] text-[#2a170f] border border-[#3a2318]/15 transition-colors cursor-pointer"
-            title="Pause Interview"
-            aria-label="Pause Interview"
-          >
-            <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
+          {/* Right: Elapsed Timer & Controls */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 font-mono text-xs text-[#2a170f] bg-[#f0e3c5] px-3 py-1.5 rounded-xl border border-[#3a2318]/15 shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-[#b4532a]" />
+              <span className="font-medium">{formatTime(elapsedSeconds)}</span>
+            </div>
 
-          <button
-            onClick={() => {
-              stopElevenLabsSpeech();
-              setIsEndModalOpen(true);
-            }}
-            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
-          >
-            <StopCircle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">End Round</span>
-          </button>
-        </div>
-      </header>
+            <button
+              onClick={() => {
+                stopElevenLabsSpeech();
+                setIsPauseModalOpen(true);
+              }}
+              className="p-2 rounded-xl bg-[#f0e3c5] hover:bg-[#e7d8b5] text-[#2a170f] border border-[#3a2318]/15 transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-[0.98]"
+              title="Pause Interview"
+              aria-label="Pause Interview"
+            >
+              <Pause className="w-3.5 h-3.5" />
+            </button>
 
-      {/* 2. Main Stage: Virtual Room (Mobile Responsive Stack & Scroll) */}
-      <main className="flex-1 p-3 sm:p-5 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 max-w-7xl mx-auto w-full overflow-y-auto">
+            <button
+              onClick={() => {
+                stopElevenLabsSpeech();
+                setIsEndModalOpen(true);
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <StopCircle className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">End Round</span>
+            </button>
+          </div>
+        </header>
+      </div>
+
+      {/* 2. Main Stage: Virtual Room (Mobile Responsive Stack & Scroll with Bottom Dock Clearance) */}
+      <main className="flex-1 p-3 sm:p-5 md:p-6 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-5 max-w-7xl mx-auto w-full overflow-y-auto">
         
         {/* Left Column (Lg: 7 cols) — AI Interviewer & Live Prompt */}
-        <section className="lg:col-span-7 flex flex-col justify-between rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 p-4 sm:p-6 md:p-7 relative overflow-hidden shadow-sm">
+        <section className="lg:col-span-7 flex flex-col justify-between rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-5 sm:p-6 md:p-7 relative overflow-hidden shadow-sm">
           
           {/* Subtle ambient vintage background aura */}
           <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#dfa84c]/15 blur-3xl pointer-events-none" />
@@ -776,7 +785,7 @@ export const Stage8LiveRoom: React.FC = () => {
         </section>
 
         {/* Right Column (Lg: 5 cols) — Candidate Cam Feed & Live Voice/Text Response Area */}
-        <section className="lg:col-span-5 flex flex-col justify-between rounded-3xl bg-[#faf4e6] border border-[#3a2318]/15 p-4 sm:p-6 shadow-sm">
+        <section className="lg:col-span-5 flex flex-col justify-between rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 p-4 sm:p-6 shadow-sm">
           
           {/* Top Half: Candidate Camera Monitor (Optimized for Mobile Height) */}
           <div className="relative rounded-2xl bg-[#ede0c2] border border-[#3a2318]/15 overflow-hidden aspect-[16/10] max-h-[170px] sm:max-h-[220px] lg:max-h-none flex items-center justify-center mb-4 shadow-inner">
@@ -1041,12 +1050,12 @@ export const Stage8LiveRoom: React.FC = () => {
         </section>
       </main>
 
-      {/* 3. Bottom Controls Dock (Mobile Responsive Dock) */}
-      <footer className="px-3 sm:px-6 py-2.5 sm:py-3 border-t border-[#3a2318]/15 bg-[#faf4e6]/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs font-sans">
-        <div className="flex items-center gap-2 sm:gap-3">
+      {/* 3. Bottom Controls Floating Dock */}
+      <div className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-40 pointer-events-auto">
+        <footer className="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#faf0d8]/95 backdrop-blur-md border border-[#3a2318]/20 shadow-lg text-xs font-sans">
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs shadow-2xs hover:scale-[1.02] active:scale-[0.98] ${
               isMuted
                 ? 'bg-red-100 border-red-300 text-red-800'
                 : 'bg-[#f0e3c5] hover:bg-[#e7d8b5] border-[#3a2318]/15 text-[#2a170f]'
@@ -1058,7 +1067,7 @@ export const Stage8LiveRoom: React.FC = () => {
 
           <button
             onClick={() => setIsCameraActive(!isCameraActive)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs shadow-2xs hover:scale-[1.02] active:scale-[0.98] ${
               !isCameraActive
                 ? 'bg-red-100 border-red-300 text-red-800'
                 : 'bg-[#f0e3c5] hover:bg-[#e7d8b5] border-[#3a2318]/15 text-[#2a170f]'
@@ -1070,25 +1079,24 @@ export const Stage8LiveRoom: React.FC = () => {
 
           <button
             onClick={() => setShowCaptions(!showCaptions)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border transition-all cursor-pointer font-medium text-xs shadow-2xs hover:scale-[1.02] active:scale-[0.98] ${
               showCaptions
-                ? 'bg-[#dfa84c]/20 border-[#dfa84c]/60 text-[#8d3e1b]'
-                : 'bg-[#f0e3c5] hover:bg-[#e7d8b5] border-[#3a2318]/15 text-[#2a170f]/70'
+                ? 'bg-[#b4532a]/15 border-[#b4532a]/40 text-[#b4532a]'
+                : 'bg-[#f0e3c5] hover:bg-[#e7d8b5] border-[#3a2318]/15 text-[#2a170f]/75'
             }`}
           >
             <Subtitles className="w-3.5 h-3.5" />
             <span>Captions</span>
           </button>
-        </div>
 
-        <div className="flex items-center gap-3 text-[10.5px] sm:text-[11px] font-mono text-[#3a2318]/70">
-          <div className="flex items-center gap-1.5">
+          <div className="w-px h-4 bg-[#3a2318]/15 mx-1 hidden sm:block" />
+
+          <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-mono text-[#3a2318]/70">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-            <span className="hidden sm:inline">Encrypted Room v2.4</span>
-            <span className="sm:hidden">Encrypted</span>
+            <span>Encrypted Room v2.4</span>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
 
       {/* PAUSE MODAL (Mobile Responsive) */}
       {isPauseModalOpen && (
