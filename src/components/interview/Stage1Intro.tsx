@@ -10,27 +10,13 @@ export const Stage1Intro: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 md:py-8 animate-fade-in-up">
-      {/* Main Hero Card with Warm Theme and Subtle Grid Effect */}
-      <div className="relative rounded-3xl bg-gradient-to-br from-[#fbf4e6] via-[#f5e7ce] to-[#ebd8be] border border-[#b4532a]/20 shadow-[0_16px_50px_-12px_rgba(58,35,24,0.16),0_2px_10px_rgba(180,83,42,0.08)] overflow-hidden p-5 sm:p-8 md:p-10 transition-all hover:shadow-[0_20px_60px_-12px_rgba(58,35,24,0.2),0_4px_16px_rgba(180,83,42,0.12)]">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-0 sm:pt-1 pb-6 sm:pb-8 animate-fade-in-up">
+      {/* Main Hero Card with Warm Editorial Theme (elevated above outer gridded background) */}
+      <div className="relative rounded-3xl bg-gradient-to-br from-[#fcf6ea] via-[#f7ecd6] to-[#eddac0] border border-[#b4532a]/25 shadow-[0_20px_60px_-15px_rgba(58,35,24,0.22),0_4px_16px_rgba(180,83,42,0.1)] overflow-hidden p-5 sm:p-8 md:p-9 transition-all hover:shadow-[0_24px_70px_-15px_rgba(58,35,24,0.26),0_6px_20px_rgba(180,83,42,0.14)]">
         
-        {/* Subtle Architectural Grid Pattern Overlay */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-65"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(90, 52, 32, 0.11) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(90, 52, 32, 0.11) 1px, transparent 1px)
-            `,
-            backgroundSize: '28px 28px',
-            maskImage: 'radial-gradient(ellipse 90% 85% at 50% 40%, black 50%, transparent 100%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 40%, black 50%, transparent 100%)',
-          }}
-        />
-
-        {/* Ambient Warm Glow Accents */}
-        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#b4532a]/12 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-[#d97706]/10 blur-3xl pointer-events-none" />
+        {/* Subtle Warm Amber Glow Highlights inside Card Corners */}
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#b4532a]/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-[#d97706]/8 blur-3xl pointer-events-none" />
 
         {/* Top Header inside Card with Improved Back to Overview Button */}
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 mb-7 sm:mb-9">
