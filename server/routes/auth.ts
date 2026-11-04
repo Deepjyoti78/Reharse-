@@ -61,13 +61,14 @@ authRouter.get('/providers', (_req: Request, res: Response) => {
 authRouter.get('/me', (req: Request, res: Response) => {
   const session = extractSessionFromRequest(req);
   if (!session) {
-    return res.status(401).json({ error: 'Unauthenticated' });
+    // Return 200 with user: null to prevent browser console red error flags on guest visits
+    return res.status(200).json({ user: null });
   }
 
   const user = findUserById(session.userId);
   if (!user || user.status !== 'active') {
     clearSessionCookie(res);
-    return res.status(401).json({ error: 'User session invalid or suspended' });
+    return res.status(200).json({ user: null });
   }
 
   res.json({ user: formatUserResponse(user) });

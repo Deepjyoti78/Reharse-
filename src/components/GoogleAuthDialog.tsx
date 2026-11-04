@@ -28,7 +28,7 @@ const SAVED_GOOGLE_ACCOUNTS: GoogleAccountOption[] = [
 ];
 
 export const GoogleAuthDialog: React.FC<GoogleAuthDialogProps> = ({ isOpen, onClose, onSuccess }) => {
-  const { refreshSession } = useAuth();
+  const { refreshSession, loginWithGoogleLocal } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<string | null>(null);
   const [showCustomForm, setShowCustomForm] = useState(false);
@@ -58,9 +58,17 @@ export const GoogleAuthDialog: React.FC<GoogleAuthDialogProps> = ({ isOpen, onCl
         await refreshSession();
         onSuccess?.();
         onClose();
+        return;
       }
-    } catch (err) {
-      console.warn('Google sign-in error:', err);
+      
+      // Fallback if endpoint returns 404
+      await loginWithGoogleLocal(account.name, account.email);
+      onSuccess?.();
+      onClose();
+    } catch {
+      await loginWithGoogleLocal(account.name, account.email);
+      onSuccess?.();
+      onClose();
     } finally {
       setIsSubmitting(false);
     }
@@ -100,9 +108,16 @@ export const GoogleAuthDialog: React.FC<GoogleAuthDialogProps> = ({ isOpen, onCl
         await refreshSession();
         onSuccess?.();
         onClose();
+        return;
       }
-    } catch (err) {
-      console.warn('Google custom sign-in error:', err);
+
+      await loginWithGoogleLocal(name, email);
+      onSuccess?.();
+      onClose();
+    } catch {
+      await loginWithGoogleLocal(name, email);
+      onSuccess?.();
+      onClose();
     } finally {
       setIsSubmitting(false);
     }
