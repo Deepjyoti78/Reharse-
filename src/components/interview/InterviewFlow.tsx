@@ -40,8 +40,21 @@ export const InterviewFlow: React.FC = () => {
   // If in performance report
   if (currentStage === 'report') {
     return (
-      <div key="report" className="animate-fade-in">
-        <Stage9Report />
+      <div key="report" className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] py-6 sm:py-10 px-3 sm:px-6 lg:px-8 font-sans animate-fade-in overflow-x-hidden">
+        {/* Outer Architectural Blueprint Grid Pattern - Uniform across report view */}
+        <div 
+          className="fixed inset-0 pointer-events-none opacity-[0.34] mix-blend-multiply z-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(90, 52, 32, 0.11) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(90, 52, 32, 0.11) 1px, transparent 1px)
+            `,
+            backgroundSize: '32px 32px',
+          }}
+        />
+        <div className="relative z-10 w-full">
+          <Stage9Report />
+        </div>
       </div>
     );
   }
