@@ -176,46 +176,50 @@ export const Stage4Personalization: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-0 animate-fade-in-up">
-      {/* Soft spotlight behind heading and subtext to dissolve outer grid */}
-      <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-[600px] h-[150px] bg-[#f3e7c9] blur-2xl opacity-95 pointer-events-none rounded-full z-0" />
-
-      {/* Header (shifted higher up) */}
-      <div className="relative z-10 text-center max-w-2xl mx-auto mb-3 sm:mb-3.5">
-        <h2 className="font-serif text-2xl sm:text-3xl text-[#2a170f] font-normal leading-tight">
+    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+      {/* Header with localized fading grid halo behind heading & subtext */}
+      <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
+        <div 
+          className="absolute -inset-x-16 -inset-y-6 rounded-full pointer-events-none -z-10"
+          style={{
+            background: 'radial-gradient(ellipse 70% 70% at 50% 50%, #f3e7c9 50%, rgba(243, 231, 201, 0) 100%)',
+            filter: 'blur(16px)',
+          }}
+        />
+        <h2 className="font-serif text-3xl sm:text-4xl text-[#2a170f] font-normal leading-tight">
           Personalize your <em className="italic text-[#b4532a]">interview context.</em>
         </h2>
-        <p className="mt-1 text-xs sm:text-[13px] text-[#3a2318]/75 font-sans">
+        <p className="mt-2 text-sm sm:text-[15px] text-[#3a2318]/80 font-sans max-w-xl mx-auto leading-relaxed">
           Upload your resume and target JD so your AI interviewer can grill you on your exact war stories. Both are optional.
         </p>
       </div>
 
-      {/* Unified Master Card (Side-by-Side 2-Column, Non-Scrollable) */}
-      <div className="relative z-10 rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 shadow-md p-4 sm:p-5 md:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-start">
+      {/* Unified Master Card (Spacious Side-by-Side 2-Column) */}
+      <div className="relative z-10 rounded-3xl bg-[#faf3e3] border border-[#3a2318]/15 shadow-md p-6 sm:p-8 md:p-9">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
           
           {/* ============ Column 1: Candidate Resume ============ */}
           <div className="flex flex-col h-full justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2a170f] font-sans">
-                  <FileText className="w-3.5 h-3.5 text-[#b4532a]" />
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans">
+                  <FileText className="w-4 h-4 text-[#b4532a]" />
                   <span>Candidate Resume</span>
                 </div>
-                <span className="text-[10px] font-mono text-[#3a2318]/50 bg-[#3a2318]/8 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-mono text-[#3a2318]/60 bg-[#3a2318]/8 px-2.5 py-0.5 rounded-full">
                   Optional
                 </span>
               </div>
 
               {!resume && !isUploading ? (
                 <div>
-                  {/* Compact Dropzone */}
+                  {/* Spacious Dropzone */}
                   <div
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-2xl p-4 sm:p-5 text-center cursor-pointer transition-all ${
+                    className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center cursor-pointer transition-all ${
                       isDragging
                         ? 'border-[#b4532a] bg-[#f5e7c8]'
                         : 'border-[#3a2318]/25 bg-[#f8efe0] hover:bg-[#f3e5cb] hover:border-[#3a2318]/50'
@@ -228,66 +232,66 @@ export const Stage4Personalization: React.FC = () => {
                       onChange={handleFileChange}
                       className="hidden"
                     />
-                    <div className="w-9 h-9 rounded-full bg-[#3a2318]/10 text-[#3a2318] flex items-center justify-center mx-auto mb-2">
-                      <Upload className="w-4 h-4 text-[#b4532a]" />
+                    <div className="w-11 h-11 rounded-full bg-[#3a2318]/10 text-[#3a2318] flex items-center justify-center mx-auto mb-3">
+                      <Upload className="w-5 h-5 text-[#b4532a]" />
                     </div>
-                    <div className="font-serif text-sm sm:text-base text-[#2a170f] mb-0.5">
-                      Drag and drop your resume, or <span className="text-[#b4532a] underline underline-offset-2">browse</span>
+                    <div className="font-serif text-base sm:text-lg text-[#2a170f] mb-1">
+                      Drag and drop your resume here, or <span className="text-[#b4532a] underline underline-offset-2">browse files</span>
                     </div>
-                    <div className="text-[11px] text-[#3a2318]/60 font-sans">
+                    <div className="text-xs text-[#3a2318]/65 font-sans">
                       Supports PDF or DOCX up to 10MB • Private & securely processed
                     </div>
 
                     {uploadError && (
-                      <div className="mt-2 flex items-center justify-center gap-1.5 text-[11px] text-red-700 bg-red-100/80 py-1 px-2.5 rounded-lg max-w-sm mx-auto">
-                        <AlertCircle className="w-3 h-3 shrink-0" />
+                      <div className="mt-3 flex items-center justify-center gap-1.5 text-xs text-red-700 bg-red-100/80 py-1.5 px-3 rounded-lg max-w-sm mx-auto">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                         <span>{uploadError}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Sample resume helper */}
-                  <div className="mt-2 flex items-center justify-between text-[11px] text-[#3a2318]/70">
+                  <div className="mt-3 flex items-center justify-between text-xs text-[#3a2318]/70">
                     <span>Don’t have a resume handy?</span>
                     <button
                       type="button"
                       onClick={handleApplyPresetResume}
-                      className="text-[#b4532a] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
+                      className="text-[#b4532a] hover:underline font-medium inline-flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Sparkles className="w-3 h-3" />
-                      <span>Load demo resume</span>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Load demo engineering resume</span>
                     </button>
                   </div>
                 </div>
               ) : isUploading ? (
                 /* Upload Progress State */
-                <div className="rounded-2xl bg-[#f8efe0] border border-[#3a2318]/15 p-5 text-center">
-                  <div className="font-serif text-base text-[#2a170f] mb-1">Analyzing Resume Structure...</div>
-                  <p className="text-[11px] text-[#3a2318]/70 mb-3 font-sans">
+                <div className="rounded-2xl bg-[#f8efe0] border border-[#3a2318]/15 p-7 text-center">
+                  <div className="font-serif text-lg text-[#2a170f] mb-1.5">Analyzing Resume Structure...</div>
+                  <p className="text-xs text-[#3a2318]/70 mb-4 font-sans">
                     Extracting core engineering projects, skills matrix, and timeline...
                   </p>
-                  <div className="w-full bg-[#3a2318]/10 rounded-full h-2 overflow-hidden max-w-xs mx-auto mb-1.5">
+                  <div className="w-full bg-[#3a2318]/10 rounded-full h-2.5 overflow-hidden max-w-xs mx-auto mb-2">
                     <div
-                      className="bg-[#b4532a] h-2 rounded-full transition-all duration-150"
+                      className="bg-[#b4532a] h-2.5 rounded-full transition-all duration-150"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
-                  <div className="text-[11px] font-mono text-[#3a2318]/60">{uploadProgress}% complete</div>
+                  <div className="text-xs font-mono text-[#3a2318]/60">{uploadProgress}% complete</div>
                 </div>
               ) : resume ? (
                 /* Extracted Info Summary */
-                <div className="rounded-2xl bg-[#f9eed7] border border-[#b4532a]/30 p-3.5 space-y-2.5">
-                  <div className="flex items-center justify-between border-b border-[#3a2318]/10 pb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-[#b4532a] text-white flex items-center justify-center shrink-0">
-                        <FileCheck className="w-4 h-4" />
+                <div className="rounded-2xl bg-[#f9eed7] border border-[#b4532a]/30 p-5 space-y-3.5">
+                  <div className="flex items-center justify-between border-b border-[#3a2318]/10 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-[#b4532a] text-white flex items-center justify-center shrink-0">
+                        <FileCheck className="w-5 h-5" />
                       </div>
-                      <div className="truncate max-w-[180px] sm:max-w-[220px]">
-                        <div className="font-serif text-xs sm:text-sm text-[#2a170f] leading-tight font-medium truncate">
+                      <div className="truncate max-w-[200px] sm:max-w-[240px]">
+                        <div className="font-serif text-sm sm:text-base text-[#2a170f] leading-tight font-medium truncate">
                           {resume.fileName}
                         </div>
-                        <div className="text-[10px] font-mono text-[#3a2318]/60">
-                          {resume.fileSize} • Uploaded
+                        <div className="text-[11px] font-mono text-[#3a2318]/60">
+                          {resume.fileSize} • Uploaded successfully
                         </div>
                       </div>
                     </div>
@@ -295,23 +299,23 @@ export const Stage4Personalization: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleRemoveResume}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-medium text-red-800 bg-red-100/70 hover:bg-red-200/80 transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-red-800 bg-red-100/70 hover:bg-red-200/80 transition-colors cursor-pointer"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3.5 h-3.5" />
                       <span>Remove</span>
                     </button>
                   </div>
 
                   {/* Extracted badges */}
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
-                      <div className="text-[10px] uppercase tracking-wider font-mono text-[#3a2318]/60 mb-1 flex items-center gap-1">
-                        <Code className="w-2.5 h-2.5 text-[#b4532a]" />
+                      <div className="text-[11px] uppercase tracking-wider font-mono text-[#3a2318]/60 mb-1.5 flex items-center gap-1">
+                        <Code className="w-3 h-3 text-[#b4532a]" />
                         <span>Extracted Skills</span>
                       </div>
-                      <div className="flex flex-wrap gap-1 max-h-16 overflow-y-auto">
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                         {resume.skills.map(s => (
-                          <span key={s} className="px-1.5 py-0.5 rounded bg-[#f0e1c2] text-[#2a170f] text-[10px] font-medium">
+                          <span key={s} className="px-2 py-0.5 rounded-md bg-[#f0e1c2] text-[#2a170f] text-[11px] font-medium">
                             {s}
                           </span>
                         ))}
@@ -319,13 +323,13 @@ export const Stage4Personalization: React.FC = () => {
                     </div>
 
                     <div>
-                      <div className="text-[10px] uppercase tracking-wider font-mono text-[#3a2318]/60 mb-1 flex items-center gap-1">
-                        <Briefcase className="w-2.5 h-2.5 text-[#5b8076]" />
+                      <div className="text-[11px] uppercase tracking-wider font-mono text-[#3a2318]/60 mb-1.5 flex items-center gap-1">
+                        <Briefcase className="w-3 h-3 text-[#5b8076]" />
                         <span>Experience Highlights</span>
                       </div>
-                      <ul className="space-y-0.5 text-[#3a2318]/85 font-sans leading-snug text-[10px] max-h-16 overflow-y-auto">
+                      <ul className="space-y-1 text-[#3a2318]/85 font-sans leading-snug text-xs max-h-24 overflow-y-auto">
                         {resume.workExperience.map((w, idx) => (
-                          <li key={idx} className="flex items-start gap-1">
+                          <li key={idx} className="flex items-start gap-1.5">
                             <span className="text-[#5b8076]">•</span>
                             <span className="truncate">{w}</span>
                           </li>
@@ -334,9 +338,9 @@ export const Stage4Personalization: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="text-[10px] font-sans text-[#3a2318]/70 italic flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-700 shrink-0" />
-                    <span>AI interviewer will reference these during follow-up questions.</span>
+                  <div className="pt-1 text-xs font-sans text-[#3a2318]/70 italic flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                    <span>The AI interviewer will reference these during follow-up questions.</span>
                   </div>
                 </div>
               ) : null}
@@ -346,32 +350,32 @@ export const Stage4Personalization: React.FC = () => {
           {/* ============ Column 2: Target Job Description (JD) ============ */}
           <div className="flex flex-col h-full justify-between">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2a170f] font-sans">
-                  <Layers className="w-3.5 h-3.5 text-[#5b8076]" />
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#2a170f] font-sans">
+                  <Layers className="w-4 h-4 text-[#5b8076]" />
                   <span>Target Job Description (JD)</span>
                 </div>
-                <span className="text-[10px] font-mono text-[#3a2318]/50 bg-[#3a2318]/8 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-mono text-[#3a2318]/60 bg-[#3a2318]/8 px-2.5 py-0.5 rounded-full">
                   Optional
                 </span>
               </div>
 
               <div className="relative">
                 <textarea
-                  rows={4}
+                  rows={5}
                   value={jdText}
                   onChange={handleJdTextChange}
                   placeholder="Paste job posting text here (responsibilities, requirements, qualifications)..."
                   maxLength={3000}
-                  className="w-full p-2.5 rounded-xl bg-white/90 border border-[#3a2318]/20 text-xs text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none"
+                  className="w-full p-3.5 rounded-2xl bg-white/95 border border-[#3a2318]/20 text-xs sm:text-sm text-[#2a170f] placeholder:text-[#3a2318]/40 focus:outline-none focus:border-[#b4532a] focus:ring-1 focus:ring-[#b4532a] font-sans resize-none"
                 />
-                <div className="flex items-center justify-between text-[10px] text-[#3a2318]/60 mt-1 px-1">
+                <div className="flex items-center justify-between text-xs text-[#3a2318]/65 mt-2 px-1">
                   <button
                     type="button"
                     onClick={handlePresetJD}
-                    className="text-[#b4532a] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
+                    className="text-[#b4532a] hover:underline font-medium inline-flex items-center gap-1.5 cursor-pointer"
                   >
-                    <Sparkles className="w-2.5 h-2.5" />
+                    <Sparkles className="w-3 h-3" />
                     <span>Paste sample Senior Engineer JD</span>
                   </button>
                   <span>{jdText.length} / 3000 chars</span>
@@ -380,8 +384,8 @@ export const Stage4Personalization: React.FC = () => {
 
               {/* Toggle for personalized questions */}
               {jobDescription && (
-                <div className="mt-2.5 pt-2 border-t border-[#3a2318]/10 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
+                <div className="mt-4 pt-3 border-t border-[#3a2318]/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       id="enableJdMatching"
@@ -392,14 +396,14 @@ export const Stage4Personalization: React.FC = () => {
                           setJobDescription({ ...jobDescription, enablePersonalizedJD: e.target.checked });
                         }
                       }}
-                      className="rounded text-[#b4532a] focus:ring-[#b4532a] cursor-pointer w-3.5 h-3.5"
+                      className="rounded text-[#b4532a] focus:ring-[#b4532a] cursor-pointer w-4 h-4"
                     />
-                    <label htmlFor="enableJdMatching" className="text-[11px] text-[#2a170f] font-medium cursor-pointer">
+                    <label htmlFor="enableJdMatching" className="text-xs text-[#2a170f] font-medium cursor-pointer">
                       Prioritize questions evaluating these JD requirements
                     </label>
                   </div>
 
-                  <span className="text-[10px] font-mono text-[#5b8076] font-medium">
+                  <span className="text-xs font-mono text-[#5b8076] font-medium">
                     {jobDescription.keySkills.length} competencies detected
                   </span>
                 </div>
@@ -408,14 +412,14 @@ export const Stage4Personalization: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer Navigation Inside Master Card for Compactness */}
-        <div className="mt-4 pt-3.5 border-t border-[#3a2318]/10 flex items-center justify-between gap-3">
+        {/* Footer Navigation Inside Master Card */}
+        <div className="mt-8 pt-5 border-t border-[#3a2318]/10 flex items-center justify-between gap-4">
           <button
             onClick={() => setCurrentStage('configuration')}
             type="button"
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 transition-all cursor-pointer group"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs sm:text-sm font-medium font-sans border border-[#3a2318]/20 transition-all cursor-pointer group"
           >
-            <ArrowLeft className="w-3 h-3 text-[#b4532a] transition-transform group-hover:-translate-x-0.5" />
+            <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-0.5" />
             <span>Back to Configuration</span>
           </button>
 
@@ -425,10 +429,10 @@ export const Stage4Personalization: React.FC = () => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             type="button"
-            className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs font-medium transition-all shadow-sm group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
           >
             <span>Continue to Choose Interviewer</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
       </div>
