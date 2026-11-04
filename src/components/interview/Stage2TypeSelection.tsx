@@ -134,19 +134,22 @@ export const Stage2TypeSelection: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 md:py-8">
-      {/* Header */}
-      <div className="text-center max-w-2xl mx-auto mb-8">
-        <h2 className="font-serif text-3xl sm:text-4xl text-[#2a170f] font-normal leading-tight">
+    <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-0 animate-fade-in-up">
+      {/* Soft spotlight behind heading and subtext so the outer grid dissolves smoothly */}
+      <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-[600px] h-[150px] bg-[#f3e7c9] blur-2xl opacity-95 pointer-events-none rounded-full z-0" />
+
+      {/* Header (shifted higher up with clean typography) */}
+      <div className="relative z-10 text-center max-w-2xl mx-auto mb-3.5 sm:mb-4">
+        <h2 className="font-serif text-2xl sm:text-3xl text-[#2a170f] font-normal leading-tight">
           Choose your <em className="italic text-[#b4532a]">interview track.</em>
         </h2>
-        <p className="mt-2 text-sm text-[#3a2318]/75 font-sans">
+        <p className="mt-1 text-xs sm:text-[13px] text-[#3a2318]/75 font-sans">
           Select the focus of your session. Each track uses calibrated questioning models and specific evaluation rubrics.
         </p>
       </div>
 
-      {/* Grid of 6 Interactive Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Grid of 6 Compact Interactive Cards (No "Evaluated on", Non-Scrollable) */}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
         {INTERVIEW_TYPES.map((card, index) => {
           const isSelected = config.interviewType === card.type;
           const Icon = card.icon;
@@ -156,66 +159,51 @@ export const Stage2TypeSelection: React.FC = () => {
             <div
               key={card.type}
               onClick={() => handleSelectType(card.type)}
-              className={`relative rounded-3xl p-6 transition-all duration-300 cursor-pointer flex flex-col justify-between border interactive-card animate-fade-in-up ${staggerClass} ${
+              className={`relative rounded-2xl p-4 sm:p-4.5 transition-all duration-200 cursor-pointer flex flex-col justify-between border interactive-card animate-fade-in-up ${staggerClass} ${
                 isSelected
-                  ? 'bg-[#faf1dc] border-[#b4532a] shadow-lg ring-2 ring-[#b4532a]/40 -translate-y-1.5'
-                  : 'bg-[#faf4e6] border-[#3a2318]/15 hover:border-[#3a2318]/40 hover:bg-[#faf1dd]'
+                  ? 'bg-[#faf0d8] border-[#b4532a] shadow-md ring-2 ring-[#b4532a]/35 -translate-y-0.5'
+                  : 'bg-[#faf4e6] border-[#3a2318]/15 hover:border-[#3a2318]/35 hover:bg-[#faf1dc]'
               }`}
             >
               <div>
                 {/* Top Row: Icon + Category + Selection badge */}
-                <div className="flex items-start justify-between gap-3 mb-4">
+                <div className="flex items-center justify-between gap-2.5 mb-2.5">
                   <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs transition-transform duration-300 group-hover:scale-110"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
                     style={{ backgroundColor: card.accentBg, color: card.accentColor }}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-4.5 h-4.5" />
                   </div>
                   
                   {isSelected ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#b4532a] text-[#fbf7ee] text-[11px] font-medium font-sans shadow-xs animate-scale-in">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#b4532a] text-[#fbf7ee] text-[10.5px] font-medium font-sans shadow-xs animate-scale-in">
                       <CheckCircle2 className="w-3 h-3" />
                       <span>Selected</span>
                     </span>
                   ) : (
-                    <span className="text-[10.5px] uppercase tracking-wider font-mono text-[#3a2318]/50">
+                    <span className="text-[10px] uppercase tracking-wider font-mono text-[#3a2318]/50">
                       {card.category}
                     </span>
                   )}
                 </div>
 
                 {/* Title */}
-                <h3 className="font-serif text-xl sm:text-[22px] text-[#2a170f] leading-snug font-normal mb-2">
+                <h3 className="font-serif text-lg sm:text-[19px] text-[#2a170f] leading-snug font-normal mb-1">
                   {card.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-xs text-[#3a2318]/80 leading-relaxed font-sans mb-4">
+                <p className="text-[11.5px] sm:text-xs text-[#3a2318]/75 leading-relaxed font-sans line-clamp-2">
                   {card.description}
                 </p>
-
-                {/* Evaluated On Section */}
-                <div className="pt-2">
-                  <div className="text-[10.5px] uppercase tracking-wider font-mono text-[#3a2318]/60 mb-2 font-medium">
-                    Evaluated on:
-                  </div>
-                  <ul className="space-y-1.5">
-                    {card.evaluatedOn.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5 text-[11.5px] text-[#3a2318]/85 font-sans leading-tight">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#b4532a]/60 mt-1 shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </div>
 
               {/* Bottom selection indicator */}
-              <div className="mt-5 pt-3 flex items-center justify-between text-xs font-sans border-t border-[#3a2318]/10">
-                <span className={`font-medium transition-colors ${isSelected ? 'text-[#b4532a]' : 'text-[#3a2318]/60'}`}>
+              <div className="mt-3 pt-2 flex items-center justify-between text-[11px] font-sans border-t border-[#3a2318]/10">
+                <span className={`font-medium transition-colors ${isSelected ? 'text-[#b4532a]' : 'text-[#3a2318]/55'}`}>
                   {isSelected ? 'Track selected' : 'Click to select track'}
                 </span>
-                <span className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${isSelected ? 'bg-[#b4532a] ring-4 ring-[#b4532a]/30 scale-125' : 'bg-[#3a2318]/20'}`} />
+                <span className={`w-2 h-2 rounded-full transition-all duration-200 ${isSelected ? 'bg-[#b4532a] ring-3 ring-[#b4532a]/30 scale-110' : 'bg-[#3a2318]/20'}`} />
               </div>
             </div>
           );
@@ -223,11 +211,11 @@ export const Stage2TypeSelection: React.FC = () => {
       </div>
 
       {/* Navigation Controls */}
-      <div className="mt-8 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="relative z-10 mt-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <button
           onClick={handleBack}
           type="button"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
         >
           <ArrowLeft className="w-3.5 h-3.5 text-[#b4532a] transition-transform group-hover:-translate-x-1" />
           <span>Back to overview</span>
@@ -236,7 +224,7 @@ export const Stage2TypeSelection: React.FC = () => {
         <button
           onClick={handleContinue}
           type="button"
-          className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-[13px] font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
         >
           <span>Continue to Configuration</span>
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />

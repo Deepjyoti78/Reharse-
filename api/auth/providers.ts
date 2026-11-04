@@ -5,3 +5,4 @@ export default function handler(_req: any, res: any) {
     githubConfigured: Boolean(process.env.GITHUB_CLIENT_ID),
   });
 }
+

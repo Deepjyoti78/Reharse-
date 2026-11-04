@@ -42,25 +42,26 @@ export const InterviewFlow: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] pt-2 sm:pt-4 pb-8 sm:pb-12 font-sans overflow-x-hidden">
-      {/* Outer Architectural Blueprint Grid Pattern across the empty background area */}
+    <div className="relative min-h-screen md:h-screen md:max-h-screen bg-[#f3e7c9] text-[#2a1a12] py-2 px-3 sm:px-6 font-sans md:overflow-hidden flex flex-col justify-center">
+      {/* Outer Architectural Blueprint Grid Pattern with Fading Effect around Header Typography */}
       <div 
-        className="fixed inset-0 pointer-events-none opacity-[0.35] mix-blend-multiply z-0"
+        className="fixed inset-0 pointer-events-none opacity-[0.38] mix-blend-multiply z-0"
         style={{
           backgroundImage: `
             linear-gradient(to right, rgba(90, 52, 32, 0.12) 1px, transparent 1px),
             linear-gradient(to bottom, rgba(90, 52, 32, 0.12) 1px, transparent 1px)
           `,
           backgroundSize: '28px 28px',
+          maskImage: 'radial-gradient(ellipse 70% 48% at 50% 20%, transparent 22%, black 78%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 70% 48% at 50% 20%, transparent 22%, black 78%)',
         }}
       />
 
-      {/* Subtle Warm Ambient Glow in the background */}
-      <div className="fixed -top-40 -right-40 w-96 h-96 rounded-full bg-[#b4532a]/8 blur-3xl pointer-events-none z-0" />
-      <div className="fixed -bottom-40 -left-40 w-96 h-96 rounded-full bg-[#d97706]/8 blur-3xl pointer-events-none z-0" />
+      {/* Gentle Spotlight Radial Mask dissolving grid directly behind the heading and subtext */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-[#f3e7c9] blur-3xl opacity-85 pointer-events-none z-0" />
 
       {/* Dynamic Stage Rendering with Stage Entry Transition */}
-      <div key={currentStage} className="relative z-10 animate-fade-in-up">
+      <div key={currentStage} className="relative z-10 w-full animate-fade-in-up">
         {currentStage === 'intro' && <Stage1Intro />}
         {currentStage === 'type-selection' && <Stage2TypeSelection />}
         {currentStage === 'configuration' && <Stage3Configuration />}
