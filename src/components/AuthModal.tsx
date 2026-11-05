@@ -142,28 +142,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         // Dismiss when clicking directly on the backdrop
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#180d08]/75 backdrop-blur-md animate-backdrop-fade"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-[#100804]/80 backdrop-blur-md animate-backdrop-fade"
     >
-      {/* Modal Surface: Flush right picture with zero gap to boundary */}
-      <div className="relative bg-[#faf4e8] text-[#2a170f] max-w-[920px] w-full rounded-[28px] sm:rounded-[34px] shadow-[0_35px_100px_rgba(20,10,6,0.5)] border border-[#3a2318]/20 flex flex-col lg:flex-row items-stretch overflow-hidden animate-modal-pop">
+      {/* Modal Surface: Warm dark theme harmonizing with right-hand artwork */}
+      <div className="relative bg-[#20120a] text-[#f6ebd4] max-w-[920px] w-full rounded-[28px] sm:rounded-[34px] shadow-[0_35px_100px_rgba(10,5,3,0.85)] border border-[#dfa84c]/20 flex flex-col lg:flex-row items-stretch overflow-hidden animate-modal-pop">
         
         {/* ================= Left Column: Auth Form ================= */}
-        <div className="flex-1 p-6 sm:p-7 lg:p-8 flex flex-col justify-center space-y-3.5">
+        <div className="flex-1 p-6 sm:p-7 lg:p-8 flex flex-col justify-center space-y-3.5 bg-[#20120a]">
           
           {/* Brand Logo Header */}
           <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 text-[#b8542c] font-serif text-lg leading-none animate-subtle-float">✦</span>
-            <span className="font-serif text-2xl tracking-tight text-[#2a170f]">Rehearse</span>
+            <span className="w-3.5 h-3.5 text-[#dfa84c] font-serif text-lg leading-none animate-subtle-float">✦</span>
+            <span className="font-serif text-2xl tracking-tight text-[#f6ebd4]">Rehearse</span>
           </div>
 
           {/* Animated Mode Container for smooth sign up <-> log in switch */}
           <div key={mode} className="animate-fade-in-up space-y-3.5">
             {/* Headline & Description */}
             <div>
-              <h2 className="font-serif text-[28px] sm:text-[32px] font-normal tracking-tight text-[#2a170f] leading-[1.08]">
+              <h2 className="font-serif text-[28px] sm:text-[32px] font-normal tracking-tight text-[#f6ebd4] leading-[1.08]">
                 {mode === 'signup' ? 'Create your account' : 'Welcome back'}
               </h2>
-              <p className="mt-1 text-[13px] sm:text-[13.5px] text-[#3a2318]/70 leading-relaxed font-sans">
+              <p className="mt-1 text-[13px] sm:text-[13.5px] text-[#f6ebd4]/70 leading-relaxed font-sans">
                 {mode === 'signup'
                   ? 'Start practicing for real interviews with an AI interviewer, tailored to your goals.'
                   : 'Continue your mock interview preparation right where you left off.'}
@@ -172,7 +172,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             {/* Error Message Alert */}
             {error && (
-              <div className="p-3 rounded-xl bg-[#9c3a1a]/10 border border-[#9c3a1a]/25 text-[#9c3a1a] text-xs flex items-start gap-2 animate-fade-in-down">
+              <div className="p-3 rounded-xl bg-[#9c3a1a]/20 border border-[#9c3a1a]/40 text-[#fca5a5] text-xs flex items-start gap-2 animate-fade-in-down">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -185,7 +185,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="button"
                 disabled={isLoading}
                 onClick={handleSocialGoogle}
-                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-white hover:bg-[#fbf7f0] border border-[#3a2318]/15 shadow-xs text-xs font-medium text-[#2a170f] transition-all cursor-pointer whitespace-nowrap disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98] hover:shadow-sm"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#2b180f] hover:bg-[#382015] border border-[#f6ebd4]/15 hover:border-[#dfa84c]/30 shadow-xs text-xs font-medium text-[#f6ebd4] transition-all cursor-pointer whitespace-nowrap disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98] hover:shadow-sm"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path
@@ -213,9 +213,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="button"
                 disabled={isLoading}
                 onClick={handleSocialGitHub}
-                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-white hover:bg-[#fbf7f0] border border-[#3a2318]/15 shadow-xs text-xs font-medium text-[#2a170f] transition-all cursor-pointer whitespace-nowrap disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98] hover:shadow-sm"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[#2b180f] hover:bg-[#382015] border border-[#f6ebd4]/15 hover:border-[#dfa84c]/30 shadow-xs text-xs font-medium text-[#f6ebd4] transition-all cursor-pointer whitespace-nowrap disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98] hover:shadow-sm"
               >
-                <svg className="w-4 h-4 shrink-0 fill-current text-[#2a170f]" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 shrink-0 fill-current text-[#f6ebd4]" viewBox="0 0 24 24">
                   <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                 </svg>
                 <span>Continue with GitHub</span>
@@ -225,10 +225,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Editorial Divider */}
             <div className="relative my-0.5">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#3a2318]/15" />
+                <div className="w-full border-t border-[#f6ebd4]/15" />
               </div>
-              <div className="relative flex justify-center text-[11px] font-sans text-[#3a2318]/60">
-                <span className="bg-[#faf4e8] px-3">
+              <div className="relative flex justify-center text-[11px] font-sans text-[#f6ebd4]/60">
+                <span className="bg-[#20120a] px-3">
                   {mode === 'signup' ? 'Or sign up with email' : 'Or sign in with email'}
                 </span>
               </div>
@@ -240,18 +240,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {/* Full Name (Sign Up only) */}
               {mode === 'signup' && (
                 <div className="animate-fade-in-up">
-                  <label className="block text-[11.5px] font-semibold text-[#2a170f] mb-1">
+                  <label className="block text-[11.5px] font-semibold text-[#f6ebd4]/90 mb-1">
                     Full name
                   </label>
-                  <div className="relative rounded-xl border border-[#3a2318]/20 bg-white/80 focus-within:bg-white focus-within:border-[#b8542c] focus-within:ring-2 focus-within:ring-[#b8542c]/15 transition-all">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3a2318]/45 pointer-events-none" />
+                  <div className="relative rounded-xl border border-[#f6ebd4]/18 bg-[#2a170e] focus-within:bg-[#341d11] focus-within:border-[#dfa84c] focus-within:ring-2 focus-within:ring-[#dfa84c]/20 transition-all">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#dfa84c]/70 pointer-events-none" />
                     <input
                       type="text"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Enter your full name"
-                      className="w-full pl-10 pr-3.5 py-2 bg-transparent text-[13px] text-[#2a170f] focus:outline-none placeholder-[#3a2318]/40 font-sans"
+                      className="w-full pl-10 pr-3.5 py-2 bg-transparent text-[13px] text-[#f6ebd4] focus:outline-none placeholder-[#f6ebd4]/35 font-sans"
                     />
                   </div>
                 </div>
@@ -260,14 +260,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {/* Email */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[11.5px] font-semibold text-[#2a170f]">
+                  <label className="block text-[11.5px] font-semibold text-[#f6ebd4]/90">
                     Email
                   </label>
                   {mode === 'login' && (
                     <button
                       type="button"
                       onClick={fillDemoCredentials}
-                      className="text-[11px] font-mono text-[#b8542c] hover:underline flex items-center gap-1 cursor-pointer transition-transform hover:scale-105"
+                      className="text-[11px] font-mono text-[#dfa84c] hover:text-[#f3c26d] hover:underline flex items-center gap-1 cursor-pointer transition-transform hover:scale-105"
                     >
                       <Sparkles className="w-3 h-3 text-[#dfa84c]" />
                       <span>Use demo account</span>
@@ -275,15 +275,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   )}
                 </div>
 
-                <div className="relative rounded-xl border border-[#3a2318]/20 bg-white/80 focus-within:bg-white focus-within:border-[#b8542c] focus-within:ring-2 focus-within:ring-[#b8542c]/15 transition-all">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3a2318]/45 pointer-events-none" />
+                <div className="relative rounded-xl border border-[#f6ebd4]/18 bg-[#2a170e] focus-within:bg-[#341d11] focus-within:border-[#dfa84c] focus-within:ring-2 focus-within:ring-[#dfa84c]/20 transition-all">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#dfa84c]/70 pointer-events-none" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full pl-10 pr-3.5 py-2 bg-transparent text-[13px] text-[#2a170f] focus:outline-none placeholder-[#3a2318]/40 font-sans"
+                    className="w-full pl-10 pr-3.5 py-2 bg-transparent text-[13px] text-[#f6ebd4] focus:outline-none placeholder-[#f6ebd4]/35 font-sans"
                   />
                 </div>
               </div>
@@ -291,100 +291,100 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {/* Password */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                <label className="block text-[11.5px] font-semibold text-[#2a170f]">
-                  Password
-                </label>
-                {mode === 'login' && (
+                  <label className="block text-[11.5px] font-semibold text-[#f6ebd4]/90">
+                    Password
+                  </label>
+                  {mode === 'login' && (
+                    <button
+                      type="button"
+                      onClick={fillDemoCredentials}
+                      className="text-[11px] text-[#dfa84c]/80 hover:text-[#dfa84c] transition-colors cursor-pointer"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative rounded-xl border border-[#f6ebd4]/18 bg-[#2a170e] focus-within:bg-[#341d11] focus-within:border-[#dfa84c] focus-within:ring-2 focus-within:ring-[#dfa84c]/20 transition-all">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#dfa84c]/70 pointer-events-none" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === 'signup' ? 'Create a password' : 'Enter your password'}
+                    className="w-full pl-10 pr-10 py-2 bg-transparent text-[13px] text-[#f6ebd4] focus:outline-none placeholder-[#f6ebd4]/35 font-sans"
+                  />
                   <button
                     type="button"
-                    onClick={fillDemoCredentials}
-                    className="text-[11px] text-[#3a2318]/60 hover:text-[#b8542c] transition-colors cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#f6ebd4]/50 hover:text-[#f6ebd4] transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    Forgot password?
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                )}
+                </div>
               </div>
 
-              <div className="relative rounded-xl border border-[#3a2318]/20 bg-white/80 focus-within:bg-white focus-within:border-[#b8542c] focus-within:ring-2 focus-within:ring-[#b8542c]/15 transition-all">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3a2318]/45 pointer-events-none" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={mode === 'signup' ? 'Create a password' : 'Enter your password'}
-                  className="w-full pl-10 pr-10 py-2 bg-transparent text-[13px] text-[#2a170f] focus:outline-none placeholder-[#3a2318]/40 font-sans"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#3a2318]/50 hover:text-[#2a170f] transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+              {/* Password Requirements (Sign Up only) */}
+              {mode === 'signup' && (
+                <div className="pt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10.5px] font-sans">
+                  <span className={`inline-flex items-center gap-1 ${hasMinLength ? 'text-emerald-400 font-medium' : 'text-[#f6ebd4]/45'}`}>
+                    <Check className={`w-3.5 h-3.5 ${hasMinLength ? 'text-emerald-400' : 'text-[#f6ebd4]/30'}`} />
+                    <span>At least 8 characters</span>
+                  </span>
+                  <span className={`inline-flex items-center gap-1 ${hasNumber ? 'text-emerald-400 font-medium' : 'text-[#f6ebd4]/45'}`}>
+                    <Check className={`w-3.5 h-3.5 ${hasNumber ? 'text-emerald-400' : 'text-[#f6ebd4]/30'}`} />
+                    <span>One number</span>
+                  </span>
+                  <span className={`inline-flex items-center gap-1 ${hasSpecial ? 'text-emerald-400 font-medium' : 'text-[#f6ebd4]/45'}`}>
+                    <Check className={`w-3.5 h-3.5 ${hasSpecial ? 'text-emerald-400' : 'text-[#f6ebd4]/30'}`} />
+                    <span>One special character</span>
+                  </span>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full mt-2 py-2.5 px-5 rounded-xl bg-[#b8542c] hover:bg-[#cf6335] active:scale-[0.99] text-[#fdfaf3] font-medium text-[13.5px] shadow-lg shadow-[#b8542c]/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                <span>
+                  {isLoading
+                    ? (mode === 'signup' ? 'Creating account...' : 'Signing in...')
+                    : (mode === 'signup' ? 'Create account' : 'Sign in')}
+                </span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* Switch Mode Footer */}
+            <div className="pt-1 text-center text-xs text-[#f6ebd4]/70 font-sans">
+              {mode === 'signup' ? (
+                <>
+                  <span>Already have an account? </span>
+                  <button
+                    type="button"
+                    onClick={() => setMode('login')}
+                    className="font-semibold text-[#dfa84c] hover:text-[#f3c26d] hover:underline cursor-pointer transition-transform hover:scale-105 inline-block"
+                  >
+                    Log in
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span>Don't have an account? </span>
+                  <button
+                    type="button"
+                    onClick={() => setMode('signup')}
+                    className="font-semibold text-[#dfa84c] hover:text-[#f3c26d] hover:underline cursor-pointer transition-transform hover:scale-105 inline-block"
+                  >
+                    Sign up
+                  </button>
+                </>
+              )}
             </div>
-
-            {/* Password Requirements (Sign Up only) */}
-            {mode === 'signup' && (
-              <div className="pt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10.5px] font-sans">
-                <span className={`inline-flex items-center gap-1 ${hasMinLength ? 'text-emerald-700 font-medium' : 'text-[#3a2318]/55'}`}>
-                  <Check className={`w-3.5 h-3.5 ${hasMinLength ? 'text-emerald-600' : 'text-[#3a2318]/35'}`} />
-                  <span>At least 8 characters</span>
-                </span>
-                <span className={`inline-flex items-center gap-1 ${hasNumber ? 'text-emerald-700 font-medium' : 'text-[#3a2318]/55'}`}>
-                  <Check className={`w-3.5 h-3.5 ${hasNumber ? 'text-emerald-600' : 'text-[#3a2318]/35'}`} />
-                  <span>One number</span>
-                </span>
-                <span className={`inline-flex items-center gap-1 ${hasSpecial ? 'text-emerald-700 font-medium' : 'text-[#3a2318]/55'}`}>
-                  <Check className={`w-3.5 h-3.5 ${hasSpecial ? 'text-emerald-600' : 'text-[#3a2318]/35'}`} />
-                  <span>One special character</span>
-                </span>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 py-2.5 px-5 rounded-xl bg-[#b8542c] hover:bg-[#a04520] active:scale-[0.99] text-[#fdfaf3] font-medium text-[13.5px] shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-            >
-              <span>
-                {isLoading
-                  ? (mode === 'signup' ? 'Creating account...' : 'Signing in...')
-                  : (mode === 'signup' ? 'Create account' : 'Sign in')}
-              </span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-
-          {/* Switch Mode Footer */}
-          <div className="pt-1 text-center text-xs text-[#3a2318]/75 font-sans">
-            {mode === 'signup' ? (
-              <>
-                <span>Already have an account? </span>
-                <button
-                  type="button"
-                  onClick={() => setMode('login')}
-                  className="font-semibold text-[#b8542c] hover:underline cursor-pointer transition-transform hover:scale-105 inline-block"
-                >
-                  Log in
-                </button>
-              </>
-            ) : (
-              <>
-                <span>Don't have an account? </span>
-                <button
-                  type="button"
-                  onClick={() => setMode('signup')}
-                  className="font-semibold text-[#b8542c] hover:underline cursor-pointer transition-transform hover:scale-105 inline-block"
-                >
-                  Sign up
-                </button>
-              </>
-            )}
-          </div>
           </div>
         </div>
 
