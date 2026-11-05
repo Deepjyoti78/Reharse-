@@ -29,21 +29,21 @@ export const HowItWorks: React.FC = () => {
       <div className="w-full pl-0 pr-4 sm:pr-8 lg:pr-10 xl:pr-12 max-w-[1360px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-center">
           
-          {/* Left Column: Shifted to the left edge and compact height */}
-          <div className="lg:col-span-5 relative flex items-end justify-center lg:justify-start self-center lg:self-end ml-0 sm:-ml-2 lg:-ml-6 xl:-ml-10 -translate-y-2 sm:-translate-y-3">
+          {/* Left Column: Shifted to the left edge with increased height to reduce empty space above */}
+          <div className="lg:col-span-5 relative flex items-end justify-center lg:justify-start self-center lg:self-end ml-0 sm:-ml-2 lg:-ml-6 xl:-ml-10 -translate-y-3 sm:-translate-y-5 lg:-translate-y-7">
             
             {/* Mid-century Architectural Background Color Blocks */}
             <div className="absolute bottom-0 left-0 flex items-end gap-1.5 z-0 pointer-events-none opacity-95">
               {/* Slate/Teal block behind plant */}
-              <div className="w-12 sm:w-14 lg:w-16 h-40 sm:h-48 lg:h-[240px] bg-[#5b8076] rounded-t-sm" />
+              <div className="w-14 sm:w-16 lg:w-20 h-48 sm:h-60 lg:h-[300px] bg-[#5b8076] rounded-t-sm" />
               {/* Burnt Terracotta tall block behind scholar */}
-              <div className="w-14 sm:w-16 lg:w-20 h-48 sm:h-60 lg:h-[290px] bg-[#c45628] rounded-t-sm" />
+              <div className="w-16 sm:w-20 lg:w-24 h-60 sm:h-72 lg:h-[365px] bg-[#c45628] rounded-t-sm" />
               {/* Deep ochre/rust block behind lamp/desk */}
-              <div className="w-10 sm:w-12 lg:w-14 h-32 sm:h-40 lg:h-[190px] bg-[#9e3e19] rounded-t-sm" />
+              <div className="w-12 sm:w-14 lg:w-18 h-40 sm:h-50 lg:h-[235px] bg-[#9e3e19] rounded-t-sm" />
             </div>
 
-            {/* Thoughtful Scholar at Desk Illustration */}
-            <div className="relative z-10 w-full max-w-[290px] sm:max-w-[330px] lg:max-w-[360px] drop-shadow-md">
+            {/* Thoughtful Scholar at Desk Illustration - increased size & height */}
+            <div className="relative z-10 w-full max-w-[340px] sm:max-w-[390px] lg:max-w-[430px] xl:max-w-[465px] drop-shadow-md">
               <img
                 src="/images/thoughtful-scholar.png"
                 alt="Thoughtful candidate seated at vintage desk reflecting on interview preparation"
@@ -52,8 +52,8 @@ export const HowItWorks: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Column: 3 Minimalist Steps - compact and vertically centered */}
-          <div className="lg:col-span-7 flex flex-col justify-center pt-0 pb-1 sm:pb-3 lg:pb-4">
+          {/* Right Column: 3 Minimalist Steps - shifted to the right side */}
+          <div className="lg:col-span-7 flex flex-col justify-center pt-0 pb-1 sm:pb-3 lg:pb-4 lg:pl-8 xl:pl-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 xl:gap-7">
               
               {/* Step 1: Real interview questions */}
