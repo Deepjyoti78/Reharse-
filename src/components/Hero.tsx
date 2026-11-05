@@ -8,11 +8,11 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({ onOpenDemo }) => {
   return (
     <section className="relative w-full aspect-[16/9] min-h-[560px] md:min-h-[576px] lg:min-h-[640px] flex flex-col justify-start text-[#f6ebd4] pt-16 sm:pt-20 md:pt-22 pb-6 overflow-hidden border-b border-[#3a2318]/20 bg-[#a84420]">
-      {/* Exact Mid-century modern interview background painting */}
+      {/* Art Deco Interview with a Robot background painting */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/hero-bg-v2.jpg"
-          alt="Rehearse candidate and AI interviewer in retro mid-century modern office"
+          src="/images/art-deco-interview-robot.png"
+          alt="Art Deco candidate and AI interviewer"
           className="w-full h-full object-cover object-bottom select-none pointer-events-none"
         />
 
