@@ -101,10 +101,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleSocialGoogle = () => {
-    if (providers.googleConfigured) {
-      loginWithGoogle();
-    } else {
+  const handleSocialGoogle = async () => {
+    try {
+      // 1. If already known configured, redirect directly to Google OAuth
+      if (providers.googleConfigured) {
+        loginWithGoogle();
+        return;
+      }
+
+      // 2. Double-check provider status from backend in case initial fetch was delayed
+      const res = await fetch('/api/auth/providers').catch(() => null);
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data && data.googleConfigured) {
+          loginWithGoogle();
+          return;
+        }
+      }
+
+      // 3. Fallback to local account chooser dialog if unconfigured
+      setIsGoogleDialogOpen(true);
+    } catch {
       setIsGoogleDialogOpen(true);
     }
   };

@@ -28,7 +28,22 @@ import {
 
 export const authRouter = Router();
 
-function getFrontendUrl(): string {
+function getFrontendUrl(req?: Request): string {
+  if (req) {
+    const origin = req.headers.origin;
+    if (origin && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+      return origin;
+    }
+    const referer = req.headers.referer;
+    if (referer) {
+      try {
+        const u = new URL(referer);
+        if (/^(localhost|127\.0\.0\.1)$/.test(u.hostname)) {
+          return `${u.protocol}//${u.host}`;
+        }
+      } catch {}
+    }
+  }
   return process.env.FRONTEND_URL || 'http://localhost:5173';
 }
 
@@ -228,29 +243,33 @@ authRouter.post('/dev-google-login', async (req: Request, res: Response) => {
 
 authRouter.get('/google', (req: Request, res: Response) => {
   try {
+    const frontendUrl = getFrontendUrl(req);
     const destination = (req.query.destination as string) || '/';
-    const authUrl = createGoogleAuthUrl(destination);
+    const targetUrl = destination.startsWith('http')
+      ? destination
+      : `${frontendUrl}${destination.startsWith('/') ? destination : `/${destination}`}`;
+    const authUrl = createGoogleAuthUrl(targetUrl);
     res.redirect(authUrl);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Failed to initiate Google authentication';
     console.error('Google OAuth init error:', message);
-    res.redirect(`${getFrontendUrl()}/?auth_error=${encodeURIComponent(message)}`);
+    res.redirect(`${getFrontendUrl(req)}/?auth_error=${encodeURIComponent(message)}`);
   }
 });
 
 authRouter.get('/google/callback', async (req: Request, res: Response) => {
-  const frontendUrl = getFrontendUrl();
+  const fallbackFrontend = getFrontendUrl(req);
 
   try {
     const { code, state, error: oauthError } = req.query;
 
     if (oauthError) {
       console.warn('Google OAuth returned error:', oauthError);
-      return res.redirect(`${frontendUrl}/?auth_error=${encodeURIComponent('Google sign-in was cancelled or declined.')}`);
+      return res.redirect(`${fallbackFrontend}/?auth_error=${encodeURIComponent('Google sign-in was cancelled or declined.')}`);
     }
 
     if (!code || !state || typeof code !== 'string' || typeof state !== 'string') {
-      return res.redirect(`${frontendUrl}/?auth_error=${encodeURIComponent('Missing authorization code or state parameter.')}`);
+      return res.redirect(`${fallbackFrontend}/?auth_error=${encodeURIComponent('Missing authorization code or state parameter.')}`);
     }
 
     // Exchange code, verify ID token, and extract verified profile
@@ -300,13 +319,25 @@ authRouter.get('/google/callback', async (req: Request, res: Response) => {
     setSessionCookie(res, token);
 
     const userJson = encodeURIComponent(JSON.stringify(formatUserResponse(user)));
-    const redirectPath = destination && destination.startsWith('/') ? destination : '/';
-    const separator = redirectPath.includes('?') ? '&' : '?';
-    res.redirect(`${frontendUrl}${redirectPath}${separator}auth=success&provider=google&user=${userJson}&token=${encodeURIComponent(token)}`);
+    let redirectUrl: URL;
+    try {
+      redirectUrl = destination && destination.startsWith('http')
+        ? new URL(destination)
+        : new URL(destination && destination.startsWith('/') ? destination : '/', fallbackFrontend);
+    } catch {
+      redirectUrl = new URL('/', fallbackFrontend);
+    }
+
+    redirectUrl.searchParams.set('auth', 'success');
+    redirectUrl.searchParams.set('provider', 'google');
+    redirectUrl.searchParams.set('user', JSON.stringify(formatUserResponse(user)));
+    redirectUrl.searchParams.set('token', token);
+
+    res.redirect(redirectUrl.toString());
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Google authentication failed';
     console.error('Google callback error:', message);
-    res.redirect(`${frontendUrl}/?auth_error=${encodeURIComponent(message)}`);
+    res.redirect(`${fallbackFrontend}/?auth_error=${encodeURIComponent(message)}`);
   }
 });
 

@@ -28,7 +28,7 @@ const SAVED_GOOGLE_ACCOUNTS: GoogleAccountOption[] = [
 ];
 
 export const GoogleAuthDialog: React.FC<GoogleAuthDialogProps> = ({ isOpen, onClose, onSuccess }) => {
-  const { refreshSession, loginWithGoogleLocal } = useAuth();
+  const { refreshSession, loginWithGoogleLocal, loginWithGoogle, providers } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<string | null>(null);
   const [showCustomForm, setShowCustomForm] = useState(false);
@@ -181,13 +181,18 @@ export const GoogleAuthDialog: React.FC<GoogleAuthDialogProps> = ({ isOpen, onCl
             </div>
           </div>
 
-          {/* Real OAuth Credentials Status Banner */}
-          <div className="mb-3 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-[11px] leading-tight flex items-start gap-2">
-            <span className="font-semibold text-blue-800">OAuth Setup:</span>
-            <span>
-              To activate direct Google Cloud redirection, add your <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">GOOGLE_CLIENT_ID</code> and <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">GOOGLE_CLIENT_SECRET</code> to <code className="bg-blue-100 px-1 py-0.5 rounded font-mono">.env.local</code>. Selecting an account below authenticates and saves directly into the SQLite backend database.
-            </span>
-          </div>
+          {/* Direct Google Cloud OAuth option when configured */}
+          {providers.googleConfigured && (
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => loginWithGoogle()}
+              className="w-full mb-3 p-3 rounded-xl bg-[#4285F4] hover:bg-[#3367D6] text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+            >
+              <span>Sign in with official Google Account</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
 
           {/* Account Selector List */}
           {!showCustomForm ? (
