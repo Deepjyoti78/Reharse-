@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { useInterview } from '../../context/InterviewContext';
+import { instantScrollToTop } from '../../utils/scroll';
 import { Stage1Intro } from './Stage1Intro';
 import { Stage2TypeSelection } from './Stage2TypeSelection';
 import { Stage3Configuration } from './Stage3Configuration';
@@ -15,8 +16,8 @@ export const InterviewFlow: React.FC = () => {
   const { currentStage } = useInterview();
 
   // Instantly reset scroll to top on stage change without "down to up" scrolling
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
+  useLayoutEffect(() => {
+    instantScrollToTop();
   }, [currentStage]);
 
   // If in live room, render full virtual room without setup header

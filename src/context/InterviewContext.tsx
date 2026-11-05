@@ -13,6 +13,7 @@ import type {
 } from '../types/interview';
 import { AI_INTERVIEWERS, DEFAULT_CONFIGURATION, generatePerformanceReport } from '../data/interviewBank';
 import { stopElevenLabsSpeech } from '../services/elevenlabs';
+import { instantScrollToTop } from '../utils/scroll';
 
 interface InterviewContextType {
   currentView: AppView;
@@ -251,7 +252,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setActiveReport(null);
     setCurrentStage('intro');
     setCurrentView('interview-flow');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    instantScrollToTop();
   };
 
   const restartWithSameConfig = () => {
@@ -260,7 +261,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setActiveReport(null);
     setCurrentStage('preview');
     setCurrentView('interview-flow');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    instantScrollToTop();
   };
 
   const finishInterview = (finalTurns?: UserTurn[]) => {
@@ -276,13 +277,14 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setActiveReport(report);
     saveReportToHistory(report);
     setCurrentStage('processing');
+    instantScrollToTop();
   };
 
   const exitToDashboard = () => {
     stopAllMediaHardware();
     setCurrentView('landing');
     setCurrentStage('intro');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    instantScrollToTop();
   };
 
   return (

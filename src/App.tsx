@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { HowItWorks } from './components/HowItWorks';
@@ -17,11 +17,17 @@ import { InterviewFlow } from './components/interview/InterviewFlow';
 import { InterviewHistoryView } from './components/dashboard/InterviewHistoryView';
 import { ProgressDashboardView } from './components/dashboard/ProgressDashboardView';
 import { WeakAreasPracticeView } from './components/dashboard/WeakAreasPracticeView';
+import { instantScrollToTop } from './utils/scroll';
 
 const AppContent: React.FC = () => {
   const { currentView, startInterviewFlow } = useInterview();
   const [isDemoOpen, setIsDemoOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  // Instantly snap to top whenever switching main views without upward scrolling
+  useLayoutEffect(() => {
+    instantScrollToTop();
+  }, [currentView]);
 
   const handleOpenDemoWithRole = (role: string) => {
     // Launch the complete mock interview flow directly for that role

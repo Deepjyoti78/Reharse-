@@ -12,6 +12,7 @@ import { useInterview } from '../../context/InterviewContext';
 import { AI_INTERVIEWERS } from '../../data/interviewBank';
 import type { AIInterviewerProfile } from '../../types/interview';
 import { playElevenLabsSpeech, stopElevenLabsSpeech, isElevenLabsConfigured } from '../../services/elevenlabs';
+import { instantScrollToTop } from '../../utils/scroll';
 
 export const Stage5InterviewerSelection: React.FC = () => {
   const { 
@@ -71,7 +72,7 @@ export const Stage5InterviewerSelection: React.FC = () => {
 
   const handleContinue = () => {
     setCurrentStage('preview');
-    window.scrollTo(0, 0);
+    instantScrollToTop();
   };
 
   return (
@@ -252,7 +253,10 @@ export const Stage5InterviewerSelection: React.FC = () => {
       {/* Sticky Bottom Navigation Dock - Guaranteed Always Visible & Clickable */}
       <div className="sticky bottom-3 z-30 mt-4 px-3 sm:px-6 py-2.5 sm:py-3 rounded-full bg-[#faf0d8]/95 backdrop-blur-md border border-[#3a2318]/25 shadow-lg flex items-center justify-between gap-3 sm:gap-4">
         <button
-          onClick={() => setCurrentStage('personalization')}
+          onClick={() => {
+            setCurrentStage('personalization');
+            instantScrollToTop();
+          }}
           type="button"
           className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs sm:text-sm font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
         >

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, Sparkles, ChevronDown, LogOut, Award, History, BarChart3, Target } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useInterview } from '../context/InterviewContext';
+import { instantScrollToTop } from '../utils/scroll';
 
 interface NavbarProps {
   onOpenAuth: () => void;
@@ -40,7 +41,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
   const handleNavClick = (viewTarget?: 'landing' | 'history' | 'dashboard' | 'weak-areas') => {
     if (viewTarget) {
       setCurrentView(viewTarget);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      instantScrollToTop();
+    }
+  };
+
+  const scrollToAnchor = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    if (currentView !== 'landing') {
+      setCurrentView('landing');
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -66,6 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
           <>
             <a
               href="#how"
+              onClick={(e) => scrollToAnchor(e, 'how')}
               className="text-[#f6ebd4]/90 hover:text-white transition-colors relative py-1"
             >
               How it works
@@ -78,6 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuth }) => {
             </button>
             <a
               href="#roles"
+              onClick={(e) => scrollToAnchor(e, 'roles')}
               className="text-[#f6ebd4]/90 hover:text-white transition-colors relative py-1"
             >
               Roles

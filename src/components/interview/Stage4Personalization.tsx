@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
 import type { ResumeData, JobDescriptionData } from '../../types/interview';
+import { instantScrollToTop } from '../../utils/scroll';
 
 export const Stage4Personalization: React.FC = () => {
   const { 
@@ -415,7 +416,10 @@ export const Stage4Personalization: React.FC = () => {
         {/* Footer Navigation Inside Master Card */}
         <div className="mt-6 sm:mt-8 pt-5 border-t border-[#3a2318]/10 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <button
-            onClick={() => setCurrentStage('configuration')}
+            onClick={() => {
+              setCurrentStage('configuration');
+              instantScrollToTop();
+            }}
             type="button"
             className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs sm:text-sm font-medium font-sans border border-[#3a2318]/20 transition-all cursor-pointer group"
           >
@@ -426,7 +430,7 @@ export const Stage4Personalization: React.FC = () => {
           <button
             onClick={() => {
               setCurrentStage('interviewer');
-              window.scrollTo(0, 0);
+              instantScrollToTop();
             }}
             type="button"
             className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"

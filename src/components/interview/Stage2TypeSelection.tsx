@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
 import type { InterviewType } from '../../types/interview';
+import { instantScrollToTop } from '../../utils/scroll';
 
 interface TypeCardOption {
   type: InterviewType;
@@ -126,11 +127,12 @@ export const Stage2TypeSelection: React.FC = () => {
 
   const handleContinue = () => {
     setCurrentStage('configuration');
-    window.scrollTo(0, 0);
+    instantScrollToTop();
   };
 
   const handleBack = () => {
     setCurrentStage('intro');
+    instantScrollToTop();
   };
 
   return (

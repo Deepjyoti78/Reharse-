@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
 import type { PerformanceReport } from '../../types/interview';
+import { instantScrollToTop } from '../../utils/scroll';
 
 export const InterviewHistoryView: React.FC = () => {
   const { 
@@ -40,7 +41,7 @@ export const InterviewHistoryView: React.FC = () => {
     setActiveReport(report);
     setCurrentStage('report');
     setCurrentView('interview-flow');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    instantScrollToTop();
   };
 
   return (

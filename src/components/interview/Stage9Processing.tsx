@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Brain, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
+import { instantScrollToTop } from '../../utils/scroll';
 
 const PROCESSING_STEPS = [
   'Saving interview responses and audio telemetry...',
@@ -29,7 +30,7 @@ export const Stage9Processing: React.FC = () => {
           clearInterval(stepInterval);
           setTimeout(() => {
             setCurrentStage('report');
-            window.scrollTo(0, 0);
+            instantScrollToTop();
           }, 600);
           return prev;
         }

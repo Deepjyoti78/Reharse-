@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sparkles, ArrowRight, ArrowLeft, Target, ShieldCheck, Cpu, Award } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
+import { instantScrollToTop } from '../../utils/scroll';
 
 export const Stage1Intro: React.FC = () => {
   const { setCurrentStage, exitToDashboard, config, updateConfig } = useInterview();
@@ -82,7 +83,7 @@ export const Stage1Intro: React.FC = () => {
               <button
                 onClick={() => {
                   setCurrentStage('type-selection');
-                  window.scrollTo(0, 0);
+                  instantScrollToTop();
                 }}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
