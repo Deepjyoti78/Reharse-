@@ -9,7 +9,13 @@ export default function handler(req: any, res: any) {
 
   const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
   const proto = req.headers['x-forwarded-proto'] || 'https';
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${proto}://${host}/api/auth/google/callback`;
+  const currentOrigin = `${proto}://${host}`;
+  
+  // Safeguard: use current production origin for callback unless a non-localhost custom redirect URI is provided
+  let redirectUri = `${currentOrigin}/api/auth/google/callback`;
+  if (process.env.GOOGLE_REDIRECT_URI && !process.env.GOOGLE_REDIRECT_URI.includes('localhost')) {
+    redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  }
 
   const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
 

@@ -19,7 +19,12 @@ export default async function handler(req: any, res: any) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${frontendUrl}/api/auth/google/callback`;
+  
+  // Safeguard: use current production origin for callback unless a non-localhost custom redirect URI is provided
+  let redirectUri = `${frontendUrl}/api/auth/google/callback`;
+  if (process.env.GOOGLE_REDIRECT_URI && !process.env.GOOGLE_REDIRECT_URI.includes('localhost')) {
+    redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  }
 
   try {
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
