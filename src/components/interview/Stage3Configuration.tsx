@@ -12,7 +12,6 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
-import { instantScrollToTop } from '../../utils/scroll';
 import type { 
   JobRole, 
   ExperienceLevel, 
@@ -467,7 +466,10 @@ export const Stage3Configuration: React.FC = () => {
           <button
             onClick={() => {
               setCurrentStage('type-selection');
-              instantScrollToTop();
+              const el = document.getElementById('stage-2-type-selection');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
             }}
             type="button"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs sm:text-sm font-medium font-sans border border-[#3a2318]/20 transition-all cursor-pointer group"
@@ -479,7 +481,10 @@ export const Stage3Configuration: React.FC = () => {
           <button
             onClick={() => {
               setCurrentStage('personalization');
-              instantScrollToTop();
+              const el = document.getElementById('stage-4-personalization');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
             }}
             type="button"
             className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.01] active:scale-[0.99]"

@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
 import type { InterviewType } from '../../types/interview';
-import { instantScrollToTop } from '../../utils/scroll';
 
 interface TypeCardOption {
   type: InterviewType;
@@ -127,12 +126,18 @@ export const Stage2TypeSelection: React.FC = () => {
 
   const handleContinue = () => {
     setCurrentStage('configuration');
-    instantScrollToTop();
+    const el = document.getElementById('stage-3-configuration');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleBack = () => {
     setCurrentStage('intro');
-    instantScrollToTop();
+    const el = document.getElementById('stage-1-intro');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (
@@ -171,6 +176,24 @@ export const Stage2TypeSelection: React.FC = () => {
                   : 'bg-[#faf0d8] border-[#3a2318]/15 hover:border-[#3a2318]/35 hover:bg-[#f5e7c8] hover:shadow-xs'
               }`}
             >
+              {/* Branch Connection Anchor Badges (Exact from User Specification) */}
+              {card.type === 'technical' && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#b4532a] text-[#fff6e2] text-[10.5px] font-mono font-semibold border-2 border-[#fff6e2] shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#fff6e2] animate-ping" />
+                    Dotted Branch A
+                  </span>
+                </div>
+              )}
+              {card.type === 'coding' && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#7d3418] text-[#fff6e2] text-[10.5px] font-mono font-semibold border-2 border-[#fff6e2] shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#fff6e2] animate-ping" />
+                    Dotted Branch B
+                  </span>
+                </div>
+              )}
+
               <div>
                 {/* Top Row: Icon + Category + Selection badge */}
                 <div className="flex items-center justify-between gap-3 mb-3">

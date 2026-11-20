@@ -1,7 +1,6 @@
 import React from 'react';
 import { Sparkles, ArrowRight, ArrowLeft, Target, ShieldCheck, Cpu, Award } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
-import { instantScrollToTop } from '../../utils/scroll';
 
 export const Stage1Intro: React.FC = () => {
   const { setCurrentStage, exitToDashboard, config, updateConfig } = useInterview();
@@ -83,7 +82,10 @@ export const Stage1Intro: React.FC = () => {
               <button
                 onClick={() => {
                   setCurrentStage('type-selection');
-                  instantScrollToTop();
+                  const el = document.getElementById('stage-2-type-selection');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
                 }}
                 className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
@@ -144,6 +146,13 @@ export const Stage1Intro: React.FC = () => {
           <div className="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-[#f0e4c8]/60 hover:bg-[#f0e4c8]/90 border border-[#3a2318]/10 transition-colors">
             <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#dfa84c] shrink-0" />
             <span className="font-medium text-[11px] sm:text-xs">STAR rubrics & debrief</span>
+          </div>
+        </div>
+
+        {/* Visual Connector Anchor on Card Bottom Boundary (Aligned Under Right Image) */}
+        <div className="absolute -bottom-2.5 right-[18%] sm:right-[20%] lg:right-[21%] z-30 flex items-center justify-center pointer-events-none">
+          <div className="w-5 h-5 rounded-full bg-[#b4532a] border-2 border-[#fff5e0] shadow-md flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-[#fbf7ee] animate-ping" />
           </div>
         </div>
       </div>
