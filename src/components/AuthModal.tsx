@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Star, ChevronLeft, ChevronRight, Check, AlertCircle, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Check, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { GoogleAuthDialog } from './GoogleAuthDialog';
 
@@ -103,13 +103,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleSocialGoogle = async () => {
     try {
-      // 1. If already known configured, redirect directly to Google OAuth
       if (providers.googleConfigured) {
         loginWithGoogle();
         return;
       }
 
-      // 2. Double-check provider status from backend in case initial fetch was delayed
       const res = await fetch('/api/auth/providers').catch(() => null);
       if (res && res.ok) {
         const data = await res.json();
@@ -119,7 +117,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         }
       }
 
-      // 3. Fallback to local account chooser dialog if unconfigured
       setIsGoogleDialogOpen(true);
     } catch {
       setIsGoogleDialogOpen(true);
@@ -139,339 +136,306 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   return (
     <div
       onClick={(e) => {
-        // Dismiss when clicking directly on the backdrop
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#100804]/80 backdrop-blur-md animate-backdrop-fade"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-backdrop-fade"
     >
-      {/* Modal Surface: Compact, Clean Dual-Tone (Left Parchment + Right Cozy Artwork) */}
-      <div className="relative bg-[#fbf4e8] text-[#2a170f] max-w-[850px] w-full rounded-[24px] sm:rounded-[30px] shadow-[0_25px_80px_rgba(10,5,3,0.8)] border border-[#3a2318]/20 flex flex-col lg:flex-row items-stretch overflow-hidden animate-modal-pop">
+      <div className="w-full max-w-sm md:max-w-4xl flex flex-col gap-4 animate-modal-pop">
         
-        {/* ================= Left Column: Compact Warm Parchment Auth Form ================= */}
-        <div className="relative flex-1 px-5 py-5 sm:px-7 sm:py-6 flex flex-col justify-center bg-[#fbf4e8] overflow-hidden">
-          
-          {/* Delicate Dappled Leaf Shadow Overlay in Top Right */}
-          <svg
-            className="absolute -top-2 -right-2 w-48 h-36 pointer-events-none opacity-[0.09] text-[#4a2612] select-none"
-            viewBox="0 0 200 150"
-            fill="currentColor"
-            style={{ filter: 'blur(0.8px)' }}
-          >
-            {/* Organic botanical branch and leaves */}
-            <path d="M190 0 C160 25, 130 45, 90 75 C75 87, 50 110, 30 145 C28 142, 45 110, 68 90 C95 65, 130 40, 190 10 Z" />
-            <ellipse cx="145" cy="30" rx="20" ry="8" transform="rotate(-30 145 30)" />
-            <ellipse cx="120" cy="48" rx="18" ry="7" transform="rotate(-40 120 48)" />
-            <ellipse cx="165" cy="20" rx="16" ry="6" transform="rotate(-20 165 20)" />
-            <ellipse cx="95" cy="70" rx="17" ry="7" transform="rotate(-48 95 70)" />
-            <ellipse cx="75" cy="92" rx="15" ry="6" transform="rotate(-55 75 92)" />
-            <ellipse cx="50" cy="118" rx="14" ry="5.5" transform="rotate(-60 50 118)" />
-            <ellipse cx="130" cy="62" rx="14" ry="6" transform="rotate(25 130 62)" />
-            <ellipse cx="108" cy="82" rx="13" ry="5.5" transform="rotate(30 108 82)" />
-          </svg>
-
-          {/* Brand Logo Header */}
-          <div className="relative z-10 flex items-center gap-1.5 mb-2 sm:mb-2.5">
-            <span className="text-[#b4532a] font-serif text-base leading-none select-none">✦</span>
-            <span className="font-serif text-xl tracking-tight text-[#2a170f] font-normal">Rehearse</span>
-          </div>
-
-          {/* Animated Mode Container for smooth sign up <-> log in switch */}
-          <div key={mode} className="relative z-10 animate-fade-in-up space-y-2.5 sm:space-y-3">
-            {/* Headline & Description */}
-            <div>
-              <h2 className="font-serif text-[24px] sm:text-[27px] font-normal tracking-tight text-[#2a170f] leading-tight">
-                {mode === 'signup' ? 'Create your account' : 'Welcome back'}
-              </h2>
-              <p className="mt-0.5 text-xs sm:text-[13px] text-[#3a2318]/75 leading-relaxed font-sans">
-                {mode === 'signup'
-                  ? 'Start practicing for real interviews with an AI interviewer, tailored to your goals.'
-                  : 'Continue your mock interview preparation right where you left off.'}
-              </p>
-            </div>
-
-            {/* Error Message Alert */}
-            {error && (
-              <div className="p-2 sm:p-2.5 rounded-xl bg-[#9c3a1a]/15 border border-[#9c3a1a]/30 text-[#9c3a1a] text-[11px] sm:text-xs flex items-start gap-1.5 animate-fade-in-down">
-                <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#9c3a1a]" />
-                <span className="font-medium">{error}</span>
-              </div>
-            )}
-
-            {/* Social Authentication Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
-              {/* Google */}
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={handleSocialGoogle}
-                className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[#f2e7d3] hover:bg-[#ebdcc4] border border-[#3a2318]/15 hover:border-[#3a2318]/30 shadow-2xs text-[12px] font-medium text-[#2a170f] font-sans transition-all cursor-pointer whitespace-nowrap disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98]"
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>Continue with Google</span>
-              </button>
-
-              {/* GitHub */}
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={handleSocialGitHub}
-                className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[#f2e7d3] hover:bg-[#ebdcc4] border border-[#3a2318]/15 hover:border-[#3a2318]/30 shadow-2xs text-[12px] font-medium text-[#2a170f] font-sans transition-all cursor-pointer whitespace-nowrap disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98]"
-              >
-                <svg className="w-3.5 h-3.5 shrink-0 fill-current text-[#2a170f]" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                </svg>
-                <span>Continue with GitHub</span>
-              </button>
-            </div>
-
-            {/* Editorial Divider */}
-            <div className="relative my-0.5">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#3a2318]/15" />
-              </div>
-              <div className="relative flex justify-center text-[11px] font-sans text-[#3a2318]/60">
-                <span className="bg-[#fbf4e8] px-2.5">
-                  {mode === 'signup' ? 'Or sign up with email' : 'Or sign in with email'}
-                </span>
-              </div>
-            </div>
-
-            {/* Form Fields */}
-            <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-2.5">
+        {/* Main Card Container (shadcn login-04 block) */}
+        <div className="overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 shadow-2xl text-zinc-100">
+          <div className="grid md:grid-cols-2">
+            
+            {/* Left Column: Form */}
+            <form onSubmit={handleSubmit} className="p-6 md:p-8 flex flex-col justify-center gap-4">
               
+              {/* Header Title & Subtitle */}
+              <div className="flex flex-col items-center gap-1.5 text-center">
+                <h1 className="text-2xl font-bold tracking-tight text-white">
+                  {mode === 'signup' ? 'Create an account' : 'Welcome back'}
+                </h1>
+                <p className="text-sm text-zinc-400">
+                  {mode === 'signup'
+                    ? 'Enter your details below to create your account'
+                    : 'Login to your Rehearse account'}
+                </p>
+              </div>
+
+              {/* Error Alert */}
+              {error && (
+                <div className="p-2.5 rounded-md bg-red-950/60 border border-red-800/80 text-red-200 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               {/* Full Name (Sign Up only) */}
               {mode === 'signup' && (
-                <div className="animate-fade-in-up">
-                  <label className="block text-[11.5px] font-medium text-[#2a170f] mb-0.5 font-sans">
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="fullName" className="text-xs font-medium text-zinc-300">
                     Full name
                   </label>
-                  <div className="relative rounded-xl border border-[#3a2318]/20 bg-[#fdf9f0] focus-within:bg-[#ffffff] focus-within:border-[#b4532a] focus-within:ring-2 focus-within:ring-[#b4532a]/15 shadow-2xs transition-all">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#3a2318]/50 pointer-events-none" />
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter your full name"
-                      className="w-full pl-9 pr-3 py-1.5 sm:py-2 bg-transparent text-[13px] text-[#2a170f] focus:outline-none placeholder-[#3a2318]/40 font-sans"
-                    />
-                  </div>
+                  <input
+                    id="fullName"
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full px-3 py-2 rounded-md bg-zinc-800/80 border border-zinc-700/80 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-colors"
+                  />
                 </div>
               )}
 
               {/* Email */}
-              <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <label className="block text-[11.5px] font-medium text-[#2a170f] font-sans">
-                    Email
-                  </label>
-                  {mode === 'login' && (
-                    <button
-                      type="button"
-                      onClick={fillDemoCredentials}
-                      className="text-[10.5px] font-mono text-[#b4532a] hover:text-[#7d3418] hover:underline flex items-center gap-1 cursor-pointer transition-transform hover:scale-105"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#b4532a]" />
-                      <span>Use demo account</span>
-                    </button>
-                  )}
-                </div>
-
-                <div className="relative rounded-xl border border-[#3a2318]/20 bg-[#fdf9f0] focus-within:bg-[#ffffff] focus-within:border-[#b4532a] focus-within:ring-2 focus-within:ring-[#b4532a]/15 shadow-2xs transition-all">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#3a2318]/50 pointer-events-none" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full pl-9 pr-3 py-1.5 sm:py-2 bg-transparent text-[13px] text-[#2a170f] focus:outline-none placeholder-[#3a2318]/40 font-sans"
-                  />
-                </div>
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="text-xs font-medium text-zinc-300">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md bg-zinc-800/80 border border-zinc-700/80 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-colors"
+                />
               </div>
 
               {/* Password */}
-              <div>
-                <div className="flex items-center justify-between mb-0.5">
-                  <label className="block text-[11.5px] font-medium text-[#2a170f] font-sans">
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="text-xs font-medium text-zinc-300">
                     Password
                   </label>
-                  {mode === 'login' && (
-                    <button
-                      type="button"
-                      onClick={fillDemoCredentials}
-                      className="text-[10.5px] text-[#b4532a] hover:text-[#7d3418] transition-colors cursor-pointer"
-                    >
-                      Forgot password?
-                    </button>
-                  )}
+                  {mode === 'login' ? (
+                    <div className="flex items-center gap-2.5 text-xs text-zinc-400">
+                      <button
+                        type="button"
+                        onClick={fillDemoCredentials}
+                        className="hover:text-white underline-offset-2 hover:underline cursor-pointer"
+                      >
+                        Use demo
+                      </button>
+                      <span>•</span>
+                      <a href="#" className="hover:text-white underline-offset-2 hover:underline">
+                        Forgot your password?
+                      </a>
+                    </div>
+                  ) : null}
                 </div>
 
-                <div className="relative rounded-xl border border-[#3a2318]/20 bg-[#fdf9f0] focus-within:bg-[#ffffff] focus-within:border-[#b4532a] focus-within:ring-2 focus-within:ring-[#b4532a]/15 shadow-2xs transition-all">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#3a2318]/50 pointer-events-none" />
+                <div className="relative">
                   <input
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={mode === 'signup' ? 'Create a password' : 'Enter your password'}
-                    className="w-full pl-9 pr-9 py-1.5 sm:py-2 bg-transparent text-[13px] text-[#2a170f] focus:outline-none placeholder-[#3a2318]/40 font-sans"
+                    placeholder="••••••••"
+                    className="w-full pl-3 pr-9 py-2 rounded-md bg-zinc-800/80 border border-zinc-700/80 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3a2318]/50 hover:text-[#2a170f] transition-colors cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors cursor-pointer"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               {/* Password Requirements (Sign Up only) */}
               {mode === 'signup' && (
-                <div className="pt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10.5px] font-sans">
-                  <span className={`inline-flex items-center gap-1 ${hasMinLength ? 'text-emerald-700 font-medium' : 'text-[#3a2318]/60'}`}>
-                    <Check className={`w-3 h-3 ${hasMinLength ? 'text-emerald-700' : 'text-[#3a2318]/35'}`} />
-                    <span>At least 8 characters</span>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-400">
+                  <span className={`inline-flex items-center gap-1 ${hasMinLength ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                    <Check className="w-3.5 h-3.5" />
+                    <span>8+ characters</span>
                   </span>
-                  <span className={`inline-flex items-center gap-1 ${hasNumber ? 'text-emerald-700 font-medium' : 'text-[#3a2318]/60'}`}>
-                    <Check className={`w-3 h-3 ${hasNumber ? 'text-emerald-700' : 'text-[#3a2318]/35'}`} />
+                  <span className={`inline-flex items-center gap-1 ${hasNumber ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                    <Check className="w-3.5 h-3.5" />
                     <span>One number</span>
                   </span>
-                  <span className={`inline-flex items-center gap-1 ${hasSpecial ? 'text-emerald-700 font-medium' : 'text-[#3a2318]/60'}`}>
-                    <Check className={`w-3 h-3 ${hasSpecial ? 'text-emerald-700' : 'text-[#3a2318]/35'}`} />
-                    <span>One special character</span>
+                  <span className={`inline-flex items-center gap-1 ${hasSpecial ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Special character</span>
                   </span>
                 </div>
               )}
 
-              {/* Submit Button in Rich Warm Terracotta / Chocolate */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-2.5 px-4 rounded-xl bg-[#522412] hover:bg-[#431b0c] active:scale-[0.99] text-[#fdfaf3] font-medium text-[13.5px] font-sans shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                className="w-full mt-1 py-2 px-4 rounded-md bg-white hover:bg-zinc-200 text-zinc-950 font-medium text-sm transition-colors cursor-pointer disabled:opacity-50"
               >
-                <span>
-                  {isLoading
-                    ? (mode === 'signup' ? 'Creating account...' : 'Signing in...')
-                    : (mode === 'signup' ? 'Create account' : 'Sign in')}
-                </span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                {isLoading
+                  ? 'Please wait...'
+                  : mode === 'signup'
+                  ? 'Sign up'
+                  : 'Login'}
               </button>
+
+              {/* Field Separator */}
+              <div className="relative my-1">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-zinc-800" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-zinc-900 px-2 text-zinc-400 font-sans">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+
+              {/* 3 Social Buttons in a Grid (Apple, Google, Meta/GitHub) */}
+              <div className="grid grid-cols-3 gap-3">
+                {/* Apple */}
+                <button
+                  type="button"
+                  className="flex items-center justify-center py-2 px-3 rounded-md border border-zinc-700/80 bg-zinc-800/40 hover:bg-zinc-800 text-zinc-200 transition-colors cursor-pointer"
+                  title="Login with Apple"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                    <path
+                      d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <span className="sr-only">Login with Apple</span>
+                </button>
+
+                {/* Google */}
+                <button
+                  type="button"
+                  onClick={handleSocialGoogle}
+                  className="flex items-center justify-center py-2 px-3 rounded-md border border-zinc-700/80 bg-zinc-800/40 hover:bg-zinc-800 text-zinc-200 transition-colors cursor-pointer"
+                  title="Login with Google"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                    <path
+                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <span className="sr-only">Login with Google</span>
+                </button>
+
+                {/* Meta / GitHub */}
+                <button
+                  type="button"
+                  onClick={handleSocialGitHub}
+                  className="flex items-center justify-center py-2 px-3 rounded-md border border-zinc-700/80 bg-zinc-800/40 hover:bg-zinc-800 text-zinc-200 transition-colors cursor-pointer"
+                  title="Login with Meta or GitHub"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                    <path
+                      d="M6.915 4.03c-1.968 0-3.683 1.28-4.871 3.113C.704 9.208 0 11.883 0 14.449c0 .706.07 1.369.21 1.973a6.624 6.624 0 0 0 .265.86 5.297 5.297 0 0 0 .371.761c.696 1.159 1.818 1.927 3.593 1.927 1.497 0 2.633-.671 3.965-2.444.76-1.012 1.144-1.626 2.663-4.32l.756-1.339.186-.325c.061.1.121.196.183.3l2.152 3.595c.724 1.21 1.665 2.556 2.47 3.314 1.046.987 1.992 1.22 3.06 1.22 1.075 0 1.876-.355 2.455-.843a3.743 3.743 0 0 0 .81-.973c.542-.939.861-2.127.861-3.745 0-2.72-.681-5.357-2.084-7.45-1.282-1.912-2.957-2.93-4.716-2.93-1.047 0-2.088.467-3.053 1.308-.652.57-1.257 1.29-1.82 2.05-.69-.875-1.335-1.547-1.958-2.056-1.182-.966-2.315-1.303-3.454-1.303zm10.16 2.053c1.147 0 2.188.758 2.992 1.999 1.132 1.748 1.647 4.195 1.647 6.4 0 1.548-.368 2.9-1.839 2.9-.58 0-1.027-.23-1.664-1.004-.496-.601-1.343-1.878-2.832-4.358l-.617-1.028a44.908 44.908 0 0 0-1.255-1.98c.07-.109.141-.224.211-.327 1.12-1.667 2.118-2.602 3.358-2.602zm-10.201.553c1.265 0 2.058.791 2.675 1.446.307.327.737.871 1.234 1.579l-1.02 1.566c-.757 1.163-1.882 3.017-2.837 4.338-1.191 1.649-1.81 1.817-2.486 1.817-.524 0-1.038-.237-1.383-.794-.263-.426-.464-1.13-.464-2.046 0-2.221.63-4.535 1.66-6.088.454-.687.964-1.226 1.533-1.533a2.264 2.264 0 0 1 1.088-.285z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <span className="sr-only">Login with Meta</span>
+                </button>
+              </div>
+
+              {/* Bottom Switch Link */}
+              <div className="text-center text-xs text-zinc-400">
+                {mode === 'signup' ? (
+                  <>
+                    <span>Already have an account? </span>
+                    <button
+                      type="button"
+                      onClick={() => setMode('login')}
+                      className="underline underline-offset-2 hover:text-white text-zinc-200 font-medium cursor-pointer"
+                    >
+                      Login
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span>Don&apos;t have an account? </span>
+                    <button
+                      type="button"
+                      onClick={() => setMode('signup')}
+                      className="underline underline-offset-2 hover:text-white text-zinc-200 font-medium cursor-pointer"
+                    >
+                      Sign up
+                    </button>
+                  </>
+                )}
+              </div>
+
             </form>
 
-            {/* Switch Mode Footer */}
-            <div className="pt-1 text-center text-[11.5px] text-[#3a2318]/75 font-sans">
-              {mode === 'signup' ? (
-                <>
-                  <span>Already have an account? </span>
-                  <button
-                    type="button"
-                    onClick={() => setMode('login')}
-                    className="font-semibold text-[#522412] hover:text-[#b4532a] hover:underline cursor-pointer transition-transform hover:scale-105 inline-block"
-                  >
-                    Log in
-                  </button>
-                </>
-              ) : (
-                <>
-                  <span>Don't have an account? </span>
-                  <button
-                    type="button"
-                    onClick={() => setMode('signup')}
-                    className="font-semibold text-[#522412] hover:text-[#b4532a] hover:underline cursor-pointer transition-transform hover:scale-105 inline-block"
-                  >
-                    Sign up
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+            {/* Right Column: Image with Subtle Testimonial Overlay */}
+            <div className="relative hidden md:block bg-zinc-950 overflow-hidden">
+              <img
+                src="/images/rehearse/auth-study-artwork.jpg"
+                alt="Rehearse interview preparation environment"
+                className="absolute inset-0 h-full w-full object-cover brightness-[0.5] select-none"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/40 to-transparent pointer-events-none" />
 
-        {/* ================= Right Column: Flush Artwork with Compact Proportions ================= */}
-        <div className="hidden lg:flex lg:w-[390px] xl:w-[410px] self-stretch shrink-0 relative flex-col justify-end overflow-hidden bg-[#160d08]">
-          
-          {/* Background Illustration extending edge-to-edge */}
-          <img
-            src="/images/rehearse/auth-study-artwork.jpg"
-            alt="Candidate studying at desk overlooking mountains"
-            className="absolute inset-0 w-full h-full object-cover object-center select-none"
-          />
-
-          {/* Solid gradient to eliminate all ghost text from underlying capture */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#140b07] from-35% via-[#140b07]/90 via-55% to-transparent pointer-events-none" />
-
-          {/* Testimonial Content Box with Smooth Fade Transition */}
-          <div className="relative z-10 p-5 sm:p-6 text-[#f6ebd4]">
-            
-            <div key={testimonialIdx} className="animate-fade-in-up">
-              {/* 5 Gold Stars */}
-              <div className="flex items-center gap-1 text-[#dfa84c] mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-[#dfa84c] stroke-none" />
-                ))}
-              </div>
-
-              {/* Quote */}
-              <p className="font-serif italic text-[14.5px] sm:text-[15.5px] text-[#f6ebd4] leading-relaxed mb-3 min-h-[46px]">
-                “{currentTestimonial.quote}”
-              </p>
-
-              {/* Author Attribution */}
-              <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
-                <div>
-                  <div className="font-sans font-medium text-[12.5px] text-[#f6ebd4]">
-                    — {currentTestimonial.name}
+              {/* Bottom Testimonial */}
+              <div className="relative z-10 h-full flex flex-col justify-end p-6 text-zinc-200">
+                <div key={testimonialIdx} className="animate-fade-in-up">
+                  <div className="flex items-center gap-1 text-amber-400 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400 stroke-none" />
+                    ))}
                   </div>
-                  <div className="text-[10.5px] text-[#dfa84c] font-mono">
-                    {currentTestimonial.role}
+                  <p className="font-serif italic text-sm text-zinc-200 leading-relaxed mb-3">
+                    “{currentTestimonial.quote}”
+                  </p>
+                  <div className="flex items-center justify-between border-t border-zinc-800/80 pt-2.5">
+                    <div>
+                      <div className="font-medium text-xs text-white">
+                        — {currentTestimonial.name}
+                      </div>
+                      <div className="text-[11px] text-amber-400/90 font-mono">
+                        {currentTestimonial.role}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={handlePrevTestimonial}
+                        className="w-6 h-6 rounded-full border border-zinc-700/80 hover:border-zinc-500 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                        aria-label="Previous testimonial"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleNextTestimonial}
+                        className="w-6 h-6 rounded-full border border-zinc-700/80 hover:border-zinc-500 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                        aria-label="Next testimonial"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                {/* Prev / Next Buttons */}
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={handlePrevTestimonial}
-                    className="w-6 h-6 rounded-full border border-white/20 hover:border-white/50 text-white/80 hover:text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-95"
-                    aria-label="Previous testimonial"
-                  >
-                    <ChevronLeft className="w-3 h-3" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNextTestimonial}
-                    className="w-6 h-6 rounded-full border border-white/20 hover:border-white/50 text-white/80 hover:text-white flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-95"
-                    aria-label="Next testimonial"
-                  >
-                    <ChevronRight className="w-3 h-3" />
-                  </button>
                 </div>
               </div>
             </div>
 
           </div>
-
         </div>
+
+        {/* Outer Disclaimer under the Card */}
+        <p className="px-6 text-center text-xs text-zinc-500 font-sans">
+          By clicking continue, you agree to our{' '}
+          <a href="#" className="underline underline-offset-2 hover:text-zinc-300">
+            Terms of Service
+          </a>{' '}
+          and{' '}
+          <a href="#" className="underline underline-offset-2 hover:text-zinc-300">
+            Privacy Policy
+          </a>
+          .
+        </p>
 
       </div>
 
