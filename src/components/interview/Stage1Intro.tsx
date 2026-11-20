@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sparkles, ArrowRight, ArrowLeft, Target, ShieldCheck, Cpu, Award } from 'lucide-react';
 import { useInterview } from '../../context/InterviewContext';
+import { instantScrollToTop } from '../../utils/scroll';
 
 export const Stage1Intro: React.FC = () => {
   const { setCurrentStage, exitToDashboard, config, updateConfig } = useInterview();
@@ -10,7 +11,7 @@ export const Stage1Intro: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-2 sm:px-6 py-1 sm:py-2">
+    <div className="max-w-5xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Main Hero Card with Warm Parchment Palette & Generous Spacing */}
       <div className="relative isolate rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-5 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
         
@@ -82,24 +83,12 @@ export const Stage1Intro: React.FC = () => {
               <button
                 onClick={() => {
                   setCurrentStage('type-selection');
-                  const el = document.getElementById('stage-2-type-selection');
-                  if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
+                  instantScrollToTop();
                 }}
-                className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Choose Interview Type</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                <svg className="w-8 h-2.5 text-[#fbf7ee]/75 overflow-visible hidden xs:inline-block" viewBox="0 0 32 10" fill="none">
-                  <path
-                    d="M0 5 C8 0, 16 10, 24 5 C28 2.5, 30 3.5, 32 5"
-                    stroke="currentColor"
-                    strokeWidth="1.75"
-                    strokeDasharray="3 3"
-                    className="animate-flow-dots"
-                  />
-                </svg>
               </button>
 
               <button
@@ -146,13 +135,6 @@ export const Stage1Intro: React.FC = () => {
           <div className="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-[#f0e4c8]/60 hover:bg-[#f0e4c8]/90 border border-[#3a2318]/10 transition-colors">
             <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#dfa84c] shrink-0" />
             <span className="font-medium text-[11px] sm:text-xs">STAR rubrics & debrief</span>
-          </div>
-        </div>
-
-        {/* Visual Connector Anchor on Card Bottom Boundary (Aligned Under Right Image) */}
-        <div className="absolute -bottom-2.5 right-[18%] sm:right-[20%] lg:right-[21%] z-30 flex items-center justify-center pointer-events-none">
-          <div className="w-5 h-5 rounded-full bg-[#b4532a] border-2 border-[#fff5e0] shadow-md flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-[#fbf7ee] animate-ping" />
           </div>
         </div>
       </div>

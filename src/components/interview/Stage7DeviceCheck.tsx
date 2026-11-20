@@ -230,7 +230,7 @@ export const Stage7DeviceCheck: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-5xl mx-auto px-2 sm:px-6 py-1 sm:py-2">
+    <div className="relative max-w-5xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
       {/* Header with localized fading grid halo behind heading & subtext */}
       <div className="relative z-10 text-center max-w-2xl mx-auto mb-6 sm:mb-8">
         <div 
@@ -443,10 +443,7 @@ export const Stage7DeviceCheck: React.FC = () => {
           onClick={() => {
             cleanupStreams();
             setCurrentStage('preview');
-            const el = document.getElementById('stage-6-preview');
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            instantScrollToTop();
           }}
           type="button"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] text-xs sm:text-sm font-medium font-sans border border-[#3a2318]/20 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
@@ -462,20 +459,11 @@ export const Stage7DeviceCheck: React.FC = () => {
             instantScrollToTop();
           }}
           type="button"
-          className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
         >
           <Sparkles className="w-4 h-4 text-[#dfa84c]" />
           <span>Enter Live Interview Room</span>
-          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          <svg className="w-8 h-2.5 text-[#fbf7ee]/75 overflow-visible hidden xs:inline-block" viewBox="0 0 32 10" fill="none">
-            <path
-              d="M0 5 C8 0, 16 10, 24 5 C28 2.5, 30 3.5, 32 5"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeDasharray="3 3"
-              className="animate-flow-dots"
-            />
-          </svg>
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
     </div>

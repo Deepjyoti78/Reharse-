@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { useInterview } from '../../context/InterviewContext';
-import { Connector1To2, ConnectorBetweenStages } from './StageConnectors';
+import { instantScrollToTop } from '../../utils/scroll';
 import { Stage1Intro } from './Stage1Intro';
 import { Stage2TypeSelection } from './Stage2TypeSelection';
 import { Stage3Configuration } from './Stage3Configuration';
@@ -14,6 +14,11 @@ import { Stage9Report } from './Stage9Report';
 
 export const InterviewFlow: React.FC = () => {
   const { currentStage } = useInterview();
+
+  // Instantly reset scroll to top on stage change without "down to up" scrolling
+  useLayoutEffect(() => {
+    instantScrollToTop();
+  }, [currentStage]);
 
   // If in live room, render full virtual room without setup header
   if (currentStage === 'live-room') {
@@ -36,7 +41,7 @@ export const InterviewFlow: React.FC = () => {
   // If in performance report
   if (currentStage === 'report') {
     return (
-      <div key="report" className="relative min-h-screen bg-[#f3e7c9] text-[#2a170f] py-6 sm:py-10 px-3 sm:px-6 lg:px-8 font-sans animate-fade-in overflow-x-hidden">
+      <div key="report" className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] py-6 sm:py-10 px-3 sm:px-6 lg:px-8 font-sans animate-fade-in overflow-x-hidden">
         {/* Outer Architectural Blueprint Grid Pattern - Visible purely in empty canvas areas */}
         <div 
           className="fixed inset-0 pointer-events-none opacity-[0.25] z-0"
@@ -56,8 +61,8 @@ export const InterviewFlow: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a170f] pt-6 sm:pt-10 pb-24 px-2.5 sm:px-6 lg:px-8 font-sans flex flex-col justify-start overflow-x-hidden">
-      {/* Outer Architectural Blueprint Grid Pattern */}
+    <div className="relative min-h-screen bg-[#f3e7c9] text-[#2a1a12] pt-6 sm:pt-10 lg:pt-12 pb-12 px-2.5 sm:px-6 lg:px-8 font-sans flex flex-col justify-start overflow-x-hidden">
+      {/* Outer Architectural Blueprint Grid Pattern - Clean, non-multiplying outer backdrop */}
       <div 
         className="fixed inset-0 pointer-events-none opacity-[0.25] z-0"
         style={{
@@ -69,62 +74,15 @@ export const InterviewFlow: React.FC = () => {
         }}
       />
 
-      {/* Sequential Connected Cards Flow with Physical Dotted Connectors */}
-      <div className="relative z-10 w-full flex flex-col items-center">
-        
-        {/* Section 1: Intro Setup Card */}
-        <section id="stage-1-intro" className="w-full scroll-mt-6">
-          <Stage1Intro />
-        </section>
-
-        {/* Dotted Line Connector: Leaves Stage 1 Boundary under the Right Image, Forks into Stage 2 */}
-        <Connector1To2 />
-
-        {/* Section 2: Choose Interview Track */}
-        <section id="stage-2-type-selection" className="w-full scroll-mt-6">
-          <Stage2TypeSelection />
-        </section>
-
-        {/* Dotted Line Connector: Stage 2 -> Stage 3 */}
-        <ConnectorBetweenStages title="Configure Setup" sourceX={500} targetX={500} />
-
-        {/* Section 3: Configuration & Settings */}
-        <section id="stage-3-configuration" className="w-full scroll-mt-6">
-          <Stage3Configuration />
-        </section>
-
-        {/* Dotted Line Connector: Stage 3 -> Stage 4 */}
-        <ConnectorBetweenStages title="Context & Resume" sourceX={500} targetX={500} />
-
-        {/* Section 4: Personalization (Resume & JD) */}
-        <section id="stage-4-personalization" className="w-full scroll-mt-6">
-          <Stage4Personalization />
-        </section>
-
-        {/* Dotted Line Connector: Stage 4 -> Stage 5 */}
-        <ConnectorBetweenStages title="Select AI Persona" sourceX={500} targetX={500} />
-
-        {/* Section 5: AI Interviewer Selection */}
-        <section id="stage-5-interviewer" className="w-full scroll-mt-6">
-          <Stage5InterviewerSelection />
-        </section>
-
-        {/* Dotted Line Connector: Stage 5 -> Stage 6 */}
-        <ConnectorBetweenStages title="Summary & Blueprint" sourceX={500} targetX={500} />
-
-        {/* Section 6: Summary & Blueprint Rubric */}
-        <section id="stage-6-preview" className="w-full scroll-mt-6">
-          <Stage6SummaryPreview />
-        </section>
-
-        {/* Dotted Line Connector: Stage 6 -> Stage 7 */}
-        <ConnectorBetweenStages title="Hardware Check" sourceX={500} targetX={500} />
-
-        {/* Section 7: Device & Microphone Check */}
-        <section id="stage-7-device-check" className="w-full scroll-mt-6">
-          <Stage7DeviceCheck />
-        </section>
-
+      {/* Dynamic Stage Rendering with Stage Entry Transition */}
+      <div key={currentStage} className="relative z-10 w-full animate-fade-in">
+        {currentStage === 'intro' && <Stage1Intro />}
+        {currentStage === 'type-selection' && <Stage2TypeSelection />}
+        {currentStage === 'configuration' && <Stage3Configuration />}
+        {currentStage === 'personalization' && <Stage4Personalization />}
+        {currentStage === 'interviewer' && <Stage5InterviewerSelection />}
+        {currentStage === 'preview' && <Stage6SummaryPreview />}
+        {currentStage === 'device-check' && <Stage7DeviceCheck />}
       </div>
     </div>
   );
