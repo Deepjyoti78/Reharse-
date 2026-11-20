@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, AlertCircle, Check, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { GoogleAuthDialog } from './GoogleAuthDialog';
 
@@ -8,34 +8,6 @@ interface AuthModalProps {
   onClose: () => void;
   initialMode?: 'signup' | 'login';
 }
-
-interface Testimonial {
-  quote: string;
-  name: string;
-  role: string;
-  rating: number;
-}
-
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote: "Rehearse helped me build real confidence for my system design interview. The AI feedback felt genuinely insightful.",
-    name: "Aman Verma",
-    role: "SDE @ Google",
-    rating: 5,
-  },
-  {
-    quote: "The unscripted follow-up questions felt identical to my final-round partner interview. Worth every minute.",
-    name: "Priya Sundaram",
-    role: "Senior PM @ Stripe",
-    rating: 5,
-  },
-  {
-    quote: "Mastering the STAR framework aloud instead of reading notes transformed how I presented my engineering decisions.",
-    name: "Marcus Vance",
-    role: "Frontend Lead @ Linear",
-    rating: 5,
-  }
-];
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
@@ -48,7 +20,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
 
   // Close modal when pressing Escape key
@@ -68,16 +39,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   }, [mode, isOpen]);
 
   if (!isOpen) return null;
-
-  const currentTestimonial = TESTIMONIALS[testimonialIdx];
-
-  const handleNextTestimonial = () => {
-    setTestimonialIdx((prev) => (prev + 1) % TESTIMONIALS.length);
-  };
-
-  const handlePrevTestimonial = () => {
-    setTestimonialIdx((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
-  };
 
   // Password validation checks
   const hasMinLength = password.length >= 8;
@@ -142,8 +103,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     >
       <div className="w-full max-w-sm md:max-w-4xl flex flex-col gap-4 animate-modal-pop">
         
-        {/* Main Card Container (shadcn login-04 block) */}
-        <div className="overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800 shadow-2xl text-zinc-100">
+        {/* Main Card Container (shadcn login-04 block with rounded edges) */}
+        <div className="overflow-hidden rounded-[28px] sm:rounded-[32px] bg-zinc-900 border border-zinc-800 shadow-2xl text-zinc-100">
           <div className="grid md:grid-cols-2">
             
             {/* Left Column: Form */}
@@ -369,56 +330,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             </form>
 
-            {/* Right Column: Image with Subtle Testimonial Overlay */}
-            <div className="relative hidden md:block bg-zinc-950 overflow-hidden">
+            {/* Right Column: Clean Artwork matching site color palette, no text */}
+            <div className="relative hidden md:block bg-[#1f1b18] overflow-hidden">
               <img
                 src="/images/rehearse/auth-study-artwork.jpg"
                 alt="Rehearse interview preparation environment"
-                className="absolute inset-0 h-full w-full object-cover brightness-[0.5] select-none"
+                className="absolute inset-0 h-full w-full object-cover select-none brightness-[0.98] contrast-[1.03]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/40 to-transparent pointer-events-none" />
-
-              {/* Bottom Testimonial */}
-              <div className="relative z-10 h-full flex flex-col justify-end p-6 text-zinc-200">
-                <div key={testimonialIdx} className="animate-fade-in-up">
-                  <div className="flex items-center gap-1 text-amber-400 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400 stroke-none" />
-                    ))}
-                  </div>
-                  <p className="font-serif italic text-sm text-zinc-200 leading-relaxed mb-3">
-                    “{currentTestimonial.quote}”
-                  </p>
-                  <div className="flex items-center justify-between border-t border-zinc-800/80 pt-2.5">
-                    <div>
-                      <div className="font-medium text-xs text-white">
-                        — {currentTestimonial.name}
-                      </div>
-                      <div className="text-[11px] text-amber-400/90 font-mono">
-                        {currentTestimonial.role}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={handlePrevTestimonial}
-                        className="w-6 h-6 rounded-full border border-zinc-700/80 hover:border-zinc-500 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                        aria-label="Previous testimonial"
-                      >
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleNextTestimonial}
-                        className="w-6 h-6 rounded-full border border-zinc-700/80 hover:border-zinc-500 text-zinc-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                        aria-label="Next testimonial"
-                      >
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Subtle warm amber/sunset lighting gradient matching the site aesthetic */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1b140e]/25 via-transparent to-amber-500/5 pointer-events-none" />
             </div>
 
           </div>
