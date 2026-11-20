@@ -11,7 +11,7 @@ export const Stage1Intro: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-2 sm:px-6 py-2 sm:py-4 animate-fade-in-up">
+    <div className="max-w-5xl mx-auto px-2 sm:px-6 py-1 sm:py-2">
       {/* Main Hero Card with Warm Parchment Palette & Generous Spacing */}
       <div className="relative isolate rounded-3xl bg-[#faf0d8] border border-[#3a2318]/15 shadow-md p-5 sm:p-8 md:p-10 transition-shadow hover:shadow-lg">
         
@@ -85,10 +85,19 @@ export const Stage1Intro: React.FC = () => {
                   setCurrentStage('type-selection');
                   instantScrollToTop();
                 }}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-full bg-[#b4532a] hover:bg-[#97421f] text-[#fbf7ee] font-sans text-xs sm:text-sm font-medium transition-all shadow-md group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span>Choose Interview Type</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <svg className="w-8 h-2.5 text-[#fbf7ee]/75 overflow-visible hidden xs:inline-block" viewBox="0 0 32 10" fill="none">
+                  <path
+                    d="M0 5 C8 0, 16 10, 24 5 C28 2.5, 30 3.5, 32 5"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeDasharray="3 3"
+                    className="animate-flow-dots"
+                  />
+                </svg>
               </button>
 
               <button

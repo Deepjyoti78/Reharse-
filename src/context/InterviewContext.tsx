@@ -15,11 +15,14 @@ import { AI_INTERVIEWERS, DEFAULT_CONFIGURATION, generatePerformanceReport } fro
 import { stopElevenLabsSpeech } from '../services/elevenlabs';
 import { instantScrollToTop } from '../utils/scroll';
 
+export type StageDirection = 'forward' | 'backward';
+
 interface InterviewContextType {
   currentView: AppView;
   setCurrentView: (view: AppView) => void;
   currentStage: InterviewStage;
   setCurrentStage: (stage: InterviewStage) => void;
+  stageDirection: StageDirection;
   config: InterviewConfiguration;
   updateConfig: (partial: Partial<InterviewConfiguration>) => void;
   resume: ResumeData | undefined;
@@ -113,9 +116,23 @@ const INITIAL_DEMO_REPORTS: PerformanceReport[] = [
   }
 ];
 
+const STAGE_SEQUENCE: InterviewStage[] = [
+  'intro',
+  'type-selection',
+  'configuration',
+  'personalization',
+  'interviewer',
+  'preview',
+  'device-check',
+  'live-room',
+  'processing',
+  'report'
+];
+
 export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentView, setCurrentView] = useState<AppView>('landing');
   const [currentStage, setCurrentStage] = useState<InterviewStage>('intro');
+  const [stageDirection, setStageDirection] = useState<StageDirection>('forward');
   const [config, setConfig] = useState<InterviewConfiguration>(DEFAULT_CONFIGURATION);
   const [resume, setResume] = useState<ResumeData | undefined>(undefined);
   const [jobDescription, setJobDescription] = useState<JobDescriptionData | undefined>(undefined);
@@ -240,6 +257,17 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } catch {}
   };
 
+  const handleSetCurrentStage = (nextStage: InterviewStage) => {
+    const currentIndex = STAGE_SEQUENCE.indexOf(currentStage);
+    const nextIndex = STAGE_SEQUENCE.indexOf(nextStage);
+    if (nextIndex >= currentIndex) {
+      setStageDirection('forward');
+    } else {
+      setStageDirection('backward');
+    }
+    setCurrentStage(nextStage);
+  };
+
   const startInterviewFlow = (role?: string, type?: InterviewType) => {
     stopAllMediaHardware();
     if (role) {
@@ -250,6 +278,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     setTurns([]);
     setActiveReport(null);
+    setStageDirection('forward');
     setCurrentStage('intro');
     setCurrentView('interview-flow');
     instantScrollToTop();
@@ -259,6 +288,7 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     stopAllMediaHardware();
     setTurns([]);
     setActiveReport(null);
+    setStageDirection('forward');
     setCurrentStage('preview');
     setCurrentView('interview-flow');
     instantScrollToTop();
@@ -276,12 +306,14 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     setActiveReport(report);
     saveReportToHistory(report);
+    setStageDirection('forward');
     setCurrentStage('processing');
     instantScrollToTop();
   };
 
   const exitToDashboard = () => {
     stopAllMediaHardware();
+    setStageDirection('backward');
     setCurrentView('landing');
     setCurrentStage('intro');
     instantScrollToTop();
@@ -293,7 +325,8 @@ export const InterviewProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         currentView,
         setCurrentView,
         currentStage,
-        setCurrentStage,
+        setCurrentStage: handleSetCurrentStage,
+        stageDirection,
         config,
         updateConfig,
         resume,

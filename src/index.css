@@ -203,7 +203,69 @@ body {
   }
 }
 
+/* Wavy Roadmap Dotted Line Streaming Animation */
+@keyframes flowDottedLine {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Stage Card Horizontal Transitions Following Wavy Flow */
+@keyframes stageSlideForward {
+  0% {
+    opacity: 0;
+    transform: translate3d(-38px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stageSlideBackward {
+  0% {
+    opacity: 0;
+    transform: translate3d(38px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes nodePulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.2;
+  }
+}
+
 /* Custom Animation Utility Classes */
+.animate-flow-dots {
+  animation: flowDottedLine 1.4s linear infinite;
+}
+
+.animate-stage-forward {
+  animation: stageSlideForward 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-stage-backward {
+  animation: stageSlideBackward 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-node-pulse {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: nodePulseGlow 2.2s ease-in-out infinite;
+}
+
 .animate-fade-in {
   animation: fadeIn 0.25s ease-out both;
 }
