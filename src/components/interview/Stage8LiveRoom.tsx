@@ -26,6 +26,7 @@ import {
   isElevenLabsConfigured, 
   transcribeSpeechWithElevenLabs 
 } from '../../services/elevenlabs';
+import { LiveVoiceVisualizer } from './LiveVoiceVisualizer';
 
 export const Stage8LiveRoom: React.FC = () => {
   const { 
@@ -63,12 +64,14 @@ export const Stage8LiveRoom: React.FC = () => {
 
   // Speech Recognition & Audio Recording state
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
+  const [isWebSpeechRestricted, setIsWebSpeechRestricted] = useState(false);
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
 
-  // Audio level meter
+  // Audio level meter & live Web Audio Analyser node
   const [audioVolume, setAudioVolume] = useState(0);
+  const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
 
   // Modals
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
@@ -85,6 +88,7 @@ export const Stage8LiveRoom: React.FC = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const periodicTranscribeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -101,10 +105,14 @@ export const Stage8LiveRoom: React.FC = () => {
 
   // Complete hardware teardown to guarantee 100% camera & mic turn-off
   const teardownAllHardware = () => {
-    // 1. Cancel requestAnimationFrame
+    // 1. Cancel requestAnimationFrame & periodic transcription timer
     if (animFrameRef.current) {
       cancelAnimationFrame(animFrameRef.current);
       animFrameRef.current = null;
+    }
+    if (periodicTranscribeTimerRef.current) {
+      clearInterval(periodicTranscribeTimerRef.current);
+      periodicTranscribeTimerRef.current = null;
     }
 
     // 2. Abort and stop Web Speech recognition
@@ -158,6 +166,7 @@ export const Stage8LiveRoom: React.FC = () => {
         }
       } catch {}
       audioContextRef.current = null;
+      setAudioAnalyser(null);
     }
 
     // 7. Stop ElevenLabs TTS speech
@@ -256,9 +265,11 @@ export const Stage8LiveRoom: React.FC = () => {
               audioContextRef.current = audioCtx;
               const source = audioCtx.createMediaStreamSource(stream);
               const analyser = audioCtx.createAnalyser();
-              analyser.fftSize = 64;
+              analyser.fftSize = 128;
+              analyser.smoothingTimeConstant = 0.55;
               source.connect(analyser);
               analyserRef.current = analyser;
+              setAudioAnalyser(analyser);
 
               const bufferLength = analyser.frequencyBinCount;
               const dataArray = new Uint8Array(bufferLength);
@@ -357,9 +368,9 @@ export const Stage8LiveRoom: React.FC = () => {
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           setSpeechError('Microphone permission blocked. Please click the camera/microphone icon in your browser address bar to allow access.');
           stopRecordingAudio();
+        } else if (event.error === 'network') {
+          setIsWebSpeechRestricted(true);
         }
-        // Note: 'network' and 'no-speech' are non-fatal!
-        // We do NOT abort; MediaRecorder captures audio locally and ElevenLabs Scribe transcribes it.
       };
 
       recognition.onend = () => {
@@ -397,10 +408,11 @@ export const Stage8LiveRoom: React.FC = () => {
     };
   }, [config.language]);
 
-  // Start real audio recording via MediaRecorder + parallel Web Speech
+  // Start real audio recording via MediaRecorder + parallel Web Speech + Continuous AI Scribe
   const startRecordingAudio = async () => {
     setSpeechError(null);
     setIsRecordingVoice(true);
+    isRecordingVoiceRef.current = true;
     if (isMuted) setIsMuted(false);
     audioChunksRef.current = [];
 
@@ -411,6 +423,24 @@ export const Stage8LiveRoom: React.FC = () => {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         registerMediaStream(stream);
         mediaStreamRef.current = stream;
+      }
+
+      // Ensure AudioContext Analyser is active for live visualizer
+      if (!audioContextRef.current) {
+        try {
+          const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+          if (AudioCtx) {
+            const audioCtx = new AudioCtx();
+            audioContextRef.current = audioCtx;
+            const source = audioCtx.createMediaStreamSource(stream);
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 128;
+            analyser.smoothingTimeConstant = 0.55;
+            source.connect(analyser);
+            analyserRef.current = analyser;
+            setAudioAnalyser(analyser);
+          }
+        } catch {}
       }
 
       let mimeType = 'audio/webm;codecs=opus';
@@ -444,11 +474,47 @@ export const Stage8LiveRoom: React.FC = () => {
         // Ignore already started errors
       }
     }
+
+    // 3. Periodic Background Transcriber with ElevenLabs Scribe
+    // Ensures real-time speech-to-text appears even in Brave or privacy browsers
+    if (periodicTranscribeTimerRef.current) {
+      clearInterval(periodicTranscribeTimerRef.current);
+    }
+    periodicTranscribeTimerRef.current = setInterval(async () => {
+      if (!isRecordingVoiceRef.current) return;
+      const chunks = audioChunksRef.current;
+      if (chunks.length > 0 && isElevenLabsConfigured()) {
+        const recorder = mediaRecorderRef.current;
+        const blob = new Blob(chunks, { type: recorder?.mimeType || 'audio/webm' });
+        if (blob.size > 2200) {
+          try {
+            const language = config.language === 'Hindi' ? 'hi' : 'en';
+            const text = await transcribeSpeechWithElevenLabs(blob, language);
+            if (text && text.trim()) {
+              if (!hasAskedFollowUpRef.current) {
+                setUserAnswerText(text.trim());
+              } else {
+                setUserFollowUpAnswerText(text.trim());
+              }
+              setInterimTranscript('');
+            }
+          } catch {
+            // Non-fatal, next interval or stop will handle
+          }
+        }
+      }
+    }, 3800);
   };
 
   // Stop recording and process transcription with ElevenLabs Scribe
   const stopRecordingAudio = () => {
     setIsRecordingVoice(false);
+    isRecordingVoiceRef.current = false;
+
+    if (periodicTranscribeTimerRef.current) {
+      clearInterval(periodicTranscribeTimerRef.current);
+      periodicTranscribeTimerRef.current = null;
+    }
 
     // Stop Web Speech
     if (recognitionRef.current) {
@@ -474,14 +540,18 @@ export const Stage8LiveRoom: React.FC = () => {
         if (chunks.length > 0) {
           const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
           
-          if (blob.size > 1200 && isElevenLabsConfigured()) {
+          if (blob.size > 800 && isElevenLabsConfigured()) {
             try {
               setIsTranscribing(true);
               const language = config.language === 'Hindi' ? 'hi' : 'en';
               const transcribedText = await transcribeSpeechWithElevenLabs(blob, language);
               
-              if (transcribedText) {
-                appendToCurrentAnswer(transcribedText);
+              if (transcribedText && transcribedText.trim()) {
+                if (!hasAskedFollowUpRef.current) {
+                  setUserAnswerText(transcribedText.trim());
+                } else {
+                  setUserFollowUpAnswerText(transcribedText.trim());
+                }
               }
             } catch (err) {
               console.warn('ElevenLabs STT transcription note:', err);
@@ -541,21 +611,13 @@ export const Stage8LiveRoom: React.FC = () => {
     setInterimTranscript('');
 
     // Stop recording while AI speaks
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
-    }
-    setIsRecordingVoice(false);
+    stopRecordingAudio();
 
     speakText(activeQuestion.question, () => {
       setAiState('listening');
-      // Automatically attempt to start voice listening if permitted
-      if (recognitionRef.current && !isMutedRef.current) {
-        try {
-          recognitionRef.current.start();
-          setIsRecordingVoice(true);
-        } catch {
-          // May require click gesture on some browser configs; fallback button is visible
-        }
+      // Automatically start voice recording & audio stream when AI finishes speaking
+      if (!isMutedRef.current) {
+        startRecordingAudio();
       }
     });
 
@@ -569,18 +631,12 @@ export const Stage8LiveRoom: React.FC = () => {
     const textToSpeak = hasAskedFollowUp && activeFollowUpText ? activeFollowUpText : activeQuestion.question;
     setAiState('ai-speaking');
     setInterimTranscript('');
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
-    }
-    setIsRecordingVoice(false);
+    stopRecordingAudio();
 
     speakText(textToSpeak, () => {
       setAiState('listening');
-      if (recognitionRef.current && !isMutedRef.current) {
-        try {
-          recognitionRef.current.start();
-          setIsRecordingVoice(true);
-        } catch {}
+      if (!isMutedRef.current) {
+        startRecordingAudio();
       }
     });
   };
@@ -595,11 +651,7 @@ export const Stage8LiveRoom: React.FC = () => {
     setInterimTranscript('');
 
     // Stop recording while AI evaluates & asks follow-up
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
-    }
-    setIsRecordingVoice(false);
-
+    stopRecordingAudio();
     stopElevenLabsSpeech();
 
     setAiState('processing');
@@ -614,11 +666,8 @@ export const Stage8LiveRoom: React.FC = () => {
 
       speakText(followUp, () => {
         setAiState('listening');
-        if (recognitionRef.current && !isMutedRef.current) {
-          try {
-            recognitionRef.current.start();
-            setIsRecordingVoice(true);
-          } catch {}
+        if (!isMutedRef.current) {
+          startRecordingAudio();
         }
       });
     }, 1200);
@@ -629,10 +678,8 @@ export const Stage8LiveRoom: React.FC = () => {
     const finalPrimary = userAnswerText.trim();
     const finalFollowUp = (userFollowUpAnswerText + (interimTranscript ? ' ' + interimTranscript : '')).trim();
 
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
-    }
-    setIsRecordingVoice(false);
+    stopRecordingAudio();
+    stopElevenLabsSpeech();
 
     const turnData: UserTurn = {
       questionId: activeQuestion.id,
@@ -817,34 +864,18 @@ export const Stage8LiveRoom: React.FC = () => {
               </div>
             </div>
 
-            {/* Audio Waveform Graphic */}
-            <div className="h-8 sm:h-9 flex items-center justify-center gap-1 my-3 bg-[#f0e3c5]/70 rounded-xl px-4 border border-[#3a2318]/15">
-              {[12, 24, 40, 16, 28, 50, 32, 14, 45, 20, 36, 18, 48, 22, 16, 30].map((h, i) => {
-                const isAiSpeaking = aiState === 'ai-speaking';
-                const isUserSpeaking = (isRecordingVoice || audioVolume > 15) && aiState === 'listening';
-                
-                let barHeight = 4;
-                let barColor = '#3a2318]/25';
-
-                if (isAiSpeaking) {
-                  barHeight = Math.max(6, Math.min(30, (h * 0.7) + (Math.sin(elapsedSeconds * 4 + i) * 10)));
-                  barColor = '#b4532a';
-                } else if (isUserSpeaking) {
-                  barHeight = Math.max(6, Math.min(30, (audioVolume * 0.3) + (Math.sin(i * 1.5) * 6)));
-                  barColor = '#5b8076';
-                }
-
-                return (
-                  <div
-                    key={i}
-                    className="w-1 sm:w-1.5 rounded-full transition-all duration-150"
-                    style={{
-                      height: `${barHeight}px`,
-                      backgroundColor: barColor === '#b4532a' ? '#b4532a' : barColor === '#5b8076' ? '#5b8076' : 'rgba(58, 35, 24, 0.25)'
-                    }}
-                  />
-                );
-              })}
+            {/* Audio Waveform Graphic - Sleek 60FPS Voice Equalizer */}
+            <div className="h-9 sm:h-10 flex items-center justify-center my-3 bg-[#f0e3c5]/80 rounded-xl px-4 border border-[#3a2318]/15 shadow-2xs">
+              <LiveVoiceVisualizer
+                analyser={audioAnalyser}
+                isAiSpeaking={aiState === 'ai-speaking'}
+                isUserRecording={isRecordingVoice}
+                isMuted={isMuted}
+                barCount={36}
+                barWidth={2.5}
+                barGap={2}
+                maxHeight={26}
+              />
             </div>
 
             {/* Current Primary Question Card with Smooth Transition on Next Question */}
@@ -911,15 +942,20 @@ export const Stage8LiveRoom: React.FC = () => {
             )}
 
             {/* Candidate status tag with live volume meter */}
-            <div className="absolute top-2 left-2 bg-[#2a170f]/80 backdrop-blur-xs px-2 py-1 rounded-md text-[9px] sm:text-[10px] font-mono text-[#faf4e6] flex items-center gap-1.5 border border-white/10 shadow-xs">
+            <div className="absolute top-2 left-2 bg-[#2a170f]/85 backdrop-blur-xs px-2.5 py-1 rounded-md text-[9px] sm:text-[10px] font-mono text-[#faf4e6] flex items-center gap-1.5 border border-white/10 shadow-xs">
               <span className={`w-2 h-2 rounded-full ${!isMuted ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
               <span>{!isMuted ? (isRecordingVoice ? 'Recording' : 'Mic Active') : 'Muted'}</span>
-              {!isMuted && audioVolume > 5 && (
-                <div className="flex items-center gap-0.5 ml-0.5">
-                  <span className="w-0.5 sm:w-1 h-2 rounded-full bg-emerald-400" />
-                  <span className={`w-0.5 sm:w-1 h-3 rounded-full ${audioVolume > 20 ? 'bg-emerald-400' : 'bg-emerald-400/30'}`} />
-                  <span className={`w-0.5 sm:w-1 h-4 rounded-full ${audioVolume > 40 ? 'bg-emerald-400' : 'bg-emerald-400/30'}`} />
-                </div>
+              {!isMuted && isRecordingVoice && (
+                <LiveVoiceVisualizer
+                  analyser={audioAnalyser}
+                  isUserRecording={true}
+                  isMuted={isMuted}
+                  barCount={6}
+                  barWidth={1.5}
+                  barGap={1}
+                  maxHeight={11}
+                  className="ml-0.5"
+                />
               )}
             </div>
 
@@ -1007,11 +1043,21 @@ export const Stage8LiveRoom: React.FC = () => {
                       : 'bg-[#f0e3c5] hover:bg-[#e6d6b2] text-[#2a170f] border-[#3a2318]/20'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     {isRecordingVoice ? (
                       <>
-                        <span className="w-2.5 h-2.5 rounded-full bg-red-200 animate-ping" />
-                        <span className="font-semibold">Recording voice... (Speak now)</span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-200 animate-ping shrink-0" />
+                        <span className="font-semibold text-xs sm:text-[13px]">Recording voice... (Speak now)</span>
+                        <LiveVoiceVisualizer
+                          analyser={audioAnalyser}
+                          isUserRecording={true}
+                          isMuted={isMuted}
+                          barCount={14}
+                          barWidth={2}
+                          barGap={1.5}
+                          maxHeight={14}
+                          className="ml-1 opacity-95 hidden sm:flex"
+                        />
                       </>
                     ) : (
                       <>
@@ -1035,13 +1081,28 @@ export const Stage8LiveRoom: React.FC = () => {
 
               {/* Transcribing with ElevenLabs Scribe AI Status */}
               {isTranscribing && (
-                <div className="mb-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center justify-between animate-pulse">
+                <div className="mb-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs flex items-center justify-between animate-pulse shadow-2xs">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-emerald-600 animate-spin" />
                     <span className="font-medium text-[11.5px]">Transcribing your voice with ElevenLabs Scribe AI...</span>
                   </div>
                   <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
                     High Accuracy
+                  </span>
+                </div>
+              )}
+
+              {/* Live Audio Input & Recognition indicator */}
+              {isRecordingVoice && !isTranscribing && (
+                <div className="mb-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[#7d3418] text-xs flex items-center justify-between animate-fade-in">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[11px] font-mono font-medium">
+                      {isWebSpeechRestricted ? 'ElevenLabs AI Transcriber Active' : 'Microphone listening live'}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono opacity-70">
+                    {audioVolume > 8 ? 'Speech detected' : 'Listening...'}
                   </span>
                 </div>
               )}

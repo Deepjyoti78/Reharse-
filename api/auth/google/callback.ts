@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'rehearse-dev-super-secure-jwt-key-2026-local-dev';
 
 export default async function handler(req: any, res: any) {
-  const { code, state, error: oauthError } = req.query || {};
+  const { code, error: oauthError } = req.query || {};
 
   const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
   const proto = req.headers['x-forwarded-proto'] || 'https';

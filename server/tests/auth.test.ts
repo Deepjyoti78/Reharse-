@@ -1,13 +1,10 @@
 import assert from 'assert';
-import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import {
-  findUserById,
   findUserByEmail,
   findUserByProviderIdentity,
   createUserWithIdentity,
   linkIdentityToUser,
-  updateUserLastLogin,
   saveOAuthState,
   consumeOAuthState,
 } from '../db/users';
@@ -17,8 +14,6 @@ import {
   generateRandomString,
   generateCodeChallenge,
 } from '../services/session';
-import { createGoogleAuthUrl } from '../services/googleOAuth';
-import { createGitHubAuthUrl } from '../services/githubOAuth';
 
 async function runTests() {
   console.log('--- Starting Rehearse Authentication Test Suite ---');
@@ -168,7 +163,7 @@ async function runTests() {
   await test('Generates, signs, and verifies JWT session token with user claims', async () => {
     const testUser = findUserByEmail('demo@rehearse.ai') || createUserWithIdentity(
       { name: 'Demo Test', email: `session_${Date.now()}@rehearse.ai` },
-      { provider: 'email', providerUserId: 'dummy' }
+      { provider: 'email', providerUserId: `dummy_${Date.now()}_${Math.random()}` }
     );
 
     const token = createSessionToken(testUser);

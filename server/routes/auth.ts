@@ -318,7 +318,6 @@ authRouter.get('/google/callback', async (req: Request, res: Response) => {
     const token = createSessionToken(user);
     setSessionCookie(res, token);
 
-    const userJson = encodeURIComponent(JSON.stringify(formatUserResponse(user)));
     let redirectUrl: URL;
     try {
       redirectUrl = destination && destination.startsWith('http')
